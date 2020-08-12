@@ -1,5 +1,7 @@
 = OpenShift4 Logging
 
 openshift4-logging is a Commodore component to manage OpenShift4 Logging.
+It installs the https://github.com/openshift/cluster-logging-operator[cluster logging operator] and the corresponding `ClusterLogging` instance.
+
 
 See the xref:references/parameters.adoc[parameters] reference for further details.

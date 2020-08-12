@@ -1,3 +1,42 @@
 parameters:
   openshift4_logging:
     namespace: openshift-logging
+    channel: '4.5'
+    clusterLogging:
+      managementState: Managed
+      logStore:
+        type: elasticsearch
+        elasticsearch:
+          nodeCount: 3
+          storage:
+            size: 200Gi
+          redundancyPolicy: SingleRedundancy
+          nodeSelector:
+            node-role.kubernetes.io/infra: ''
+        retentionPolicy:
+          application:
+            maxAge: 7d
+          infra:
+            maxAge: 30d
+          audit:
+            maxAge: 30d
+      curation:
+        type: curator
+        curator:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ''
+          schedule: 30 3 * * *
+      visualization:
+        type: kibana
+        kibana:
+          replicas: 2
+          nodeSelector:
+            node-role.kubernetes.io/infra: ''
+      collection:
+        logs:
+          type: fluentd
+          fluentd: {}
+
+  openshift4_elasticsearch_operator:
+    targetNamespaces:
+      - ${openshift4_logging:namespace}
