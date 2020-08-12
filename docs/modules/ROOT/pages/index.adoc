@@ -1,0 +1,5 @@
+= OpenShift4 Logging
+
+openshift4-logging is a Commodore component to manage OpenShift4 Logging.
+
+See the xref:references/parameters.adoc[parameters] reference for further details.

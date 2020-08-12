@@ -1,0 +1,3 @@
+parameters:
+  openshift4_logging:
+    namespace: openshift-logging

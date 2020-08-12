@@ -1,0 +1,6 @@
+name: openshift4-logging
+title: OpenShift4 Logging
+version: master
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/partials/nav.adoc
