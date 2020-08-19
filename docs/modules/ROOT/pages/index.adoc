@@ -5,3 +5,16 @@ It installs the https://github.com/openshift/cluster-logging-operator[cluster lo
 
 
 See the xref:references/parameters.adoc[parameters] reference for further details.
+
+== Node Selector
+
+This components assumes dedicated _infra_ nodes are used.
+The component further assumes the existence of an _app_ node role.
+The main workload is configured to run on _infra_ nodes.
+Collection of logs will take place on all nodes (worker and master).
+
+[IMPORTANT]
+====
+Ensure that the target cluster does have nodes with the _infra_ role label set.
+See the components defaults for the exact value.
+====
