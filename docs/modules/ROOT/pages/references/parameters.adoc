@@ -2,18 +2,47 @@
 
 The parent key for all of the following parameters is `openshift4_logging`.
 
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift docs] for details.
+
+
 == `namespace`
 
 [horizontal]
 type:: string
 default:: `openshift-logging`
 
-The namespace in which to deploy this component.
+The namespace in which to install the operator.
+
+
+== `channel`
+
+[horizontal]
+type:: string
+default:: `4.5`
+
+Channel of the operator subscription to use.
+
+
+== `clusterLogging`
+
+[horizontal]
+type:: dictionary
+default:: see `defaults.yml`
+
+A dictionary holding the `.spec` for cluster logging.
+
+See the https://docs.openshift.com/container-platform/latest/logging/config/cluster-logging-configuring-cr.html[OpenShift docs] for available parameters.
 
 
 == Example
 
 [source,yaml]
 ----
-namespace: example-namespace
+clusterLogging:
+  logStore:
+    retentionPolicy:
+      application:
+        maxAge: 15d
+    elasticsearch:
+      nodeCount: 5
 ----
