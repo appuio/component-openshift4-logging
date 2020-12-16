@@ -81,4 +81,33 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       },
     },
   } for role in ['master', 'worker']],
+  '50_kubelet_env_config': [kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '50-' + role + '-kubelet-env-config') {
+    metadata+: {
+      labels+: {
+        'machineconfiguration.openshift.io/role': role,
+      },
+    },
+    spec: {
+      config: {
+        ignition: {
+          version: '2.2.0',
+        },
+        storage: {
+          files: [
+            {
+              contents: {
+                // See https://access.redhat.com/solutions/4619431
+                source: 'data:text/plain;charset=utf-8;base64,' + std.base64(|||
+                  KUBELET_LOG_LEVEL=params.kubelet_loglevel
+                |||),
+              },
+              filesystem: 'root',
+              mode: 420,
+              path: '/etc/kubernetes/kubelet-env',
+            },
+          ],
+        },
+      },
+    },
+  } for role in ['master', 'worker']],
 }

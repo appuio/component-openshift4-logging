@@ -2,6 +2,7 @@ parameters:
   openshift4_logging:
     namespace: openshift-logging
     channel: '4.5'
+    kubelet_loglevel: 2
     clusterLogging:
       managementState: Managed
       logStore:

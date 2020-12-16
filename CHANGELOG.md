@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial implementation ([#1])
+- Ability to configure kubelet loglevel ([#2])
 
 [Unreleased]: https://github.com/appuio/component-openshift4-logging/compare/1eb1205088953592c6dbf82fe98662debe68571e...HEAD
 
 [#1]: https://github.com/appuio/component-openshift4-logging/pull/1
+[#2]: https://github.com/appuio/component-openshift4-logging/pull/2
