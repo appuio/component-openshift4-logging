@@ -18,9 +18,12 @@ The namespace in which to install the operator.
 
 [horizontal]
 type:: string
-default:: `4.5`
+default:: `stable`
 
 Channel of the operator subscription to use.
+In OpenShift 4.7 Red Hat introduced an OpenShift version independent logging stack starting with the version 5.0.
+Since version 5.1 there are two channels stable and stable-5.x.
+Choosing the stable channel allows never have to care about the interoperability as the specific OpenShift version delivers the right version via the operator marketplace.
 
 
 == `clusterLogging`
