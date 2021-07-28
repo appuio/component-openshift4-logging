@@ -25,6 +25,8 @@ In OpenShift 4.7 Red Hat introduced an OpenShift version independent logging sta
 Since version 5.1 there are two channels stable and stable-5.x.
 Choosing the stable channel allows never have to care about the interoperability as the specific OpenShift version delivers the right version via the operator marketplace.
 
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
+
 
 == `clusterLogging`
 
