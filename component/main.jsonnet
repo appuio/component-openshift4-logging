@@ -27,7 +27,7 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       ],
     },
   },
-  '20_subscriptions': [kube._Object(group + 'v1alpha1', 'Subscription', name) {
+  '20_subscriptions': [ kube._Object(group + 'v1alpha1', 'Subscription', name) {
     metadata+: {
       namespace: params.namespace,
     },
@@ -38,7 +38,7 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       source: 'redhat-operators',
       sourceNamespace: 'openshift-marketplace',
     },
-  } for name in ['elasticsearch-operator', 'cluster-logging']],
+  } for name in [ 'elasticsearch-operator', 'cluster-logging' ] ],
   '30_cluster_logging': kube._Object(clusterLoggingGroupVersion, 'ClusterLogging', 'instance') {
     metadata+: {
       namespace: params.namespace,
@@ -48,7 +48,7 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
     },
     spec: params.clusterLogging,
   },
-  '40_journald_configs': [kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
+  '40_journald_configs': [ kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
     metadata+: {
       labels+: {
         'machineconfiguration.openshift.io/role': role,
@@ -80,5 +80,5 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
         },
       },
     },
-  } for role in ['master', 'worker']],
+  } for role in [ 'master', 'worker' ] ],
 }
