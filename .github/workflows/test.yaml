@@ -4,6 +4,9 @@ on:
     branches:
       - master
 
+env:
+  COMPONENT_NAME: openshift4-logging
+
 jobs:
   linting:
     runs-on: ubuntu-latest
@@ -12,8 +15,15 @@ jobs:
         command:
           - lint_jsonnet
           - lint_yaml
-          - docs
+          - lint_adoc
     steps:
       - uses: actions/checkout@v2
       - name: Run ${{ matrix.command }}
         run: make ${{ matrix.command }}
+  editorconfig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: snow-actions/eclint@v1.0.1
+        with:
+          args: 'check'
