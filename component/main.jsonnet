@@ -83,4 +83,36 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       },
     },
   } for role in [ 'master', 'worker' ] ],
+  '50_networkpolicy':
+    // Allow cluster-scoped ES operator to access ES pods in openshift-logging
+    kube._Object('networking.k8s.io/v1', 'NetworkPolicy', 'allow-from-openshift-operators-redhat')
+    {
+      metadata+: {
+        namespace: params.namespace,
+      },
+      spec: {
+        ingress: [
+          {
+            from: [
+              {
+                namespaceSelector: {
+                  matchLabels: {
+                    name: 'openshift-operators-redhat',
+                  },
+                },
+              },
+              {
+                podSelector: {
+                  matchLabels: {
+                    name: 'elasticsearch-operator',
+                  },
+                },
+              },
+            ],
+          },
+        ],
+        podSelector: {},
+        policyTypes: [ 'Ingress' ],
+      },
+    },
 }
