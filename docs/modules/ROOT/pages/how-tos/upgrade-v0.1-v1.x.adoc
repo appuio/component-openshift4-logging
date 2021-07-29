@@ -1,0 +1,71 @@
+= Upgrade from v0.1.0 to v1.x
+
+== Steps
+
+[TIP]
+====
+We recommend creating an empty directory to follow this how-to.
+Following the how-to in an empty directory ensures that running Commodore doesn't accidentally delete existing files.
+
+[source,bash]
+----
+workdir=$(mktemp -d)
+pushd "${workdir}"
+----
+====
+
+. Make a note of the cluster and tenant IDs
++
+[source,bash]
+----
+export CLUSTER_ID=c-the-cluster-1234 <1>
+export TENANT_ID=t-the-tenant-1234 <2>
+----
+<1> Replace with the cluster ID of the cluster to update
+<2> Replace with the tenant ID of the cluster's tenant
+
+. Make a note of the latest v1.x version
++
+[source,bash]
+----
+export V1X=v1.0.0 <1>
+----
+<1> Replace with the latest v1.x release published on https://github.com/appuio/component-openshift4-logging/releases[GitHub].
+
+. Compile cluster catalog to create a local working directory to make the changes
++
+[source,bash]
+----
+commodore catalog compile "${CLUSTER_ID}"
+----
+
+. Configure `openshift4-operators` instance `openshift-operators-redhat`
++
+.c-cluster-id.yml
+[source,bash]
+----
+yq eval -i '.applications += ["openshift4-operators as openshift-operators-redhat"]' \
+  "inventory/classes/${TENANT_ID}/${CLUSTER_ID}.yml"
+----
+
+. Upgrade `openshift4-logging` to `v1.0.0`
++
+[source,bash]
+----
+yq eval -i ".parameters.components.openshift4-logging.version = \"${V1X}\"" \
+  "inventory/classes/${TENANT_ID}/${CLUSTER_ID}.yml"
+----
+
+. Commit and push changes to cluster config
++
+[source,bash]
+----
+(cd "inventory/classes/${TENANT_ID}" && git commit -av && git push origin master)
+----
+
+. Compile and push cluster catalog
++
+[source,bash]
+----
+commodore catalog compile --push -i "${CLUSTER_ID}"
+----
