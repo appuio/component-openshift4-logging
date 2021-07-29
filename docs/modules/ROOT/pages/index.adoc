@@ -3,6 +3,7 @@
 openshift4-logging is a Commodore component to manage OpenShift4 Logging.
 It installs the https://github.com/openshift/cluster-logging-operator[cluster logging operator] and the corresponding `ClusterLogging` instance.
 
+The component depends on component xref:openshift4-operators:ROOT:index.adoc[openshift4-operators] to manage the cluster-scoped subscription for the official RedHat Elasticsearch Operator.
 
 See the xref:references/parameters.adoc[parameters] reference for further details.
 

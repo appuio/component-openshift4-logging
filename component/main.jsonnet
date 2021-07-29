@@ -1,5 +1,6 @@
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
+local operatorlib = import 'lib/openshift4-operators.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
@@ -17,7 +18,7 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       },
     },
   },
-  '10_operator_group': kube._Object(group + 'v1', 'OperatorGroup', 'cluster-logging') {
+  '10_operator_group': operatorlib.OperatorGroup('cluster-logging') {
     metadata+: {
       namespace: params.namespace,
     },
@@ -27,18 +28,19 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       ],
     },
   },
-  '20_subscriptions': [ kube._Object(group + 'v1alpha1', 'Subscription', name) {
-    metadata+: {
-      namespace: params.namespace,
-    },
-    spec: {
-      channel: params.channel,
-      installPlanApproval: 'Automatic',
-      name: name,
-      source: 'redhat-operators',
-      sourceNamespace: 'openshift-marketplace',
-    },
-  } for name in [ 'elasticsearch-operator', 'cluster-logging' ] ],
+  '20_subscriptions': [
+    operatorlib.managedSubscription(
+      'openshift-operators-redhat',
+      'elasticsearch-operator',
+      params.channel
+    ),
+    operatorlib.namespacedSubscription(
+      params.namespace,
+      'cluster-logging',
+      params.channel,
+      'redhat-operators'
+    ),
+  ],
   '30_cluster_logging': kube._Object(clusterLoggingGroupVersion, 'ClusterLogging', 'instance') {
     metadata+: {
       namespace: params.namespace,
@@ -81,4 +83,36 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       },
     },
   } for role in [ 'master', 'worker' ] ],
+  '50_networkpolicy':
+    // Allow cluster-scoped ES operator to access ES pods in openshift-logging
+    kube._Object('networking.k8s.io/v1', 'NetworkPolicy', 'allow-from-openshift-operators-redhat')
+    {
+      metadata+: {
+        namespace: params.namespace,
+      },
+      spec: {
+        ingress: [
+          {
+            from: [
+              {
+                namespaceSelector: {
+                  matchLabels: {
+                    name: 'openshift-operators-redhat',
+                  },
+                },
+              },
+              {
+                podSelector: {
+                  matchLabels: {
+                    name: 'elasticsearch-operator',
+                  },
+                },
+              },
+            ],
+          },
+        ],
+        podSelector: {},
+        policyTypes: [ 'Ingress' ],
+      },
+    },
 }
