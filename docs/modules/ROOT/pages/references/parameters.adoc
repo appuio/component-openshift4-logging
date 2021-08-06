@@ -75,7 +75,7 @@ clusterLogging:
       nodeCount: 5
 
 clusterLogForwarding:
-  enabled: true
+  enabled: false
   spec:
     outputs:
       - name: splunk-forwarder
