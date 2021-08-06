@@ -39,6 +39,23 @@ A dictionary holding the `.spec` for cluster logging.
 See the https://docs.openshift.com/container-platform/latest/logging/config/cluster-logging-configuring-cr.html[OpenShift docs] for available parameters.
 
 
+== `clusterLogForwarder`
+
+[horizontal]
+type:: dictionary
+default:: see `defaults.yml`
+
+A dictionary holding the `.spec.outputs`, `.spec.inputs` and `.spec.pipelines` for log forwarding.
+
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
+
+=== `clusterLogForwarder.enable`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+
 == Example
 
 [source,yaml]

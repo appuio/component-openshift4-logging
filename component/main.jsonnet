@@ -50,6 +50,16 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
     },
     spec: params.clusterLogging,
   },
+  [if params.clusterLogForwarding.enable then '31_cluster_logforwarding']: kube._Object(clusterLoggingGroupVersion, 'ClusterLogForwarder', 'instance') {
+    metadata+: {
+      namespace: params.namespace,
+    },
+    spec: {
+      [if std.length(params.clusterLogForwarding.outputs) > 0 then 'outputs']: params.clusterLogForwarding.outputs,
+      [if std.length(params.clusterLogForwarding.inputs) > 0 then 'inputs']: params.clusterLogForwarding.inputs,
+      [if std.length(params.clusterLogForwarding.pipelines) > 0 then 'pipelines']: params.clusterLogForwarding.pipelines,
+    },
+  },
   '40_journald_configs': [ kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
     metadata+: {
       labels+: {
