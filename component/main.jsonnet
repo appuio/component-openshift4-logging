@@ -50,7 +50,7 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
     },
     spec: params.clusterLogging,
   },
-  [if params.clusterLogForwarding.enable then '31_cluster_logforwarding']: kube._Object(clusterLoggingGroupVersion, 'ClusterLogForwarder', 'instance') {
+  [if params.clusterLogForwarding.enabled then '31_cluster_logforwarding']: kube._Object(clusterLoggingGroupVersion, 'ClusterLogForwarder', 'instance') {
     metadata+: {
       namespace: params.namespace,
     },
