@@ -49,11 +49,25 @@ A dictionary holding the `.spec.outputs`, `.spec.inputs` and `.spec.pipelines` f
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
 
-=== `clusterLogForwarder.enable`
+=== `clusterLogForwarder.enabled`
 
 [horizontal]
 type:: boolean
 default:: `false`
+
+Enables log forwarding for the cluster.
+
+=== `clusterLogForwarder.spec`
+
+[horizontal]
+type:: dictionary
+default:: see `defaults.yml`
+
+A dictionary holding the `.spec` for log forwarding.
+
+The default configuration ensures, that all the logs are still forwarded to the internal elasticsearch. If adding a log forwarder to the config, make sure that all logs are still getting sent to the internal elastic serach (copy the default pipelines, see example).
+
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
 
 
 == Example
@@ -67,4 +81,40 @@ clusterLogging:
         maxAge: 15d
     elasticsearch:
       nodeCount: 5
+
+clusterLogForwarding:
+  enabled: true
+  spec:
+    outputs:
+      - name: splunk-forwarder
+        secret:
+          name: splunk-forwarder
+        type: fluentdForward
+        url: tls://splunk-forwarder:24224
+    inputs:
+      - name: my-app
+        application:
+          namespaces:
+            - my-project
+    pipelines:
+      - name: audit-logs
+        inputRefs:
+          - audit
+        outputRefs:
+          - default
+      - name: infrastructure-logs
+        inputRefs:
+          - infrastructure
+        outputRefs:
+          - default
+      - name: application-logs
+        inputRefs:
+          - application
+        outputRefs:
+          - default
+      - name: my-app-logs
+        inputRefs:
+          - my-app
+        outputRefs:
+          - splunk-forwarder
 ----

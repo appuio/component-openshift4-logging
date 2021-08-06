@@ -38,25 +38,24 @@ parameters:
           fluentd: {}
 
     clusterLogForwarding:
-      enable: false
-      outputs: []
-      inputs: []
-      pipelines:
-        - name: audit-logs
-          inputRefs:
-            - audit
-          outputRefs:
-            - default
-        - name: infrastructure-logs
-          inputRefs:
-            - infrastructure
-          outputRefs:
-            - default
-        - name: application-logs
-          inputRefs:
-            - application
-          outputRefs:
-            - default
+      enabled: false
+      spec:
+        pipelines:
+          - name: audit-logs
+            inputRefs:
+              - audit
+            outputRefs:
+              - default
+          - name: infrastructure-logs
+            inputRefs:
+              - infrastructure
+            outputRefs:
+              - default
+          - name: application-logs
+            inputRefs:
+              - application
+            outputRefs:
+              - default
 
   openshift4_elasticsearch_operator:
     targetNamespaces:
