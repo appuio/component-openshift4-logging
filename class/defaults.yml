@@ -44,19 +44,19 @@ parameters:
       pipelines:
         - name: audit-logs
           inputRefs:
-          - audit
+            - audit
           outputRefs:
-          - default
+            - default
         - name: infrastructure-logs
           inputRefs:
-          - infrastructure
+            - infrastructure
           outputRefs:
-          - default
+            - default
         - name: application-logs
           inputRefs:
-          - application
+            - application
           outputRefs:
-          - default
+            - default
 
   openshift4_elasticsearch_operator:
     targetNamespaces:
