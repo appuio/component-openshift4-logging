@@ -1,6 +1,8 @@
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local operatorlib = import 'lib/openshift4-operators.libsonnet';
+local com = import 'lib/commodore.libjsonnet';
+
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
@@ -54,7 +56,25 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
     metadata+: {
       namespace: params.namespace,
     },
-    spec: params.clusterLogForwarding.spec,
+    spec: params.clusterLogForwarding.spec + com.makeMergeable({
+      pipelines: [
+        {
+          name: 'audit-logs',
+          inputRefs: ['audit'],
+          outputRefs: ['default'],
+        },
+        {
+          name: 'infrastructure-logs',
+          inputRefs: ['infrastructure'],
+          outputRefs: ['default'],
+        },
+        {
+          name: 'application-logs',
+          inputRefs: ['application'],
+          outputRefs: ['default'],
+        },
+      ]
+    })
   },
   '40_journald_configs': [ kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
     metadata+: {

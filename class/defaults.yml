@@ -39,23 +39,7 @@ parameters:
 
     clusterLogForwarding:
       enabled: false
-      spec:
-        pipelines:
-          - name: audit-logs
-            inputRefs:
-              - audit
-            outputRefs:
-              - default
-          - name: infrastructure-logs
-            inputRefs:
-              - infrastructure
-            outputRefs:
-              - default
-          - name: application-logs
-            inputRefs:
-              - application
-            outputRefs:
-              - default
+      spec: {}
 
   openshift4_elasticsearch_operator:
     targetNamespaces:

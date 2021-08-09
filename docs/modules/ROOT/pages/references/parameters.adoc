@@ -39,9 +39,9 @@ A dictionary holding the `.spec` for cluster logging.
 See the https://docs.openshift.com/container-platform/latest/logging/config/cluster-logging-configuring-cr.html[OpenShift docs] for available parameters.
 
 
-== `clusterLogForwarder`
+== `clusterLogForwarding`
 
-=== `clusterLogForwarder.enabled`
+=== `clusterLogForwarding.enabled`
 
 [horizontal]
 type:: boolean
@@ -49,7 +49,7 @@ default:: `false`
 
 Enables log forwarding for the cluster.
 
-=== `clusterLogForwarder.spec`
+=== `clusterLogForwarding.spec`
 
 [horizontal]
 type:: dictionary
@@ -75,38 +75,22 @@ clusterLogging:
       nodeCount: 5
 
 clusterLogForwarding:
-  enabled: false
-  spec:
-    outputs:
-      - name: splunk-forwarder
-        secret:
-          name: splunk-forwarder
-        type: fluentdForward
-        url: tls://splunk-forwarder:24224
-    inputs:
-      - name: my-app
-        application:
-          namespaces:
-            - my-project
-    pipelines:
-      - name: audit-logs
-        inputRefs:
-          - audit
-        outputRefs:
-          - default
-      - name: infrastructure-logs
-        inputRefs:
-          - infrastructure
-        outputRefs:
-          - default
-      - name: application-logs
-        inputRefs:
-          - application
-        outputRefs:
-          - default
-      - name: my-app-logs
-        inputRefs:
-          - my-app
-        outputRefs:
-          - splunk-forwarder
+  enabled: true
+  outputs:
+    splunk-forwarder:
+      secret:
+        name: splunk-forwarder
+      type: fluentdForward
+      url: tls://splunk-forwarder:24224
+  inputs:
+    my-app:
+      application:
+        namespaces:
+          - my-project
+  pipelines:
+    my-app-logs:
+      inputRefs:
+        - my-app
+      outputRefs:
+        - splunk-forwarder
 ----
