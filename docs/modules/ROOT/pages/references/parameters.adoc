@@ -57,7 +57,7 @@ default:: see `defaults.yml`
 
 A dictionary holding the `.spec` for log forwarding.
 
-The default configuration ensures, that all the logs are still forwarded to the internal elasticsearch. If adding a log forwarder to the config, make sure that all logs are still getting sent to the internal elastic serach (copy the default pipelines, see example).
+Defaults for ensuring that (`audit`, `infra` and `application`) logs get forwarded to the internal elasticsearch are automatically added to the configuration. If you want to forward, e.g. the `infra` logs, to an external log aggregator just create a seperate pipeline for these logs under the `.spec` key (see example).
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
 
@@ -76,21 +76,27 @@ clusterLogging:
 
 clusterLogForwarding:
   enabled: true
-  outputs:
-    splunk-forwarder:
-      secret:
-        name: splunk-forwarder
-      type: fluentdForward
-      url: tls://splunk-forwarder:24224
-  inputs:
-    my-app:
-      application:
-        namespaces:
-          - my-project
-  pipelines:
-    my-app-logs:
-      inputRefs:
-        - my-app
-      outputRefs:
-        - splunk-forwarder
+  spec:
+    outputs:
+      - name: splunk-forwarder
+        secret:
+          name: splunk-forwarder
+        type: fluentdForward
+        url: tls://splunk-forwarder:24224
+    inputs:
+      - name: my-app
+        application:
+          namespaces:
+            - my-project
+    pipelines:
+      - name: my-app-logs:
+        inputRefs:
+          - my-app
+        outputRefs:
+          - splunk-forwarder
+      - name: infra-logs-external
+        inputRefs:
+          - infrastructure
+        outputRefs:
+          - splunk-forwarder
 ----
