@@ -57,7 +57,7 @@ default:: see `defaults.yml`
 
 A dictionary holding the `.spec` for log forwarding.
 
-Defaults for ensuring that (`audit`, `infra` and `application`) logs get forwarded to the internal elasticsearch are automatically added to the configuration. If you want to forward, e.g. the `infra` logs, to an external log aggregator just create a seperate pipeline for these logs under the `.spec` key (see example).
+Defaults for ensuring that (`audit`, `infra` and `application`) logs get forwarded to the internal elasticsearch are automatically added to the configuration. If you want to forward, for example, the `infra` logs to an external log aggregator just create a seperate pipeline for these logs under the `.spec` key (see example).
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
 
