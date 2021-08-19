@@ -1,7 +1,7 @@
+local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local operatorlib = import 'lib/openshift4-operators.libsonnet';
-local com = import 'lib/commodore.libjsonnet';
 
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
@@ -56,25 +56,47 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
     metadata+: {
       namespace: params.namespace,
     },
-    spec: params.clusterLogForwarding.spec + com.makeMergeable({
+    spec: {
+      [if std.length(params.clusterLogForwarding.forwarders) > 0 then 'outputs']: [
+        params.clusterLogForwarding.forwarders[fw] { name: fw }
+        for fw in std.objectFields(params.clusterLogForwarding.forwarders)
+      ],
+      [if std.length(params.clusterLogForwarding.namespaces) > 0 then 'inputs']: [
+        {
+          name: ns,
+          application: {
+            namespaces: [ ns ],
+          },
+        }
+        for ns in std.objectFields(params.clusterLogForwarding.namespaces)
+      ],
+      [if std.length(params.clusterLogForwarding.namespaces) > 0 then 'pipelines']: [
+        {
+          name: ns,
+          inputRefs: [ ns ],
+          outputRefs: [ params.clusterLogForwarding.namespaces[ns].forwarder ],
+        }
+        for ns in std.objectFields(params.clusterLogForwarding.namespaces)
+      ],
+    } + com.makeMergeable({
       pipelines: [
         {
           name: 'audit-logs',
-          inputRefs: ['audit'],
-          outputRefs: ['default'],
+          inputRefs: [ 'audit' ],
+          outputRefs: [ 'default' ],
         },
         {
           name: 'infrastructure-logs',
-          inputRefs: ['infrastructure'],
-          outputRefs: ['default'],
+          inputRefs: [ 'infrastructure' ],
+          outputRefs: [ 'default' ],
         },
         {
           name: 'application-logs',
-          inputRefs: ['application'],
-          outputRefs: ['default'],
+          inputRefs: [ 'application' ],
+          outputRefs: [ 'default' ],
         },
-      ]
-    })
+      ],
+    }),
   },
   '40_journald_configs': [ kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
     metadata+: {

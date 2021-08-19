@@ -39,7 +39,8 @@ parameters:
 
     clusterLogForwarding:
       enabled: false
-      spec: {}
+      forwarders: {}
+      namespaces: {}
 
   openshift4_elasticsearch_operator:
     targetNamespaces:

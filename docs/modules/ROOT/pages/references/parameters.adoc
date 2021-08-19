@@ -49,17 +49,34 @@ default:: `false`
 
 Enables log forwarding for the cluster.
 
-=== `clusterLogForwarding.spec`
+=== `clusterLogForwarding.forwarders`
 
 [horizontal]
 type:: dictionary
-default:: see `defaults.yml`
+default:: {}
 
-A dictionary holding the `.spec` for log forwarding.
-
-Defaults for ensuring that (`audit`, `infra` and `application`) logs get forwarded to the internal elasticsearch are automatically added to the configuration. If you want to forward, for example, the `infra` logs to an external log aggregator just create a seperate pipeline for these logs under the `.spec` key (see example).
+Each key in this dictionary holds the parameters for an `.spec.outputs` object.
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
+
+=== `clusterLogForwarding.namespaces`
+
+[horizontal]
+type:: dictionary
+default:: {}
+
+Customization for the logging of a specified namespace.
+
+[source,yaml]
+----
+clusterLogging:
+  namespaces:
+    my-project: <1>
+      forwarder: splunk-forwarder <2>
+----
+
+<1> Namespace to configure.
+<2> Name of the forwarder defined in `clusterLogForwarding.forwarder`.
 
 
 == Example
@@ -76,27 +93,13 @@ clusterLogging:
 
 clusterLogForwarding:
   enabled: true
-  spec:
-    outputs:
-      - name: splunk-forwarder
-        secret:
-          name: splunk-forwarder
-        type: fluentdForward
-        url: tls://splunk-forwarder:24224
-    inputs:
-      - name: my-app
-        application:
-          namespaces:
-            - my-project
-    pipelines:
-      - name: my-app-logs:
-        inputRefs:
-          - my-app
-        outputRefs:
-          - splunk-forwarder
-      - name: infra-logs-external
-        inputRefs:
-          - infrastructure
-        outputRefs:
-          - splunk-forwarder
+  forwarders:
+    splunk-forwarder:
+      secret:
+        name: splunk-forwarder
+      type: fluentdForward
+      url: tls://splunk-forwarder:24224
+  namespaces:
+    my-project:
+      forwarder: splunk-forwarder
 ----
