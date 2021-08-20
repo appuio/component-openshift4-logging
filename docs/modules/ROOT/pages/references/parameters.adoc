@@ -39,6 +39,46 @@ A dictionary holding the `.spec` for cluster logging.
 See the https://docs.openshift.com/container-platform/latest/logging/config/cluster-logging-configuring-cr.html[OpenShift docs] for available parameters.
 
 
+== `clusterLogForwarding`
+
+=== `clusterLogForwarding.enabled`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+Enables log forwarding for the cluster.
+
+=== `clusterLogForwarding.forwarders`
+
+[horizontal]
+type:: dictionary
+default:: {}
+
+Each key in this dictionary holds the parameters for an `.spec.outputs` object.
+
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
+
+=== `clusterLogForwarding.namespaces`
+
+[horizontal]
+type:: dictionary
+default:: {}
+
+Customization for the logging of a specified namespace.
+
+[source,yaml]
+----
+clusterLogging:
+  namespaces:
+    my-project: <1>
+      forwarder: splunk-forwarder <2>
+----
+
+<1> Namespace to configure.
+<2> Name of the forwarder defined in `clusterLogForwarding.forwarder`.
+
+
 == Example
 
 [source,yaml]
@@ -50,4 +90,16 @@ clusterLogging:
         maxAge: 15d
     elasticsearch:
       nodeCount: 5
+
+clusterLogForwarding:
+  enabled: true
+  forwarders:
+    splunk-forwarder:
+      secret:
+        name: splunk-forwarder
+      type: fluentdForward
+      url: tls://splunk-forwarder:24224
+  namespaces:
+    my-project:
+      forwarder: splunk-forwarder
 ----

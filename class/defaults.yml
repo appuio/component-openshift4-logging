@@ -37,6 +37,11 @@ parameters:
           type: fluentd
           fluentd: {}
 
+    clusterLogForwarding:
+      enabled: false
+      forwarders: {}
+      namespaces: {}
+
   openshift4_elasticsearch_operator:
     targetNamespaces:
       - ${openshift4_logging:namespace}
