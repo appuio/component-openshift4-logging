@@ -57,6 +57,12 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
       namespace: params.namespace,
     },
     spec: {
+      [if params.clusterLogForwarding.json.enabled then 'outputDefaults']: {
+        elasticsearch: {
+          structuredTypeKey: params.clusterLogForwarding.json.typekey,
+          structuredTypeName: params.clusterLogForwarding.json.typename,
+        },
+      },
       [if std.length(params.clusterLogForwarding.forwarders) > 0 then 'outputs']: [
         params.clusterLogForwarding.forwarders[fw] { name: fw }
         for fw in std.objectFields(params.clusterLogForwarding.forwarders)
@@ -94,6 +100,7 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
           name: 'application-logs',
           inputRefs: [ 'application' ],
           outputRefs: [ 'default' ],
+          [if params.clusterLogForwarding.json.enabled then 'parse']: 'json',
         },
       ],
     }),

@@ -41,6 +41,10 @@ parameters:
       enabled: false
       forwarders: {}
       namespaces: {}
+      json:
+        enabled: false
+        typekey: 'kubernetes.labels.logFormat'
+        typename: 'nologformat'
 
   openshift4_elasticsearch_operator:
     targetNamespaces:
