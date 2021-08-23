@@ -68,8 +68,7 @@ default:: {}
 Customization for the logging of a specified namespace.
 
 [source,yaml]
-----
-clusterLogging:
+clusterLogForwarding:
   namespaces:
     my-project: <1>
       forwarder: splunk-forwarder <2>
@@ -77,6 +76,29 @@ clusterLogging:
 
 <1> Namespace to configure.
 <2> Name of the forwarder defined in `clusterLogForwarding.forwarder`.
+
+=== `clusterLogForwarding.json`
+
+[horizontal]
+type:: dictionary
+default:: see below
+
+If `json.enabled` is set to `true` the logging stack attempts to parse log messages to the JSON format.
+
+[source,yaml]
+----
+clusterLogForwarding:
+  json:
+    enabled: false <1>
+    typekey: 'kubernetes.labels.logFormat' <2>
+    typename: 'nologformat' <3>
+----
+
+<1> By default JSON parsing is disabled.
+<2> The value of that field, if present, is used to construct the index name.
+<3> If `typekey` isn't set or its key isn't present, the value of this field is used to construct the index name.
+
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-enabling-json-logging.html#cluster-logging-configuration-of-json-log-data-for-default-elasticsearch_cluster-logging-enabling-json-logging[OpenShift docs] for a detailed explanation.
 
 
 == Example
@@ -102,4 +124,6 @@ clusterLogForwarding:
   namespaces:
     my-project:
       forwarder: splunk-forwarder
+  json:
+    enabled: true
 ----
