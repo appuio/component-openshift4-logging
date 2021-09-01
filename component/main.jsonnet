@@ -87,11 +87,6 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
     } + com.makeMergeable({
       pipelines: [
         {
-          name: 'audit-logs',
-          inputRefs: [ 'audit' ],
-          outputRefs: [ 'default' ],
-        },
-        {
           name: 'infrastructure-logs',
           inputRefs: [ 'infrastructure' ],
           outputRefs: [ 'default' ],
