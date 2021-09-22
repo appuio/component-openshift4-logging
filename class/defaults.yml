@@ -2,6 +2,8 @@ parameters:
   openshift4_logging:
     namespace: openshift-logging
     channel: 'stable'
+    alerts: 'master'
+    ignore_alerts: []
     clusterLogging:
       managementState: Managed
       logStore:

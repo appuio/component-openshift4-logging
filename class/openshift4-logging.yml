@@ -1,5 +1,9 @@
 parameters:
   kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/openshift/cluster-logging-operator/${openshift4_logging:alerts}/files/fluentd/fluentd_prometheus_alerts.yaml
+        output_path: dependencies/openshift4-logging/manifests/${openshift4_logging:alerts}/fluentd_prometheus_alerts.yaml
     compile:
       - input_paths:
           - openshift4-logging/component/app.jsonnet
