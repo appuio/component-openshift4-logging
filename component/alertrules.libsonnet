@@ -70,16 +70,12 @@ local filter_patch_rules(g) =
       // Patch rules to make sure they match the requirements.
       function(rule)
         local rulepatch = com.getValueOrDefault(patch_alerts, rule.alert, {});
-        //        local runbook_url = runbook(rule.alert);
         rule {
           // Change alert names so we don't get multiple alerts with the same
           // name, as the logging operator deploys its own copy of these
           // rules.
           alert: 'SYN_%s' % super.alert,
           labels+: {
-            // ensure the alerts are not silenced on OCP4
-            // TODO: figure out how to ensure we don't get duplicate alerts on
-            // not-OCP4
             syn: 'true',
             // mark alert as belonging to openshift4-logging
             // can be used for inhibition rules
@@ -102,8 +98,6 @@ local filter_patch_rules(g) =
 
 /* TO HERE */
 
-local additional_rules = [];
-
 {
   rules: kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-logging-rules') {
     metadata+: {
@@ -117,7 +111,7 @@ local additional_rules = [];
           if std.length(r.rules) > 0 then r
           for g in std.parseJson(kap.yaml_load_stream('openshift4-logging/manifests/%s/fluentd_prometheus_alerts.yaml' % [ params.alerts ]))[0].groups
         ]
-      ) + additional_rules,
+      ),
     },
   },
 }
