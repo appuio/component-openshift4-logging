@@ -9,6 +9,8 @@ local params = inv.parameters.openshift4_logging;
 local group = 'operators.coreos.com/';
 local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 
+local alert_rules = import 'alertrules.libsonnet';
+
 {
   '00_namespace': kube.Namespace(params.namespace) {
     metadata+: {
@@ -165,4 +167,5 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
         policyTypes: [ 'Ingress' ],
       },
     },
+  '60_prometheus_rules': alert_rules.rules,
 }

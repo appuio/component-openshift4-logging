@@ -27,6 +27,23 @@ Choosing the stable channel allows never have to care about the interoperability
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
 
+== `alerts`
+
+[horizontal]
+type:: string
+default:: `master`
+
+Release version of the alerting rules.
+Should be adjusted according to the channel: If you specify `channel: stable-5.2` use `alerts: release-5.2`.
+
+== `ignore_alerts`
+
+[horizontal]
+type:: list
+default:: []
+
+This parameter can be used to disable alerts provided by openshift cluster-logging-operator.
+The component supports removing entries in this parameter by providing the entry prefixed with `~`.
 
 == `clusterLogging`
 
