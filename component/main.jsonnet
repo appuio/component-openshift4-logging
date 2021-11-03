@@ -69,38 +69,43 @@ local alert_rules = import 'alertrules.libsonnet';
         params.clusterLogForwarding.forwarders[fw] { name: fw }
         for fw in std.objectFields(params.clusterLogForwarding.forwarders)
       ],
-      [if std.length(params.clusterLogForwarding.namespaces) > 0 then 'inputs']: [
+      [if std.length(params.clusterLogForwarding.namespace_groups) > 0 then 'inputs']: [
         {
-          name: ns,
+          name: group,
           application: {
-            namespaces: [ ns ],
+            namespaces: params.clusterLogForwarding.namespace_groups[group].namespaces,
           },
         }
-        for ns in std.objectFields(params.clusterLogForwarding.namespaces)
+        for group in std.objectFields(params.clusterLogForwarding.namespace_groups)
       ],
-      [if std.length(params.clusterLogForwarding.namespaces) > 0 then 'pipelines']: [
+      [if std.length(params.clusterLogForwarding.namespace_groups) > 0 then 'pipelines']: [
+        local enable_json = com.getValueOrDefault(params.clusterLogForwarding.namespace_groups[group], 'json', false);
+        local patch_json = { outputRefs: [ 'default' ], parse: 'json' };
         {
-          name: ns,
-          inputRefs: [ ns ],
-          outputRefs: [ params.clusterLogForwarding.namespaces[ns].forwarder ],
-        }
-        for ns in std.objectFields(params.clusterLogForwarding.namespaces)
+          name: group,
+          inputRefs: params.clusterLogForwarding.namespace_groups[group].namespaces,
+          outputRefs: com.getValueOrDefault(params.clusterLogForwarding.namespace_groups[group], 'forwarders', []),
+        } + com.makeMergeable(if enable_json then patch_json else {})
+        for group in std.objectFields(params.clusterLogForwarding.namespace_groups)
       ],
-    } + com.makeMergeable({
-      pipelines: [
-        {
-          name: 'infrastructure-logs',
-          inputRefs: [ 'infrastructure' ],
-          outputRefs: [ 'default' ],
-        },
-        {
-          name: 'application-logs',
-          inputRefs: [ 'application' ],
-          outputRefs: [ 'default' ],
-          [if params.clusterLogForwarding.json.enabled then 'parse']: 'json',
-        },
-      ],
-    }),
+    } + com.makeMergeable(
+      local enable_json = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'json', false);
+      {
+        pipelines: [
+          {
+            name: 'infrastructure-logs',
+            inputRefs: [ 'infrastructure' ],
+            outputRefs: [ 'default' ],
+          },
+          {
+            name: 'application-logs',
+            inputRefs: [ 'application' ],
+            outputRefs: com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'forwarders', []) + [ 'default' ],
+            [if enable_json then 'parse']: 'json',
+          },
+        ],
+      }
+    ),
   },
   '40_journald_configs': [ kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
     metadata+: {
