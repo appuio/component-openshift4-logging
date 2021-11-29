@@ -11,6 +11,19 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 
 local alert_rules = import 'alertrules.libsonnet';
 
+local namespace_groups = (
+  if std.objectHas(params.clusterLogForwarding, 'namespaces') then
+    {
+      [ns]: {
+        namespaces: [ ns ],
+        forwarders: [ params.clusterLogForwarding.namespaces[ns].forwarder ],
+      }
+      for ns in std.objectFields(params.clusterLogForwarding.namespaces)
+    }
+  else
+    {}
+) + params.clusterLogForwarding.namespace_groups;
+
 {
   '00_namespace': kube.Namespace(params.namespace) {
     metadata+: {
@@ -69,27 +82,24 @@ local alert_rules = import 'alertrules.libsonnet';
         params.clusterLogForwarding.forwarders[fw] { name: fw }
         for fw in std.objectFields(params.clusterLogForwarding.forwarders)
       ],
-      [if std.length(params.clusterLogForwarding.namespace_groups) > 0 then 'inputs']: [
+      [if std.length(namespace_groups) > 0 then 'inputs']: [
         {
           name: group,
           application: {
-            namespaces: params.clusterLogForwarding.namespace_groups[group].namespaces,
+            namespaces: namespace_groups[group].namespaces,
           },
         }
-        for group in std.objectFields(params.clusterLogForwarding.namespace_groups)
+        for group in std.objectFields(namespace_groups)
       ],
-      [if std.length(params.clusterLogForwarding.namespace_groups) > 0 then 'pipelines']: [
-        local enable_json = com.getValueOrDefault(params.clusterLogForwarding.namespace_groups[group], 'json', false);
-        local patch_json = { outputRefs: [ 'default' ], parse: 'json' };
+      [if std.length(namespace_groups) > 0 then 'pipelines']: [
         {
           name: group,
-          inputRefs: params.clusterLogForwarding.namespace_groups[group].namespaces,
-          outputRefs: com.getValueOrDefault(params.clusterLogForwarding.namespace_groups[group], 'forwarders', []),
-        } + com.makeMergeable(if enable_json then patch_json else {})
-        for group in std.objectFields(params.clusterLogForwarding.namespace_groups)
+          inputRefs: namespace_groups[group].namespaces,
+          outputRefs: com.getValueOrDefault(namespace_groups[group], 'forwarders', []),
+        }
+        for group in std.objectFields(namespace_groups)
       ],
     } + com.makeMergeable(
-      local enable_json = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'json', false);
       {
         pipelines: [
           {
@@ -101,7 +111,7 @@ local alert_rules = import 'alertrules.libsonnet';
             name: 'application-logs',
             inputRefs: [ 'application' ],
             outputRefs: com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'forwarders', []) + [ 'default' ],
-            [if enable_json then 'parse']: 'json',
+            [if params.clusterLogForwarding.json.enabled then 'parse']: 'json',
           },
         ],
       }
