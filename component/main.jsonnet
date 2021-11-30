@@ -96,7 +96,7 @@ local namespace_groups = (
         local patch_json = { outputRefs: [ 'default' ], parse: 'json' };
         {
           name: group,
-          inputRefs: namespace_groups[group].namespaces,
+          inputRefs: [ group ],
           outputRefs: com.getValueOrDefault(namespace_groups[group], 'forwarders', []),
         } + com.makeMergeable(if enable_json then patch_json else {})
         for group in std.objectFields(namespace_groups)
