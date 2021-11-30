@@ -92,14 +92,17 @@ local namespace_groups = (
         for group in std.objectFields(namespace_groups)
       ],
       [if std.length(namespace_groups) > 0 then 'pipelines']: [
+        local enable_json = com.getValueOrDefault(namespace_groups[group], 'json', false);
+        local patch_json = { outputRefs: [ 'default' ], parse: 'json' };
         {
           name: group,
           inputRefs: namespace_groups[group].namespaces,
           outputRefs: com.getValueOrDefault(namespace_groups[group], 'forwarders', []),
-        }
+        } + com.makeMergeable(if enable_json then patch_json else {})
         for group in std.objectFields(namespace_groups)
       ],
     } + com.makeMergeable(
+      local enable_json = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'json', false);
       {
         pipelines: [
           {
@@ -111,7 +114,7 @@ local namespace_groups = (
             name: 'application-logs',
             inputRefs: [ 'application' ],
             outputRefs: com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'forwarders', []) + [ 'default' ],
-            [if params.clusterLogForwarding.json.enabled then 'parse']: 'json',
+            [if enable_json then 'parse']: 'json',
           },
         ],
       }

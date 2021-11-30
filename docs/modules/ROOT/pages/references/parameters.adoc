@@ -97,11 +97,13 @@ clusterLogForwarding:
         - my-namespace
       forwarders: <3>
         - splunk-forwarder
+      json: true <4>
 ----
 
 <1> Namespace to configure.
 <2> List of namespaces.
 <3> List of forwarders (defined in `clusterLogForwarding.forwarders`).
+<4> Enable json logging only for defined namespaces.
 
 
 === `clusterLogForwarding.application_logs`
@@ -120,9 +122,11 @@ clusterLogForwarding:
   application_logs:
     forwarders: <1>
       - splunk-forwarder
+    json: true <2>
 ----
 
 <1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
+<2> Enable json logging for all applications.
 
 === `clusterLogForwarding.json`
 
@@ -130,7 +134,7 @@ clusterLogForwarding:
 type:: dictionary
 default:: see below
 
-If `json.enabled` is set to `true` the logging stack attempts to parse log messages to the JSON format.
+Setting `json.enabled` is required for json parsing to be available. You need to additionally enable it in `clusterLogForwarding.application_logs` or `clusterLogForwarding.namespace_groups`, based on your needs, to actually parse the logs.
 
 [source,yaml]
 ----
@@ -196,4 +200,31 @@ clusterLogForwarding:
         - my-namespace
       forwarders:
         - splunk-forwarder
+----
+
+=== Enable JSON parsing for all application logs
+
+[source,yaml]
+----
+clusterLogForwarding:
+  enabled: true
+  application_logs:
+    json: true
+  json:
+    enabled: true
+----
+
+=== Enable JSON parsing for certain namespaces
+
+[source,yaml]
+----
+clusterLogForwarding:
+  enabled: true
+  namespace_groups:
+    my-group:
+      namespaces:
+        - my-namespace
+      json: true
+  json:
+    enabled: true
 ----
