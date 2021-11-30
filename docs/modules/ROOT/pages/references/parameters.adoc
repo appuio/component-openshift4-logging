@@ -84,7 +84,8 @@ default:: {}
 
 Customization for the logging of a specified group of namespaces.
 
-Enable forwarders will send the logs of the specified namespaces to a third-party log aggregator. Depending on the need you may need to deploy a separate log forwarder.
+Enabling forwarders will send the logs of the specified namespaces to a third-party log aggregator.
+For some log aggregation systems you may need to deploy a separate log forwarder.
 
 Enable json parsing for a 'namespace_group' only makes sense if the logs are forwarded to the clusters default elasticsearch instance. Therefor 'default' will automatically be added to the forwarders.
 
@@ -111,7 +112,8 @@ default:: {}
 
 Customization for the logging of all applications.
 
-Enable forwarders will send the logs of all namespaces to a third-party log aggregator. Depending on the need you may need to deploy a separate log forwarder.
+Enabling forwarders will send the logs of all namespaces to a third-party log aggregator.
+For some log aggregation systems you may need to deploy a separate log forwarder.
 
 [source,yaml]
 clusterLogForwarding:
