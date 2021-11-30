@@ -42,7 +42,8 @@ parameters:
     clusterLogForwarding:
       enabled: false
       forwarders: {}
-      namespaces: {}
+      namespace_groups: {}
+      application_logs: {}
       json:
         enabled: false
         typekey: 'kubernetes.labels.logFormat'
