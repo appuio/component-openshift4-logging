@@ -1,0 +1,11 @@
+= Alert rule: ${rule}
+
+include::partial$runbooks/contribution_note.adoc[]
+
+== icon:glasses[] Overview
+
+// Add overview over the condition which triggers the rule
+
+== icon:bug[] Steps for debugging
+
+// Add detailed steps to debug and resolve the issue
