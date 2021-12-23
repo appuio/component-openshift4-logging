@@ -186,4 +186,4 @@ local namespace_groups = (
       },
     },
   '60_prometheus_rules': alert_rules.rules,
-}
+} + (import 'kibana-host.libsonnet')
