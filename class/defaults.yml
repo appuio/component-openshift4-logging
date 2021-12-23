@@ -3,6 +3,7 @@ parameters:
     namespace: openshift-logging
     channel: 'stable'
     alerts: 'master'
+    kibana_host: null
     predict_elasticsearch_storage_alert:
       enabled: true
       lookback_range: 72h
