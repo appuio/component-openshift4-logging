@@ -36,6 +36,16 @@ default:: `master`
 Release version of the alerting rules.
 Should be adjusted according to the channel: If you specify `channel: stable-5.2` use `alerts: release-5.2`.
 
+== `kibana_host`
+
+[horizontal]
+type:: string
+default:: `null`
+example:: `kibana.apps.cluster.syn.tools`
+
+Host name of the Kibana route.
+
+
 == `predict_elasticsearch_storage_alert`
 
 [horizontal]
