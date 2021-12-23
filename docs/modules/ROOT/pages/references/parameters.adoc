@@ -36,6 +36,79 @@ default:: `master`
 Release version of the alerting rules.
 Should be adjusted according to the channel: If you specify `channel: stable-5.2` use `alerts: release-5.2`.
 
+== `predict_elasticsearch_storage_alert`
+
+[horizontal]
+type:: dict
+example::
++
+[source,yaml]
+----
+predict_elasticsearch_storage_alert:
+  enabled: true
+  lookback_range: 72h
+  predict_hours_from_now: 72
+  threshold: 85
+  for: 6h
+  severity: warning
+----
+
+Create an alert `SYN_ElasticsearchExpectNodeToReachDiskWatermark` if the storage allocated for Elasticsearch is predicted to reach the low storage watermark.
+
+=== `predict_elasticsearch_storage_alert.enabled`
+
+[horizontal]
+type:: boolean
+default:: `true`
+
+Enable or disable this alert.
+
+=== `predict_elasticsearch_storage_alert.lookback_range`
+
+[horizontal]
+type:: prometheus duration
+default:: `72h`
+
+How for to look back to calculate the prediction.
+
+
+=== `predict_elasticsearch_storage_alert.predict_hours_from_now`
+
+[horizontal]
+type:: number
+default:: `72`
+
+How far in the future the prediction is calculated.
+
+
+=== `predict_elasticsearch_storage_alert.threshold`
+
+[horizontal]
+type:: number
+default:: `85`
+
+The threshold for the alert.
+Percentage of disk fill.
+
+
+=== `predict_elasticsearch_storage_alert.for`
+
+[horizontal]
+type:: prometheus duration
+default:: `6h`
+
+The alert is firing once the threshold has been reached for this long.
+
+
+=== `predict_elasticsearch_storage_alert.severity`
+
+[horizontal]
+type:: string
+default:: `warning`
+
+The severity of the fired alert.
+
+
 == `ignore_alerts`
 
 [horizontal]

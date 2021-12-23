@@ -3,6 +3,13 @@ parameters:
     namespace: openshift-logging
     channel: 'stable'
     alerts: 'master'
+    predict_elasticsearch_storage_alert:
+      enabled: true
+      lookback_range: 72h
+      predict_hours_from_now: 72
+      threshold: 85
+      for: 6h
+      severity: warning
     ignore_alerts: []
     clusterLogging:
       managementState: Managed

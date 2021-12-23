@@ -5,3 +5,6 @@
 
 .How-Tos
 * xref:how-tos/upgrade-v0.1-v1.x.adoc[Upgrade from v0.1.0 to v1.x]
+
+.Alert runbooks
+* xref:runbooks/SYN_ElasticsearchExpectNodeToReachDiskWatermark.adoc[SYN_ElasticsearchExpectNodeToReachDiskWatermark]

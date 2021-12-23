@@ -4,6 +4,9 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
+local runbook(alertname) =
+  'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
+
 assert
   std.member(inv.applications, 'openshift4-monitoring')
   : 'openshift4-monitoring is not available';
@@ -98,6 +101,35 @@ local filter_patch_rules(g) =
 
 /* TO HERE */
 
+local predictESStorage = {
+  local alertName = 'SYN_ElasticsearchExpectNodeToReachDiskWatermark',
+  local hoursFromNow = params.predict_elasticsearch_storage_alert.predict_hours_from_now,
+  local secondsFromNow = hoursFromNow * 3600,
+  alert: alertName,
+  annotations: {
+    message: (
+      'Expecting to reach disk low watermark at {{ $labels.node }} node in {{ $labels.cluster }} cluster in %s hours.'
+      + ' When reaching the watermark no new shards will be allocated to this node anymore. You should consider adding more disk to the node.'
+    ) % std.toString(hoursFromNow),
+    runbook_url: runbook(alertName),
+    summary: 'Expecting to Reach Disk Low Watermark in %s Hours' % std.toString(hoursFromNow),
+  },
+  expr: |||
+    sum by(cluster, instance, node) (
+      (1 - (predict_linear(es_fs_path_available_bytes[%s], %s) / es_fs_path_total_bytes)) * 100
+    ) > %s
+  ||| % [ params.predict_elasticsearch_storage_alert.lookback_range, std.toString(secondsFromNow), std.toString(params.predict_elasticsearch_storage_alert.threshold) ],
+  'for': params.predict_elasticsearch_storage_alert['for'],
+  labels: {
+    severity: params.predict_elasticsearch_storage_alert.severity,
+  },
+};
+
+local esStorageGroup = {
+  name: 'elasticsearch_node_storage.alerts',
+  rules: [ predictESStorage ],
+};
+
 {
   rules: kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-logging-rules') {
     metadata+: {
@@ -110,7 +142,9 @@ local filter_patch_rules(g) =
           local r = filter_patch_rules(g);
           if std.length(r.rules) > 0 then r
           for g in std.parseJson(kap.yaml_load_stream('openshift4-logging/manifests/%s/fluentd_prometheus_alerts.yaml' % [ params.alerts ]))[0].groups
-        ]
+        ] + [
+          if params.predict_elasticsearch_storage_alert.enabled then esStorageGroup,
+        ],
       ),
     },
   },
