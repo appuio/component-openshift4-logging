@@ -42,7 +42,7 @@ metadata:
   labels:
     name: syn-resource-locker-elasticsearch-operator-manager
   name: syn-resource-locker-elasticsearch-operator-manager
-  namespace: openshift-logging
+  namespace: openshift-operators-redhat
 rules:
   - apiGroups:
       - apps
@@ -58,7 +58,7 @@ metadata:
   labels:
     name: syn-resource-locker-elasticsearch-operator-manager
   name: syn-resource-locker-elasticsearch-operator-manager
-  namespace: openshift-logging
+  namespace: openshift-operators-redhat
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -74,8 +74,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
-    name: openshift-logging-elasticsearch-operator
-  name: openshift-logging-elasticsearch-operator
+    name: openshift-operators-redhat-elasticsearch-operator
+  name: openshift-operators-redhat-elasticsearch-operator
   namespace: syn-resource-locker
 spec:
   patches:
@@ -87,6 +87,6 @@ spec:
         apiVersion: apps/v1
         kind: Deployment
         name: elasticsearch-operator
-        namespace: openshift-logging
+        namespace: openshift-operators-redhat
   serviceAccountRef:
     name: elasticsearch-operator-manager

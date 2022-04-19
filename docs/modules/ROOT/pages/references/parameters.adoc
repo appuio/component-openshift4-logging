@@ -312,8 +312,12 @@ default::
 +
 [source,yaml]
 ----
-nodeSelector:
-  node-role.kubernetes.io/infra: ''
+patchTarget:
+  namespace: openshift-operators-redhat
+  name: elasticsearch-operator
+patch:
+  nodeSelector:
+    node-role.kubernetes.io/infra: ''
 ----
 
 Overrides for the ElasticSearch Operator deployment.

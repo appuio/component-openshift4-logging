@@ -6,22 +6,19 @@ local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.openshift4_logging;
 
-local deploymentToPatch = kube._Object('apps/v1', 'Deployment', 'elasticsearch-operator') {
+local deploymentToPatch = kube._Object('apps/v1', 'Deployment', params.elasticsearchOperator.patchTarget.name) {
   metadata+: {
-    namespace: params.namespace,
+    namespace: params.elasticsearchOperator.patchTarget.namespace,
   },
 };
 
 local patch = resourceLocker.Patch(deploymentToPatch, {
   spec: {
     template: {
-      spec: {
-        nodeSelector: params.elasticsearchOperator.nodeSelector,
-      },
+      spec: params.elasticsearchOperator.patch,
     },
   },
 });
-
 
 {
   '40_deployment_patch': patch,
