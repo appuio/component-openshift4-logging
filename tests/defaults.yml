@@ -23,3 +23,6 @@ parameters:
 
   resource_locker:
     namespace: syn-resource-locker
+
+  openshift4_logging:
+    kibana_host: kibana.example.com

@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    name: kibana-manager
+  name: kibana-manager
+  namespace: syn-resource-locker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    name: syn-resource-locker-kibana-manager
+  name: syn-resource-locker-kibana-manager
+rules:
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    name: syn-resource-locker-kibana-manager
+  name: syn-resource-locker-kibana-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: syn-resource-locker-kibana-manager
+subjects:
+  - kind: ServiceAccount
+    name: kibana-manager
+    namespace: syn-resource-locker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    name: syn-resource-locker-kibana-manager
+  name: syn-resource-locker-kibana-manager
+  namespace: openshift-logging
+rules:
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes/custom-host
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    name: syn-resource-locker-kibana-manager
+  name: syn-resource-locker-kibana-manager
+  namespace: openshift-logging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: syn-resource-locker-kibana-manager
+subjects:
+  - kind: ServiceAccount
+    name: kibana-manager
+    namespace: syn-resource-locker
+---
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: ResourceLocker
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    name: openshift-logging-kibana
+  name: openshift-logging-kibana
+  namespace: syn-resource-locker
+spec:
+  patches:
+    - id: patch1
+      patchTemplate: "\"spec\":\n  \"host\": \"kibana.example.com\""
+      patchType: application/strategic-merge-patch+json
+      targetObjectRef:
+        apiVersion: route.openshift.io/v1
+        kind: Route
+        name: kibana
+        namespace: openshift-logging
+  serviceAccountRef:
+    name: kibana-manager
