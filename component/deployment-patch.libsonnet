@@ -16,7 +16,7 @@ local patch = resourceLocker.Patch(deploymentToPatch, {
   spec: {
     template: {
       spec: {
-        nodeSelector: params.elasticsearch_operator.nodeSelector,
+        nodeSelector: params.elasticsearchOperator.nodeSelector,
       },
     },
   },

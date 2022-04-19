@@ -304,6 +304,20 @@ clusterLogForwarding:
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-enabling-json-logging.html#cluster-logging-configuration-of-json-log-data-for-default-elasticsearch_cluster-logging-enabling-json-logging[OpenShift docs] for a detailed explanation.
 
 
+== `elasticsearchOperator`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+nodeSelector:
+  node-role.kubernetes.io/infra: ''
+----
+
+Overrides for the ElasticSearch Operator deployment.
+
 == Example
 
 [source,yaml]

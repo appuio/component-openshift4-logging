@@ -61,6 +61,6 @@ parameters:
         typekey: 'kubernetes.labels.logFormat'
         typename: 'nologformat'
 
-    elasticsearch_operator:
+    elasticsearchOperator:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
