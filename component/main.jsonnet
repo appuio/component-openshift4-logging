@@ -106,15 +106,33 @@ local namespace_groups = (
       {
         pipelines: [
           {
-            name: 'infrastructure-logs',
-            inputRefs: [ 'infrastructure' ],
-            outputRefs: [ 'default' ],
-          },
-          {
             name: 'application-logs',
             inputRefs: [ 'application' ],
             outputRefs: com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'forwarders', []) + [ 'default' ],
             [if enable_json then 'parse']: 'json',
+          },
+        ],
+      }
+    ) + com.makeMergeable(
+      local enable_json = com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'json', false);
+      {
+        [if params.clusterLogForwarding.infrastructure_logs.enabled then 'pipelines']: [
+          {
+            name: 'infrastructure-logs',
+            inputRefs: [ 'infrastructure' ],
+            outputRefs: com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'forwarders', []) + [ 'default' ],
+            [if enable_json then 'parse']: 'json',
+          },
+        ],
+      }
+    ) + com.makeMergeable(
+      local enable_json = com.getValueOrDefault(params.clusterLogForwarding.audit_logs, 'json', false);
+      {
+        [if params.clusterLogForwarding.audit_logs.enabled then 'pipelines']: [
+          {
+            name: 'audit-logs',
+            inputRefs: [ 'audit' ],
+            outputRefs: com.getValueOrDefault(params.clusterLogForwarding.audit_logs, 'forwarders', []) + [ 'default' ],
           },
         ],
       }

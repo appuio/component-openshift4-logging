@@ -173,6 +173,7 @@ For some log aggregation systems you may need to deploy a separate log forwarder
 Enable json parsing for a 'namespace_group' only makes sense if the logs are forwarded to the clusters default elasticsearch instance. Therefor 'default' will automatically be added to the forwarders.
 
 [source,yaml]
+----
 clusterLogForwarding:
   namespace_groups:
     my-group: <1>
@@ -201,6 +202,7 @@ Enabling forwarders will send the logs of all namespaces to a third-party log ag
 For some log aggregation systems you may need to deploy a separate log forwarder.
 
 [source,yaml]
+----
 clusterLogForwarding:
   application_logs:
     forwarders: <1>
@@ -210,6 +212,73 @@ clusterLogForwarding:
 
 <1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
 <2> Enable json logging for all applications.
+
+
+=== `clusterLogForwarding.infrastructure_logs`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+clusterLogForwarding:
+  infrastructure_logs:
+    enabled: true
+----
+
+Customization for the logging of `openshift*`, `kube*`, or `default` projects.
+
+Enabled by default.
+
+Enabling forwarders will send the logs of all namespaces to a third-party log aggregator.
+For some log aggregation systems you may need to deploy a separate log forwarder.
+
+[source,yaml]
+----
+clusterLogForwarding:
+  infrastructure_logs:
+    forwarders: <1>
+      - splunk-forwarder
+    json: true <2>
+----
+
+<1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
+<2> Enable json logging for all applications.
+
+
+=== `clusterLogForwarding.audit_logs`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+clusterLogForwarding:
+  audit_logs:
+    enabled: false
+----
+
+Customization for the logging of https://docs.openshift.com/container-platform/latest/security/audit-log-policy-config.html[audit logs].
+
+Disabled by default.
+
+Enabling forwarders will send the logs of all namespaces to a third-party log aggregator.
+For some log aggregation systems you may need to deploy a separate log forwarder.
+
+[source,yaml]
+----
+clusterLogForwarding:
+  audit_logs:
+    forwarders: <1>
+      - splunk-forwarder
+    json: true <2>
+----
+
+<1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
+<2> Enable json logging for all applications.
+
 
 === `clusterLogForwarding.json`
 
