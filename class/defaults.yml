@@ -61,6 +61,6 @@ parameters:
         typekey: 'kubernetes.labels.logFormat'
         typename: 'nologformat'
 
-  openshift4_elasticsearch_operator:
-    targetNamespaces:
-      - ${openshift4_logging:namespace}
+    elasticsearch_operator:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''

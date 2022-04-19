@@ -6,6 +6,9 @@ parameters:
   kapitan:
     dependencies:
       - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-resource-locker/v2.1.0/lib/resource-locker.libjsonnet
+        output_path: vendor/lib/resource-locker.libjsonnet
+      - type: https
         source: https://raw.githubusercontent.com/appuio/component-openshift4-operators/v1.0.2/lib/openshift4-operators.libsonnet
         output_path: vendor/lib/openshift4-operators.libsonnet
 
@@ -17,3 +20,6 @@ parameters:
   openshift4_monitoring:
     alerts:
       ignoreNames: []
+
+  resource_locker:
+    namespace: syn-resource-locker
