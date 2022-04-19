@@ -1,9 +1,6 @@
 :global:
   componentName: openshift4-logging
-  # Disable component compile workflow for now, since Commodore currently
-  # doesn't really support compiling components which depend on another
-  # component's component library.
-  feature_componentCompile: false
+  feature_goldenTests: true
 
 docs/antora.yml:
   name: openshift4-logging
