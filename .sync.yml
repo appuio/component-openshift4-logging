@@ -1,7 +1,3 @@
 :global:
-  componentName: openshift4-logging
+  componentName: OpenShift4 Logging
   feature_goldenTests: true
-
-docs/antora.yml:
-  name: openshift4-logging
-  title: OpenShift4 Logging
