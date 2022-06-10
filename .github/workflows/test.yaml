@@ -5,7 +5,7 @@ on:
       - master
 
 env:
-  COMPONENT_NAME: openshift4-logging
+  COMPONENT_NAME: OpenShift4 Logging
 
 jobs:
   linting:
