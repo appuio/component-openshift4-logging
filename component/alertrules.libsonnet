@@ -8,8 +8,9 @@ local runbook(alertname) =
   'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
 
 assert
-  std.member(inv.applications, 'openshift4-monitoring')
-  : 'openshift4-monitoring is not available';
+  std.member(inv.applications, 'openshift4-monitoring') ||
+  std.member(inv.applications, 'prometheus')
+  : 'neither component `openshift4-monitoring` nor `prometheus` enabled';
 
 // Function to process an array which supports removing previously added
 // elements by prefixing them with ~
@@ -62,7 +63,15 @@ local patch_alerts = {
 // reuse their functionality as a black box to make sure our alerts work
 // correctly in the environment into which we're deploying.
 
-local global_alert_params = inv.parameters.openshift4_monitoring.alerts;
+// XXX: We'll figure out how we do alert management, when we start working on
+// alerting for the vendor-independent monitoring stack based on component
+// prometheus.
+local global_alert_params =
+  com.getValueOrDefault(
+    inv.parameters,
+    'openshift4_monitoring',
+    { alerts: { ignoreNames: [] } }
+  ).alerts;
 
 local filter_patch_rules(g) =
   // combine our set of alerts to ignore with the monitoring component's

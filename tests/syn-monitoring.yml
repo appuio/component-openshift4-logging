@@ -1,8 +1,5 @@
 applications:
   - openshift4-operators as openshift-operators-redhat
-  # TODO: remove this application once we update the component to support the
-  # new monitoring stack.
-  - openshift4-monitoring
   - prometheus
 
 parameters:
@@ -30,7 +27,3 @@ parameters:
           namespace: syn-monitoring
         prometheus:
           enabled: true
-
-  openshift4_monitoring:
-    alerts:
-      ignoreNames: []
