@@ -5,6 +5,7 @@ local prom = import 'lib/prometheus.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
+local nsName = 'syn-monitoring-openshift4-logging';
 local endpointDefaults = {
   interval: '30s',
   relabelings: [
@@ -19,7 +20,10 @@ local promInstance =
     inv.parameters.prometheus.defaultInstance;
 
 local serviceMonitors = [
-  prom.ServiceMonitor('cluster-logging-operator') {
+  prom.ServiceMonitor('cluster-logging-operator',) {
+    metadata+: {
+      namespace: nsName,
+    },
     endpoints: {
       operator: {
         interval: '30s',
@@ -37,6 +41,9 @@ local serviceMonitors = [
     targetNamespace: params.namespace,
   },
   prom.ServiceMonitor('fluentd') {
+    metadata+: {
+      namespace: nsName,
+    },
     endpoints: {
       fluentd:
         prom.ServiceMonitorHttpsEndpoint('fluentd.openshift-logging.svc') {
@@ -56,6 +63,9 @@ local serviceMonitors = [
     },
   },
   prom.ServiceMonitor('elasticsearch-cluster') {
+    metadata+: {
+      namespace: nsName,
+    },
     endpoints: {
       elasticsearch:
         prom.ServiceMonitorHttpsEndpoint('elasticsearch-metrics.openshift-logging.svc')
@@ -79,7 +89,7 @@ local serviceMonitors = [
 
 {
   namespace: prom.RegisterNamespace(
-    kube.Namespace('syn-monitoring-openshift4-logging'),
+    kube.Namespace(nsName),
     instance=promInstance,
   ),
   service_monitors: serviceMonitors,

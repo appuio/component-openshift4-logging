@@ -5,6 +5,7 @@ metadata:
   labels:
     name: cluster-logging-operator
   name: cluster-logging-operator
+  namespace: syn-monitoring-openshift4-logging
 spec:
   endpoints:
     - interval: 30s
@@ -28,6 +29,7 @@ metadata:
   labels:
     name: fluentd
   name: fluentd
+  namespace: syn-monitoring-openshift4-logging
 spec:
   endpoints:
     - interval: 30s
@@ -55,6 +57,7 @@ metadata:
   labels:
     name: elasticsearch-cluster
   name: elasticsearch-cluster
+  namespace: syn-monitoring-openshift4-logging
 spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
