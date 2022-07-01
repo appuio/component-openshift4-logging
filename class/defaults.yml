@@ -16,6 +16,7 @@ parameters:
     ignore_alerts: []
     monitoring:
       enabled: true
+      instance: ''
 
     clusterLogging:
       managementState: Managed

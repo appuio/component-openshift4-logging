@@ -12,6 +12,12 @@ local endpointDefaults = {
   ],
 };
 
+local promInstance =
+  if params.monitoring.instance != '' then
+    params.monitoring.instance
+  else
+    inv.parameters.prometheus.defaultInstance;
+
 local serviceMonitors = [
   prom.ServiceMonitor('cluster-logging-operator') {
     endpoints: {
@@ -73,7 +79,8 @@ local serviceMonitors = [
 
 {
   namespace: prom.RegisterNamespace(
-    kube.Namespace('syn-monitoring-openshift4-logging')
+    kube.Namespace('syn-monitoring-openshift4-logging'),
+    instance=promInstance,
   ),
   service_monitors: serviceMonitors,
 }
