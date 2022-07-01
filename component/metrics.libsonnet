@@ -19,9 +19,6 @@ local promInstance =
 
 local serviceMonitors = [
   prom.ServiceMonitor('cluster-logging-operator',) {
-    metadata+: {
-      namespace: nsName,
-    },
     endpoints: {
       operator: {
         interval: '30s',
@@ -39,9 +36,6 @@ local serviceMonitors = [
     targetNamespace: params.namespace,
   },
   prom.ServiceMonitor('fluentd') {
-    metadata+: {
-      namespace: nsName,
-    },
     endpoints: {
       fluentd:
         prom.ServiceMonitorHttpsEndpoint('fluentd.openshift-logging.svc') {
@@ -61,9 +55,6 @@ local serviceMonitors = [
     },
   },
   prom.ServiceMonitor('elasticsearch-cluster') {
-    metadata+: {
-      namespace: nsName,
-    },
     endpoints: {
       elasticsearch:
         prom.ServiceMonitorHttpsEndpoint('elasticsearch-metrics.openshift-logging.svc')
@@ -91,7 +82,18 @@ if syn_metrics then
       kube.Namespace(nsName),
       instance=promInstance,
     ),
-    '70_monitoring_servicemonitors': serviceMonitors,
+    '70_monitoring_servicemonitors': std.filter(
+      function(it) it != null,
+      [
+        if params.monitoring.enableServiceMonitors[sm.metadata.name] then
+          sm {
+            metadata+: {
+              namespace: nsName,
+            },
+          }
+        for sm in serviceMonitors
+      ]
+    ),
     '70_monitoring_networkpolicy': prom.NetworkPolicy(instance=promInstance) {
       metadata+: {
         // The networkpolicy needs to be in the namespace in which OpenShift

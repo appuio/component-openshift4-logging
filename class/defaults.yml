@@ -17,6 +17,10 @@ parameters:
     monitoring:
       enabled: true
       instance: ''
+      enableServiceMonitors:
+        cluster-logging-operator: true
+        fluentd: true
+        elasticsearch-cluster: true
 
     clusterLogging:
       managementState: Managed
