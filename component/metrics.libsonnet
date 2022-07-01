@@ -41,10 +41,6 @@ local serviceMonitors = [
         prom.ServiceMonitorHttpsEndpoint('fluentd.openshift-logging.svc') {
           // Fluentd doesn't need bearer token
           bearerTokenFile:: '',
-          port: 'logfile-metrics',
-          metricRelabelings: [
-            prom.DropRuntimeMetrics,
-          ],
         },
     },
     targetNamespace: params.namespace,

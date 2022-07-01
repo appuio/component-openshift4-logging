@@ -33,12 +33,7 @@ metadata:
 spec:
   endpoints:
     - interval: 30s
-      metricRelabelings:
-        - action: drop
-          regex: (go_.*|process_.*|promhttp_.*)
-          sourceLabels:
-            - __name__
-      port: logfile-metrics
+      port: metrics
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
