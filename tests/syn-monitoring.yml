@@ -30,7 +30,3 @@ parameters:
   openshift4_monitoring:
     alerts:
       ignoreNames: []
-
-  openshift4_logging:
-    monitoring:
-      enabled: true

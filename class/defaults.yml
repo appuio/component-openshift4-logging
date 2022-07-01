@@ -11,7 +11,12 @@ parameters:
       threshold: 85
       for: 6h
       severity: warning
+
+    # TBD: move to `monitoring` key?
     ignore_alerts: []
+    monitoring:
+      enabled: true
+
     clusterLogging:
       managementState: Managed
       logStore:
