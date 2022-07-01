@@ -29,6 +29,11 @@ jobs:
           args: 'check'
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        instance:
+          - defaults
+          - syn-monitoring
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -40,6 +45,11 @@ jobs:
         run: make test
   golden:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        instance:
+          - defaults
+          - syn-monitoring
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -48,4 +58,4 @@ jobs:
         with:
           path: ${{ env.COMPONENT_NAME }}
       - name: Golden diff
-        run: make golden-diff
+        run: make golden-diff -e instance=${{ matrix.instance }}
