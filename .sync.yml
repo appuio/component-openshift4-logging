@@ -1,3 +1,12 @@
 :global:
   componentName: OpenShift4 Logging
   feature_goldenTests: true
+  testMatrix:
+    key: instance
+    entries:
+      - defaults
+      - syn-monitoring
+
+.github/workflows/test.yaml:
+  test_makeTarget: test -e instance=${{ matrix.instance }}
+  goldenTest_makeTarget: golden-diff -e instance=${{ matrix.instance }}
