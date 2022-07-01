@@ -9,12 +9,12 @@ metadata:
 spec:
   endpoints:
     - interval: 30s
-      port: http-metrics
-      relabelings:
+      metricRelabelings:
         - action: drop
           regex: (go_.*|process_.*|promhttp_.*)
           sourceLabels:
             - __name__
+      port: http-metrics
   namespaceSelector:
     matchNames:
       - openshift-logging
@@ -33,12 +33,12 @@ metadata:
 spec:
   endpoints:
     - interval: 30s
-      port: logfile-metrics
-      relabelings:
+      metricRelabelings:
         - action: drop
           regex: (go_.*|process_.*|promhttp_.*)
           sourceLabels:
             - __name__
+      port: logfile-metrics
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
@@ -62,13 +62,13 @@ spec:
   endpoints:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 30s
-      path: /_prometheus/metrics
-      port: elasticsearch
-      relabelings:
+      metricRelabelings:
         - action: drop
           regex: (go_.*|process_.*|promhttp_.*)
           sourceLabels:
             - __name__
+      path: /_prometheus/metrics
+      port: elasticsearch
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt

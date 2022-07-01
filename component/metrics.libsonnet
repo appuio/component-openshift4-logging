@@ -10,12 +10,6 @@ local syn_metrics =
   std.member(inv.applications, 'prometheus');
 
 local nsName = 'syn-monitoring-openshift4-logging';
-local endpointDefaults = {
-  interval: '30s',
-  relabelings: [
-    prom.DropRuntimeMetrics,
-  ],
-};
 
 local promInstance =
   if params.monitoring.instance != '' then
@@ -31,7 +25,7 @@ local serviceMonitors = [
     endpoints: {
       operator: {
         interval: '30s',
-        relabelings: [
+        metricRelabelings: [
           prom.DropRuntimeMetrics,
         ],
         port: 'http-metrics',
@@ -54,7 +48,7 @@ local serviceMonitors = [
           // Fluentd doesn't need bearer token
           bearerTokenFile:: '',
           port: 'logfile-metrics',
-          relabelings: [
+          metricRelabelings: [
             prom.DropRuntimeMetrics,
           ],
         },
@@ -76,7 +70,7 @@ local serviceMonitors = [
         {
           path: '/_prometheus/metrics',
           port: 'elasticsearch',
-          relabelings: [
+          metricRelabelings: [
             prom.DropRuntimeMetrics,
           ],
         },
