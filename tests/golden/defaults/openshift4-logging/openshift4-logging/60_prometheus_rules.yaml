@@ -15,7 +15,7 @@ spec:
             message: Prometheus could not scrape fluentd {{ $labels.instance }} for
               more than 10m.
             summary: Fluentd cannot be scraped
-          expr: 'absent(up{job="collector"} == 1)
+          expr: 'up{job="collector"} == 0 or absent(up{job="collector"}) == 1
 
             '
           for: 10m
@@ -26,19 +26,19 @@ spec:
             syn_component: openshift4-logging
         - alert: SYN_FluentdQueueLengthIncreasing
           annotations:
-            message: For the last hour, fluentd {{ $labels.instance }} average buffer
-              queue length has increased continuously.
-            summary: Fluentd unable to keep up with traffic over time.
-          expr: '( 0 * (kube_pod_start_time{pod=~".*fluentd.*"} < time() - 3600 )
-            )  + on(pod)  label_replace( ( deriv(fluentd_output_status_buffer_queue_length[10m])
-            > 0 and delta(fluentd_output_status_buffer_queue_length[1h]) > 1 ), "pod",
-            "$1", "hostname", "(.*)")
+            message: For the last hour, fluentd {{ $labels.instance }} output '{{
+              $labels.plugin_id }}' average buffer queue length has increased continuously.
+            summary: Fluentd is unable to keep up with traffic over time for forwarder
+              output {{ $labels.plugin_id }}.
+          expr: '( 0 * (deriv(fluentd_output_status_emit_records[1m] offset 1h)))  +
+            on(pod,plugin_id)  ( deriv(fluentd_output_status_buffer_queue_length[10m])
+            > 0 and delta(fluentd_output_status_buffer_queue_length[1h]) > 1 )
 
             '
           for: 12h
           labels:
             service: fluentd
-            severity: error
+            severity: Warning
             syn: 'true'
             syn_component: openshift4-logging
         - alert: SYN_FluentDHighErrorRate
