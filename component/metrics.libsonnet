@@ -5,6 +5,10 @@ local prom = import 'lib/prometheus.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
+local syn_metrics =
+  params.monitoring.enabled &&
+  std.member(inv.applications, 'prometheus');
+
 local nsName = 'syn-monitoring-openshift4-logging';
 local endpointDefaults = {
   interval: '30s',
@@ -87,17 +91,20 @@ local serviceMonitors = [
   },
 ];
 
-{
-  namespace: prom.RegisterNamespace(
-    kube.Namespace(nsName),
-    instance=promInstance,
-  ),
-  service_monitors: serviceMonitors,
-  network_policy: prom.NetworkPolicy(instance=promInstance) {
-    metadata+: {
-      // The networkpolicy needs to be in the namespace in which OpenShift
-      // logging is deployed.
-      namespace: params.namespace,
+if syn_metrics then
+  {
+    '70_monitoring_namespace': prom.RegisterNamespace(
+      kube.Namespace(nsName),
+      instance=promInstance,
+    ),
+    '70_monitoring_servicemonitors': serviceMonitors,
+    '70_monitoring_networkpolicy': prom.NetworkPolicy(instance=promInstance) {
+      metadata+: {
+        // The networkpolicy needs to be in the namespace in which OpenShift
+        // logging is deployed.
+        namespace: params.namespace,
+      },
     },
-  },
-}
+  }
+else
+  {}
