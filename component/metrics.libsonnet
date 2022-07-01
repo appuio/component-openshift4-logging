@@ -93,4 +93,11 @@ local serviceMonitors = [
     instance=promInstance,
   ),
   service_monitors: serviceMonitors,
+  network_policy: prom.NetworkPolicy(instance=promInstance) {
+    metadata+: {
+      // The networkpolicy needs to be in the namespace in which OpenShift
+      // logging is deployed.
+      namespace: params.namespace,
+    },
+  },
 }
