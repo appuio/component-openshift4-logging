@@ -16,7 +16,7 @@ parameters:
     ignore_alerts: []
     monitoring:
       enabled: true
-      instance: ''
+      instance: null
       enableServiceMonitors:
         cluster-logging-operator: true
         fluentd: true
