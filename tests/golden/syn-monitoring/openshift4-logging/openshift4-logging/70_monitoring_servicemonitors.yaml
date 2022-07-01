@@ -1,0 +1,79 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    name: cluster-logging-operator
+  name: cluster-logging-operator
+spec:
+  endpoints:
+    - interval: 30s
+      port: http-metrics
+      relabelings:
+        - action: drop
+          regex: (go_.*|process_.*|promhttp_.*)
+          sourceLabels:
+            - __name__
+  namespaceSelector:
+    matchNames:
+      - openshift-logging
+  selector:
+    matchLabels:
+      control-plane: cluster-logging-operator
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    name: fluentd
+  name: fluentd
+spec:
+  endpoints:
+    - interval: 30s
+      port: logfile-metrics
+      relabelings:
+        - action: drop
+          regex: (go_.*|process_.*|promhttp_.*)
+          sourceLabels:
+            - __name__
+      scheme: https
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        serverName: fluentd.openshift-logging.svc
+  namespaceSelector:
+    matchNames:
+      - openshift-logging
+  selector:
+    matchLabels:
+      logging-infra: support
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    name: elasticsearch-cluster
+  name: elasticsearch-cluster
+spec:
+  endpoints:
+    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      interval: 30s
+      path: /_prometheus/metrics
+      port: elasticsearch
+      relabelings:
+        - action: drop
+          regex: (go_.*|process_.*|promhttp_.*)
+          sourceLabels:
+            - __name__
+      scheme: https
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        serverName: elasticsearch-metrics.openshift-logging.svc
+  namespaceSelector:
+    matchNames:
+      - openshift-logging
+  selector:
+    matchLabels:
+      cluster-name: elasticsearch
+      scrape-metrics: enabled

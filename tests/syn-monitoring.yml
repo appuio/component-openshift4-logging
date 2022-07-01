@@ -11,6 +11,10 @@ parameters:
       - type: https
         source: https://raw.githubusercontent.com/appuio/component-openshift4-operators/v1.0.2/lib/openshift4-operators.libsonnet
         output_path: vendor/lib/openshift4-operators.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-prometheus/master/lib/prometheus.libsonnet
+        output_path: vendor/lib/prometheus.libsonnet
+
 
   openshift4_operators:
     defaultInstallPlanApproval: Automatic

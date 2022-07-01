@@ -205,5 +205,11 @@ local namespace_groups = (
       },
     },
   '60_prometheus_rules': alert_rules.rules,
-  [if params.monitoring.enabled then '70_servicemonitors']: metrics.service_monitors,
 } + (import 'kibana-host.libsonnet')
++ (
+  if params.monitoring.enabled then {
+    '70_monitoring_namespace': metrics.namespace,
+    '70_monitoring_servicemonitors': metrics.service_monitors,
+  } else {
+  }
+)
