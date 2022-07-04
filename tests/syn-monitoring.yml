@@ -1,8 +1,5 @@
 applications:
   - openshift4-operators as openshift-operators-redhat
-  # TODO: remove this application once we update the component to support the
-  # new monitoring stack.
-  - openshift4-monitoring
   - prometheus
 
 parameters:
@@ -11,6 +8,10 @@ parameters:
       - type: https
         source: https://raw.githubusercontent.com/appuio/component-openshift4-operators/v1.0.2/lib/openshift4-operators.libsonnet
         output_path: vendor/lib/openshift4-operators.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-prometheus/master/lib/prometheus.libsonnet
+        output_path: vendor/lib/prometheus.libsonnet
+
 
   openshift4_operators:
     defaultInstallPlanApproval: Automatic
@@ -26,11 +27,3 @@ parameters:
           namespace: syn-monitoring
         prometheus:
           enabled: true
-
-  openshift4_monitoring:
-    alerts:
-      ignoreNames: []
-
-  openshift4_logging:
-    monitoring:
-      enabled: true

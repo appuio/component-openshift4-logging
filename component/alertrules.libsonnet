@@ -8,35 +8,13 @@ local runbook(alertname) =
   'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
 
 assert
-  std.member(inv.applications, 'openshift4-monitoring')
-  : 'openshift4-monitoring is not available';
-
-// Function to process an array which supports removing previously added
-// elements by prefixing them with ~
-local render_array(arr) =
-  // extract real value of array entry
-  local realval(v) = std.lstripChars(v, '~');
-  // Compute whether each element should be included by keeping track of
-  // whether its last occurrence in the input array was prefixed with ~ or
-  // not.
-  local val_state = std.foldl(
-    function(a, it) a + it,
-    [
-      { [realval(v)]: !std.startsWith(v, '~') }
-      for v in arr
-    ],
-    {}
-  );
-  // Return filtered array containing only elements whose last occurrence
-  // wasn't prefixed by ~.
-  std.filter(
-    function(val) val_state[val],
-    std.objectFields(val_state)
-  );
+  std.member(inv.applications, 'openshift4-monitoring') ||
+  std.member(inv.applications, 'prometheus')
+  : 'neither component `openshift4-monitoring` nor `prometheus` enabled';
 
 // Keep only alerts from params.ignore_alerts for which the last
 // array entry wasn't prefixed with `~`.
-local user_ignore_alerts = render_array(params.ignore_alerts);
+local user_ignore_alerts = com.renderArray(params.ignore_alerts);
 
 // Upstream alerts to ignore
 local ignore_alerts = std.set(
@@ -62,7 +40,15 @@ local patch_alerts = {
 // reuse their functionality as a black box to make sure our alerts work
 // correctly in the environment into which we're deploying.
 
-local global_alert_params = inv.parameters.openshift4_monitoring.alerts;
+// XXX: We'll figure out how we do alert management, when we start working on
+// alerting for the vendor-independent monitoring stack based on component
+// prometheus.
+local global_alert_params =
+  com.getValueOrDefault(
+    inv.parameters,
+    'openshift4_monitoring',
+    { alerts: { ignoreNames: [] } }
+  ).alerts;
 
 local filter_patch_rules(g) =
   // combine our set of alerts to ignore with the monitoring component's

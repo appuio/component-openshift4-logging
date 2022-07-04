@@ -10,6 +10,7 @@ local group = 'operators.coreos.com/';
 local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 
 local alert_rules = import 'alertrules.libsonnet';
+local metrics = import 'metrics.libsonnet';
 
 local namespace_groups = (
   if std.objectHas(params.clusterLogForwarding, 'namespaces') then
@@ -205,3 +206,4 @@ local namespace_groups = (
     },
   '60_prometheus_rules': alert_rules.rules,
 } + (import 'kibana-host.libsonnet')
++ (import 'metrics.libsonnet')
