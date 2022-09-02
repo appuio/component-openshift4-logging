@@ -14,5 +14,15 @@
   "suppressNotifications": [ "artifactErrors" ],
   "labels": [
     "dependency"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^class/defaults.yml$"],
+      "matchStrings": [
+          "\n\\s*# renovate: repo=(?<depName>.*?) ref=(?<currentValue>.*?)\n\\s*alerts: '(?<currentDigest>.*?)'"
+      ],
+      "versioningTemplate": "git",
+      "datasourceTemplate": "git-refs"
+    }
   ]
 }
