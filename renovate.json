@@ -19,7 +19,7 @@
     {
       "fileMatch": ["^class/defaults.yml$"],
       "matchStrings": [
-          "\n\\s*# renovate: repo=(?<depName>.*?) ref=(?<currentValue>.*?)\n\\s*alerts: '(?<currentDigest>.*?)'"
+          "\n\\s*# renovate: repo=(?<packageName>.*?) ref=(?<currentValue>.*?)\n\\s*(?<depName>alerts): '(?<currentDigest>.*?)'"
       ],
       "versioningTemplate": "git",
       "datasourceTemplate": "git-refs"
