@@ -3,7 +3,7 @@ parameters:
     namespace: openshift-logging
     channel: 'stable'
     # renovate: repo=https://github.com/openshift/cluster-logging-operator.git ref=master
-    alerts: '5dd49ff848203fb888a1bbb76912db92ca71f275'
+    alerts: '195773756243dc5140de48bf8a15a1892e4b9add'
     kibana_host: null
     predict_elasticsearch_storage_alert:
       enabled: true
