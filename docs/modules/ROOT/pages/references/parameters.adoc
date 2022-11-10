@@ -14,16 +14,33 @@ default:: `openshift-logging`
 The namespace in which to install the operator.
 
 
+== `version`
+
+[horizontal]
+type:: string
+default:: `5.4`
+
+The logging stack version to deploy.
+This parameter is used in the default values for parameters `channel` and `alerts`.
+
+We recommend that you use this parameter to specify the logging stack version which the component should deploy.
+However, you can still parameters `channel` and `alerts` directly.
+
 == `channel`
 
 [horizontal]
 type:: string
-default:: `stable`
+default:: `stable-${openshift4_logging:version}`
 
 Channel of the operator subscription to use.
-In OpenShift 4.7 Red Hat introduced an OpenShift version independent logging stack starting with the version 5.0.
-Since version 5.1 there are two channels stable and stable-5.x.
-Choosing the stable channel allows never have to care about the interoperability as the specific OpenShift version delivers the right version via the operator marketplace.
+If you specify the logging stack version through parameter `version`, you shouldn't need to modify this parameter.
+
+In OpenShift 4.7, RedHat decoupled the logging stack version from the OpenShift version.
+The decoupled logging stack versions start at version 5.0.
+With version 5.1 of the logging stack, channels for specific minor versions were introduced.
+
+Ideally we would just default to the `stable` channel, as that channel will always be backed by a logging stack version compatible with the OpenShift cluster version by the OpenShift marketplace operator.
+However, since there's potential for changes in configuration between logging stack versions which need to be managed through the component, we default to using the `stable-5.x` channel matching the version specified in parameter `version`.
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
 
@@ -31,10 +48,12 @@ See the https://docs.openshift.com/container-platform/latest/logging/cluster-log
 
 [horizontal]
 type:: string
-default:: `master`
+default:: `release-${openshift4_logging:version}`
 
 Release version of the alerting rules.
-Should be adjusted according to the channel: If you specify `channel: stable-5.2` use `alerts: release-5.2`.
+If you specify the logging stack version through parameter `version`, you shouldn't need to modify this parameter.
+
+Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.4`, you should use `alerts: release-5.4`.
 
 == `kibana_host`
 
