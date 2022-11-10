@@ -20,6 +20,7 @@ spec:
             '
           for: 10m
           labels:
+            namespace: openshift-logging
             service: fluentd
             severity: critical
             syn: 'true'
@@ -37,6 +38,7 @@ spec:
             '
           for: 12h
           labels:
+            namespace: openshift-logging
             service: fluentd
             severity: Warning
             syn: 'true'
@@ -51,6 +53,7 @@ spec:
             ) > 10\n"
           for: 15m
           labels:
+            namespace: openshift-logging
             severity: warning
             syn: 'true'
             syn_component: openshift4-logging
@@ -64,6 +67,7 @@ spec:
             ) > 25\n"
           for: 15m
           labels:
+            namespace: openshift-logging
             severity: critical
             syn: 'true'
             syn_component: openshift4-logging
