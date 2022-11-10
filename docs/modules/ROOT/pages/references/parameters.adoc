@@ -27,6 +27,18 @@ Choosing the stable channel allows never have to care about the interoperability
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
 
+[TIP]
+====
+Due to different required default configurations for the `clusterlogging` custom resource between logging stack versions <= 5.4 and >= 5.5, the component will attempt to parse the logging stack version from the value of this parameter.
+
+The parser can parse the version from channels with arbitrary channel names, as long as the channel adheres to the format `<channel>-<major>.<minor>`.
+If parsing fails for any reason, the parser will err on the side of the version being >= 5.5.
+Potential parsing failures are that the version can't be extracted from the channel, or that the major or minor version can't be converted to a number.
+If there's a parsing failure, the component will print a diagnostic message indicating where the parsing failed.
+
+To ensure that the component renders a configuration which works properly, we recommend that users set the channel to a `stable-5.x` version.
+====
+
 == `alerts`
 
 [horizontal]
