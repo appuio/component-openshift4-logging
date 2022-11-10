@@ -12,6 +12,63 @@ local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 local alert_rules = import 'alertrules.libsonnet';
 local metrics = import 'metrics.libsonnet';
 
+// Boolean flag to determine if the provided logging channel is >= <channel>-5.5
+//
+// The implementation is able to parse arbitrary channel specifications which
+// have the format <channel-name>-<maj>.<min>, channel-name can contain
+// dashes.
+//
+// IMPORTANT: Channel specifications which don't contain a recognizable
+// version are treated as >= 5.5.
+local channel_ge_55 =
+  local parts = std.split(params.channel, '-');
+
+  local genericErr = {
+    parseErr:
+      'Unable to parse channel version from "%s", assuming version >= 5.5' % [ params.channel ],
+    result: true,
+  };
+  local minorErr(maj) = {
+    parseErr:
+      'Unable to parse minor version from "%s", treating any 5.x as >= 5.5' % [ params.channel ],
+    result: maj >= 5,
+  };
+  local veridx = std.length(parts) - 1;
+  local verparts = std.split(parts[veridx], '.');
+  // Version is a object with fields result and parseErr.
+  // If parseErr is not '', `result` may not be accurate. If we can't
+  // accurately determine whether the provided channel is >= 5.5 we fall back
+  // to assuming >= 5.5 (e.g. if we can parse the major version but not the
+  // minor version, we assume that any 5.x is >= 5.5).
+  local result =
+    if std.length(parts) < 2 then
+      genericErr
+    else
+      // we assume the version is the last part
+      local veridx = std.length(parts) - 1;
+      local verparts = std.split(parts[veridx], '.');
+      // ver contains maj, min, and parseErr
+      // we use std.parseJson instead of std.parseInt here, so that we can
+      // gracefully degrade if the value is not a number.
+      local ver = {
+        maj: std.parseJson(verparts[0]),
+        min: if std.length(verparts) > 1 then std.parseJson(verparts[1]) else 5,
+      };
+      if std.isNumber(ver.maj) && std.isNumber(ver.min) then
+        {
+          result: ver.maj > 5 || (ver.maj == 5 && ver.min >= 5),
+          parseErr: '',
+        }
+      else if std.isNumber(ver.maj) then
+        minorErr(ver.maj)
+      else
+        genericErr;
+
+  if result.parseErr != '' then
+    std.trace(result.parseErr, result.result)
+  else
+    result.result;
+
 local namespace_groups = (
   if std.objectHas(params.clusterLogForwarding, 'namespaces') then
     {
@@ -66,7 +123,11 @@ local namespace_groups = (
         'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
       },
     },
-    spec: params.clusterLogging,
+    spec: params.clusterLogging {
+      [if channel_ge_55 then 'collection']+: {
+        type: super.logs.type,
+      },
+    },
   },
   [if params.clusterLogForwarding.enabled then '31_cluster_logforwarding']: kube._Object(clusterLoggingGroupVersion, 'ClusterLogForwarder', 'instance') {
     metadata+: {

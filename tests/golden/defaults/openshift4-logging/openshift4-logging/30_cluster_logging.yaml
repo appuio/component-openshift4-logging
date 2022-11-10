@@ -12,6 +12,7 @@ spec:
     logs:
       fluentd: {}
       type: fluentd
+    type: fluentd
   curation:
     curator:
       nodeSelector:
