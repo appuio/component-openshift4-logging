@@ -58,6 +58,14 @@ If you specify the logging stack version through parameter `version`, you should
 
 Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.4`, you should use `alerts: release-5.4`.
 
+[WARNING]
+====
+RedHat moved the YAML file containing the alert rules between cluster-logging version 5.4 and 5.5.
+To ensure the component can deploy alert rules for version 5.5, we've implemented support for the different file locations through a lookup map in the component class.
+However, due to limitations of reclass, there's no way to specify a fallback value in case the lookup map doesn't contain a key.
+Because of this, the component no longer automatically supports new versions of the logging stack.
+====
+
 == `kibana_host`
 
 [horizontal]
