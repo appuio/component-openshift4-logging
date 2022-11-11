@@ -26,6 +26,9 @@ This parameter is used in the default values for parameters `channel` and `alert
 We recommend that you use this parameter to specify the logging stack version which the component should deploy.
 However, you can still parameters `channel` and `alerts` directly.
 
+See the https://access.redhat.com/support/policy/updates/openshift#logging[OpenShift Logging life cycle documentation] for supported versions of the logging stack.
+We recommend that you select a version of the logging stack that's officially listed as compatible with your OpenShift version.
+
 == `channel`
 
 [horizontal]
