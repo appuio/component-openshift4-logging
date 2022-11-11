@@ -56,6 +56,8 @@ default:: `release-${openshift4_logging:version}`
 Release version of the alerting rules.
 If you specify the logging stack version through parameter `version`, you shouldn't need to modify this parameter.
 
+The component uses this parameter to determine the version to download for both Elasticsearch Operator and fluentd alert rules.
+
 Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.5`, you should use `alerts: release-5.5`.
 
 [WARNING]
