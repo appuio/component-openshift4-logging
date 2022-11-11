@@ -13,7 +13,3 @@ parameters:
     defaultInstallPlanApproval: Automatic
     defaultSource: openshift-operators-redhat
     defaultSourceNamespace: openshift-operators-redhat
-
-  openshift4_monitoring:
-    alerts:
-      ignoreNames: []

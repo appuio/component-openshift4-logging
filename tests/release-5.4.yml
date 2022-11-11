@@ -14,9 +14,5 @@ parameters:
     defaultSource: openshift-operators-redhat
     defaultSourceNamespace: openshift-operators-redhat
 
-  openshift4_monitoring:
-    alerts:
-      ignoreNames: []
-
   openshift4_logging:
     version: '5.4'
