@@ -34,7 +34,7 @@ jobs:
         instance:
           - defaults
           - syn-monitoring
-          - release-5.5
+          - release-5.4
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -51,7 +51,7 @@ jobs:
         instance:
           - defaults
           - syn-monitoring
-          - release-5.5
+          - release-5.4
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}

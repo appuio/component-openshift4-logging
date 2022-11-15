@@ -19,4 +19,4 @@ parameters:
       ignoreNames: []
 
   openshift4_logging:
-    version: '5.5'
+    version: '5.4'
