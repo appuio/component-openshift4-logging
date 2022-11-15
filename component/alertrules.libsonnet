@@ -4,6 +4,8 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
+local alertpatching = import 'lib/alert-patching.libsonnet';
+
 local runbook(alertname) =
   'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
 
@@ -32,59 +34,6 @@ local patch_alerts = {
     'for': '12h',
   },
 };
-
-/* FROM HERE: should be provided as library function by
- * rancher-/openshift4-monitoring */
-// We shouldn't be expected to care how rancher-/openshift4-monitoring
-// implement alert managmement and patching, instead we should be able to
-// reuse their functionality as a black box to make sure our alerts work
-// correctly in the environment into which we're deploying.
-
-// XXX: We'll figure out how we do alert management, when we start working on
-// alerting for the vendor-independent monitoring stack based on component
-// prometheus.
-local global_alert_params =
-  com.getValueOrDefault(
-    inv.parameters,
-    'openshift4_monitoring',
-    { alerts: { ignoreNames: [] } }
-  ).alerts;
-
-local filter_patch_rules(g) =
-  // combine our set of alerts to ignore with the monitoring component's
-  // set of ignoreNames.
-  local ignore_set = std.set(global_alert_params.ignoreNames + ignore_alerts);
-  g {
-    rules: std.map(
-      // Patch rules to make sure they match the requirements.
-      function(rule)
-        local rulepatch = com.getValueOrDefault(patch_alerts, rule.alert, {});
-        rule {
-          // Change alert names so we don't get multiple alerts with the same
-          // name, as the logging operator deploys its own copy of these
-          // rules.
-          alert: 'SYN_%s' % super.alert,
-          labels+: {
-            syn: 'true',
-            // mark alert as belonging to openshift4-logging
-            // can be used for inhibition rules
-            syn_component: 'openshift4-logging',
-          },
-        } + rulepatch,
-      std.filter(
-        // Filter out unwanted rules
-        function(rule)
-          // only create duplicates of alert rules, we can use the recording
-          // rules which are deployed anyway by the cluster-logging operator.
-          std.objectHas(rule, 'alert') &&
-          // Drop rules which are in the ignore_set
-          !std.member(ignore_set, rule.alert),
-        super.rules
-      ),
-    ),
-  };
-
-/* TO HERE */
 
 local loadFile(file) =
   local fpath = 'openshift4-logging/manifests/%s/%s' % [ params.alerts, file ];
@@ -137,7 +86,9 @@ local groups =
       groups: std.filter(
         function(it) it != null,
         [
-          local r = filter_patch_rules(g);
+          local r = alertpatching.filterPatchRules(
+            g, ignore_alerts, patch_alerts
+          );
           if std.length(r.rules) > 0 then r
           for g in groups
         ],
