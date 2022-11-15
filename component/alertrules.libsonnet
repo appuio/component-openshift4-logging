@@ -75,8 +75,7 @@ local filter_patch_rules(g) =
         // Filter out unwanted rules
         function(rule)
           // only create duplicates of alert rules, we can use the recording
-          // rules which are deployed anyway when we enable monitoring on the
-          // CephCluster resource.
+          // rules which are deployed anyway by the cluster-logging operator.
           std.objectHas(rule, 'alert') &&
           // Drop rules which are in the ignore_set
           !std.member(ignore_set, rule.alert),
@@ -87,8 +86,14 @@ local filter_patch_rules(g) =
 
 /* TO HERE */
 
+local loadFile(file) =
+  local fpath = 'openshift4-logging/manifests/%s/%s' % [ params.alerts, file ];
+  std.parseJson(kap.yaml_load_stream(fpath));
+
+
+// This will be processed by filter_patch_rules() as well
 local predictESStorage = {
-  local alertName = 'SYN_ElasticsearchExpectNodeToReachDiskWatermark',
+  local alertName = 'ElasticsearchExpectNodeToReachDiskWatermark',
   local hoursFromNow = params.predict_elasticsearch_storage_alert.predict_hours_from_now,
   local secondsFromNow = hoursFromNow * 3600,
   alert: alertName,
@@ -97,7 +102,7 @@ local predictESStorage = {
       'Expecting to reach disk low watermark at {{ $labels.node }} node in {{ $labels.cluster }} cluster in %s hours.'
       + ' When reaching the watermark no new shards will be allocated to this node anymore. You should consider adding more disk to the node.'
     ) % std.toString(hoursFromNow),
-    runbook_url: runbook(alertName),
+    runbook_url: runbook('SYN_' + alertName),
     summary: 'Expecting to Reach Disk Low Watermark in %s Hours' % std.toString(hoursFromNow),
   },
   expr: |||
@@ -116,6 +121,13 @@ local esStorageGroup = {
   rules: [ predictESStorage ],
 };
 
+local groups =
+  loadFile('elasticsearch_operator_prometheus_alerts.yaml')[0].groups +
+  loadFile('fluentd_prometheus_alerts.yaml')[0].groups +
+  [
+    if params.predict_elasticsearch_storage_alert.enabled then esStorageGroup,
+  ];
+
 {
   rules: kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-logging-rules') {
     metadata+: {
@@ -127,9 +139,7 @@ local esStorageGroup = {
         [
           local r = filter_patch_rules(g);
           if std.length(r.rules) > 0 then r
-          for g in std.parseJson(kap.yaml_load_stream('openshift4-logging/manifests/%s/fluentd_prometheus_alerts.yaml' % [ params.alerts ]))[0].groups
-        ] + [
-          if params.predict_elasticsearch_storage_alert.enabled then esStorageGroup,
+          for g in groups
         ],
       ),
     },

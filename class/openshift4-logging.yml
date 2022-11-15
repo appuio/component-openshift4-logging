@@ -1,14 +1,23 @@
 parameters:
   openshift4_logging:
-    =_alerts_source:
-      release-5.2: files/fluentd/fluentd_prometheus_alerts.yaml
-      release-5.3: files/fluentd/fluentd_prometheus_alerts.yaml
-      release-5.4: files/fluentd/fluentd_prometheus_alerts.yaml
-      release-5.5: files/collector/fluentd_prometheus_alerts.yaml
+    =_manifest_paths:
+      fluentd:
+        release-5.2: files/fluentd/fluentd_prometheus_alerts.yaml
+        release-5.3: files/fluentd/fluentd_prometheus_alerts.yaml
+        release-5.4: files/fluentd/fluentd_prometheus_alerts.yaml
+        release-5.5: files/collector/fluentd_prometheus_alerts.yaml
+      elasticsearch-operator:
+        release-5.2: files/prometheus_alerts.yml
+        release-5.3: files/prometheus_alerts.yml
+        release-5.4: files/prometheus_alerts.yml
+        release-5.5: files/prometheus_alerts.yml
   kapitan:
     dependencies:
       - type: https
-        source: https://raw.githubusercontent.com/openshift/cluster-logging-operator/${openshift4_logging:alerts}/${openshift4_logging:_alerts_source:${openshift4_logging:alerts}}
+        source: https://raw.githubusercontent.com/openshift/elasticsearch-operator/${openshift4_logging:alerts}/${openshift4_logging:_manifest_paths:elasticsearch-operator:${openshift4_logging:alerts}}
+        output_path: dependencies/openshift4-logging/manifests/${openshift4_logging:alerts}/elasticsearch_operator_prometheus_alerts.yaml
+      - type: https
+        source: https://raw.githubusercontent.com/openshift/cluster-logging-operator/${openshift4_logging:alerts}/${openshift4_logging:_manifest_paths:fluentd:${openshift4_logging:alerts}}
         output_path: dependencies/openshift4-logging/manifests/${openshift4_logging:alerts}/fluentd_prometheus_alerts.yaml
     compile:
       - input_paths:
