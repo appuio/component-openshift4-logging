@@ -255,7 +255,7 @@ spec:
           annotations:
             message: Prometheus could not scrape fluentd {{ $labels.container }} for
               more than 10m.
-            summary: Fluentd cannot be scraped - Test upstream change
+            summary: Fluentd cannot be scraped
           expr: 'up{job = "collector", container = "collector"} == 0 or absent(up{job="collector",
             container="collector"}) == 1
 
