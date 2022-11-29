@@ -1,5 +1,5 @@
 "groups":
-- "name": "logging_fluentd.alerts"
+- "name": "logging_fluentd.alerts.test"
   "rules":
   - "alert": "FluentdNodeDown"
     "annotations":

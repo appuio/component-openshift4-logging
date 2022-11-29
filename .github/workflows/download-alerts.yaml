@@ -32,7 +32,7 @@ jobs:
             git commit -m "Update upstream alerts"
             git push -u -f origin dependencies/update-upstream-alerts
 
-            gh pr view || gh pr create --title "Update upstream alerts" --label dependency
+            gh pr view || gh pr create --title "Update upstream alerts" --body "This PR updates the upstream alerts defined in alerts.txt." --label dependency
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
