@@ -1,5 +1,7 @@
 name: Download upstream alerts
 on:
+  schedule:
+    - cron:  '0 10 * * 1-5'
   workflow_dispatch: {}
 
 env:
@@ -9,5 +11,8 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - name: message
-        run: echo "This is a placeholder job"
+      - uses: actions/checkout@v3
+      - name: Download upstream alerts
+        run: make extract-alerts
+      - name: Check changes
+        run: git diff --exit-code
