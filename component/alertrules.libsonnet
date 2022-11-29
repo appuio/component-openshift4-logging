@@ -36,7 +36,7 @@ local patch_alerts = {
 };
 
 local loadFile(file) =
-  local fpath = 'openshift4-logging/manifests/%s/%s' % [ params.alerts, file ];
+  local fpath = 'openshift4-logging/component/extracted_alerts/%s/%s' % [ params.alerts, file ];
   std.parseJson(kap.yaml_load_stream(fpath));
 
 
