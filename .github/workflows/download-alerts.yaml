@@ -8,7 +8,7 @@ env:
   COMPONENT_NAME: openshift4-logging
 
 jobs:
-  linting:
+  alerts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,5 +17,22 @@ jobs:
           go-version: '>=1.19.0'
       - name: Download upstream alerts
         run: make extract-alerts
-      - name: Check changes
-        run: git diff --exit-code
+      - name: Commit changes to repository
+        run: |
+          set -e
+
+          if [[ -n $(git status --porcelain component/extracted_alerts) ]]; then
+            make gen-golden-all
+
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+
+            git switch -c dependencies/update-upstream-alerts
+            git add component/extracted_alerts tests/golden
+            git commit -m "Update upstream alerts"
+            git push -u -f origin dependencies/update-upstream-alerts
+
+            gh pr view || gh pr create --title "Update upstream alerts" --label dependency
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
