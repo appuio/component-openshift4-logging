@@ -1,0 +1,13 @@
+name: Download upstream alerts
+on:
+  workflow_dispatch: {}
+
+env:
+  COMPONENT_NAME: openshift4-logging
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: message
+        run: echo "This is a placeholder job"
