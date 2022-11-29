@@ -249,7 +249,7 @@ spec:
             severity: warning
             syn: 'true'
             syn_component: openshift4-logging
-    - name: logging_fluentd.alerts.test
+    - name: logging_fluentd.alerts
       rules:
         - alert: SYN_FluentdNodeDown
           annotations:
