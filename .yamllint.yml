@@ -17,3 +17,4 @@ ignore: |
   vendor/
   compiled/
   tests/golden/
+  component/extracted_alerts/

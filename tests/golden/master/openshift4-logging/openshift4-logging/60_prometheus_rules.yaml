@@ -1,0 +1,332 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  annotations: {}
+  labels:
+    name: syn-logging-rules
+  name: syn-logging-rules
+  namespace: openshift-logging
+spec:
+  groups:
+    - name: logging_elasticsearch.alerts
+      rules:
+        - alert: SYN_ElasticsearchClusterNotHealthy
+          annotations:
+            message: Cluster {{ $labels.cluster }} health status has been RED for
+              at least 7m. Cluster does not accept writes, shards may be missing or
+              master node hasn't been elected yet.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Cluster-Health-is-Red'
+            summary: Cluster health status is RED
+          expr: 'sum by (cluster) (es_cluster_status == 2)
+
+            '
+          for: 7m
+          labels:
+            namespace: openshift-logging
+            severity: critical
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchClusterNotHealthy
+          annotations:
+            message: Cluster {{ $labels.cluster }} health status has been YELLOW for
+              at least 20m. Some shard replicas are not allocated.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Cluster-Health-is-Yellow'
+            summary: Cluster health status is YELLOW
+          expr: 'sum by (cluster) (es_cluster_status == 1)
+
+            '
+          for: 20m
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchWriteRequestsRejectionJumps
+          annotations:
+            message: High Write Rejection Ratio at {{ $labels.node }} node in {{ $labels.cluster
+              }} cluster. This node may not be keeping up with the indexing speed.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Write-Requests-Rejection-Jumps'
+            summary: High Write Rejection Ratio - {{ $value }}%
+          expr: 'round( writing:reject_ratio:rate2m * 100, 0.001 ) > 5
+
+            '
+          for: 10m
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchNodeDiskWatermarkReached
+          annotations:
+            message: Disk Low Watermark Reached at {{ $labels.pod }} pod. Shards can
+              not be allocated to this node anymore. You should consider adding more
+              disk to the node.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Node-Disk-Low-Watermark-Reached'
+            summary: Disk Low Watermark Reached - disk saturation is {{ $value }}%
+          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      es_fs_path_available_bytes\
+            \ /\n      es_fs_path_total_bytes\n    )\n  ) * 100, 0.001)\n) > on(instance,\
+            \ pod) es_cluster_routing_allocation_disk_watermark_low_pct\n"
+          for: 5m
+          labels:
+            namespace: openshift-logging
+            severity: info
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchNodeDiskWatermarkReached
+          annotations:
+            message: Disk High Watermark Reached at {{ $labels.pod }} pod. Some shards
+              will be re-allocated to different nodes if possible. Make sure more
+              disk space is added to the node or drop old indices allocated to this
+              node.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Node-Disk-High-Watermark-Reached'
+            summary: Disk High Watermark Reached - disk saturation is {{ $value }}%
+          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      es_fs_path_available_bytes\
+            \ /\n      es_fs_path_total_bytes\n    )\n  ) * 100, 0.001)\n) > on(instance,\
+            \ pod) es_cluster_routing_allocation_disk_watermark_high_pct\n"
+          for: 5m
+          labels:
+            namespace: openshift-logging
+            severity: critical
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchNodeDiskWatermarkReached
+          annotations:
+            message: Disk Flood Stage Watermark Reached at {{ $labels.pod }}. Every
+              index having a shard allocated on this node is enforced a read-only
+              block. The index block must be released manually when the disk utilization
+              falls below the high watermark.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Node-Disk-Flood-Watermark-Reached'
+            summary: Disk Flood Stage Watermark Reached - disk saturation is {{ $value
+              }}%
+          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      es_fs_path_available_bytes\
+            \ /\n      es_fs_path_total_bytes\n    )\n  ) * 100, 0.001)\n) > on(instance,\
+            \ pod) es_cluster_routing_allocation_disk_watermark_flood_stage_pct\n"
+          for: 5m
+          labels:
+            namespace: openshift-logging
+            severity: critical
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchJVMHeapUseHigh
+          annotations:
+            message: JVM Heap usage on the node {{ $labels.node }} in {{ $labels.cluster
+              }} cluster is {{ $value }}%.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-JVM-Heap-Use-is-High'
+            summary: JVM Heap usage on the node is high
+          expr: 'sum by (cluster, instance, node) (es_jvm_mem_heap_used_percent) >
+            75
+
+            '
+          for: 10m
+          labels:
+            namespace: openshift-logging
+            severity: info
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_AggregatedLoggingSystemCPUHigh
+          annotations:
+            message: System CPU usage on the node {{ $labels.node }} in {{ $labels.cluster
+              }} cluster is {{ $value }}%.
+            runbook_url: '[[.RunbookBaseURL]]#Aggregated-Logging-System-CPU-is-High'
+            summary: System CPU usage is high
+          expr: 'sum by (cluster, instance, node) (es_os_cpu_percent) > 90
+
+            '
+          for: 1m
+          labels:
+            namespace: openshift-logging
+            severity: info
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchProcessCPUHigh
+          annotations:
+            message: ES process CPU usage on the node {{ $labels.node }} in {{ $labels.cluster
+              }} cluster is {{ $value }}%.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Process-CPU-is-High'
+            summary: ES process CPU usage is high
+          expr: 'sum by (cluster, instance, node) (es_process_cpu_percent) > 90
+
+            '
+          for: 1m
+          labels:
+            namespace: openshift-logging
+            severity: info
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchDiskSpaceRunningLow
+          annotations:
+            message: Cluster {{ $labels.cluster }} is predicted to be out of disk
+              space within the next 6h.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Disk-Space-is-Running-Low'
+            summary: Cluster low on disk space
+          expr: 'sum(predict_linear(es_fs_path_available_bytes[6h], 6 * 3600)) < 0
+
+            '
+          for: 1h
+          labels:
+            namespace: openshift-logging
+            severity: critical
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchHighFileDescriptorUsage
+          annotations:
+            message: Cluster {{ $labels.cluster }} is predicted to be out of file
+              descriptors within the next hour.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-FileDescriptor-Usage-is-high'
+            summary: Cluster low on file descriptors
+          expr: 'predict_linear(es_process_file_descriptors_max_number[1h], 3600)
+            - predict_linear(es_process_file_descriptors_open_number[1h], 3600) <
+            0
+
+            '
+          for: 10m
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchOperatorCSVNotSuccessful
+          annotations:
+            message: Elasticsearch Operator CSV has not reconciled succesfully.
+            summary: Elasticsearch Operator CSV Not Successful
+          expr: 'csv_succeeded{name =~ "elasticsearch-operator.*"} == 0
+
+            '
+          for: 10m
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchNodeDiskWatermarkReached
+          annotations:
+            message: Disk Low Watermark is predicted to be reached within the next
+              6h at {{ $labels.pod }} pod. Shards can not be allocated to this node
+              anymore. You should consider adding more disk to the node.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Node-Disk-Low-Watermark-Reached'
+            summary: Disk Low Watermark is predicted to be reached within next 6h.
+          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      predict_linear(es_fs_path_available_bytes[3h],\
+            \ 6 * 3600) /\n      predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)\n\
+            \    )\n  ) * 100, 0.001)\n) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_low_pct\n"
+          for: 1h
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchNodeDiskWatermarkReached
+          annotations:
+            message: Disk High Watermark is predicted to be reached within the next
+              6h at {{ $labels.pod }} pod. Some shards will be re-allocated to different
+              nodes if possible. Make sure more disk space is added to the node or
+              drop old indices allocated to this node.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Node-Disk-High-Watermark-Reached'
+            summary: Disk High Watermark is predicted to be reached within next 6h.
+          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      predict_linear(es_fs_path_available_bytes[3h],\
+            \ 6 * 3600) /\n      predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)\n\
+            \    )\n  ) * 100, 0.001)\n) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_high_pct\n"
+          for: 1h
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_ElasticsearchNodeDiskWatermarkReached
+          annotations:
+            message: Disk Flood Stage Watermark is predicted to be reached within
+              the next 6h at {{ $labels.pod }}. Every index having a shard allocated
+              on this node is enforced a read-only block. The index block must be
+              released manually when the disk utilization falls below the high watermark.
+            runbook_url: '[[.RunbookBaseURL]]#Elasticsearch-Node-Disk-Flood-Watermark-Reached'
+            summary: Disk Flood Stage Watermark is predicted to be reached within
+              next 6h.
+          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      predict_linear(es_fs_path_available_bytes[3h],\
+            \ 6 * 3600) /\n      predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)\n\
+            \    )\n  ) * 100, 0.001)\n) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_flood_stage_pct\n"
+          for: 1h
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+    - name: logging_fluentd.alerts
+      rules:
+        - alert: SYN_FluentdNodeDown
+          annotations:
+            message: Prometheus could not scrape fluentd {{ $labels.container }} for
+              more than 10m.
+            summary: Fluentd cannot be scraped - Test upstream change
+          expr: 'up{job = "collector", container = "collector"} == 0 or absent(up{job="collector",
+            container="collector"}) == 1
+
+            '
+          for: 10m
+          labels:
+            namespace: openshift-logging
+            service: collector
+            severity: critical
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_FluentdQueueLengthIncreasing
+          annotations:
+            message: For the last hour, fluentd {{ $labels.pod }} output '{{ $labels.plugin_id
+              }}' average buffer queue length has increased continuously.
+            summary: Fluentd pod {{ $labels.pod }} is unable to keep up with traffic
+              over time for forwarder output {{ $labels.plugin_id }}.
+          expr: 'sum by (pod,plugin_id) ( 0 * (deriv(fluentd_output_status_emit_records[1m]
+            offset 1h)))  + on(pod,plugin_id)  ( deriv(fluentd_output_status_buffer_queue_length[10m])
+            > 0 and delta(fluentd_output_status_buffer_queue_length[1h]) > 1 )
+
+            '
+          for: 12h
+          labels:
+            namespace: openshift-logging
+            service: collector
+            severity: Warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_FluentDHighErrorRate
+          annotations:
+            message: '{{ $value }}% of records have resulted in an error by fluentd
+              {{ $labels.instance }}.'
+            summary: FluentD output errors are high
+          expr: "100 * (\n  sum by(instance)(rate(fluentd_output_status_num_errors[2m]))\n\
+            /\n  sum by(instance)(rate(fluentd_output_status_emit_records[2m]))\n\
+            ) > 10\n"
+          for: 15m
+          labels:
+            namespace: openshift-logging
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
+        - alert: SYN_FluentDVeryHighErrorRate
+          annotations:
+            message: '{{ $value }}% of records have resulted in an error by fluentd
+              {{ $labels.instance }}.'
+            summary: FluentD output errors are very high
+          expr: "100 * (\n  sum by(instance)(rate(fluentd_output_status_num_errors[2m]))\n\
+            /\n  sum by(instance)(rate(fluentd_output_status_emit_records[2m]))\n\
+            ) > 25\n"
+          for: 15m
+          labels:
+            namespace: openshift-logging
+            severity: critical
+            syn: 'true'
+            syn_component: openshift4-logging
+    - name: elasticsearch_node_storage.alerts
+      rules:
+        - alert: SYN_ElasticsearchExpectNodeToReachDiskWatermark
+          annotations:
+            message: Expecting to reach disk low watermark at {{ $labels.node }} node
+              in {{ $labels.cluster }} cluster in 72 hours. When reaching the watermark
+              no new shards will be allocated to this node anymore. You should consider
+              adding more disk to the node.
+            runbook_url: https://hub.syn.tools/openshift4-logging/runbooks/SYN_ElasticsearchExpectNodeToReachDiskWatermark.html
+            summary: Expecting to Reach Disk Low Watermark in 72 Hours
+          expr: "sum by(cluster, instance, node) (\n  (1 - (predict_linear(es_fs_path_available_bytes[72h],\
+            \ 259200) / es_fs_path_total_bytes)) * 100\n) > 85\n"
+          for: 6h
+          labels:
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging

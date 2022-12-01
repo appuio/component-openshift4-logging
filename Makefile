@@ -90,3 +90,8 @@ $(test_instances):
 .PHONY: clean
 clean: ## Clean the project
 	rm -rf .cache compiled dependencies vendor helmcharts jsonnetfile*.json || true
+
+.PHONY: extract-alerts
+extract-alerts: ## Extract alerts from upstream go files
+	rm -rf component/extracted_alerts
+	tools/download-upstream-alerts.sh alerts.txt component/extracted_alerts
