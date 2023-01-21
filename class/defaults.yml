@@ -41,12 +41,6 @@ parameters:
             maxAge: 30d
           audit:
             maxAge: 30d
-      curation:
-        type: curator
-        curator:
-          nodeSelector:
-            node-role.kubernetes.io/infra: ''
-          schedule: 30 3 * * *
       visualization:
         type: kibana
         kibana:
