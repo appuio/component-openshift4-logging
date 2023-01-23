@@ -12,12 +12,6 @@ spec:
     logs:
       fluentd: {}
       type: fluentd
-  curation:
-    curator:
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      schedule: 30 3 * * *
-    type: curator
   logStore:
     elasticsearch:
       nodeCount: 3
