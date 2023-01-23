@@ -48,6 +48,28 @@ However, since there's potential for changes in configuration between logging st
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
 
 
+== `alerts`
+
+[horizontal]
+type:: string
+default:: `release-${openshift4_logging:version}`
+
+Release version of the alerting rules.
+If you specify the logging stack version through parameter `version`, you shouldn't need to modify this parameter.
+
+The component uses this parameter to determine the version to download for both Elasticsearch Operator and fluentd alert rules.
+
+Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.5`, you should use `alerts: release-5.5`.
+
+[WARNING]
+====
+RedHat moved the YAML file containing the alert rules between cluster-logging version 5.4 and 5.5.
+To ensure the component can deploy alert rules for version 5.5, we've implemented support for the different file locations through a lookup map in the component class.
+However, due to limitations of reclass, there's no way to specify a fallback value in case the lookup map doesn't contain a key.
+Because of this, the component no longer automatically supports new versions of the logging stack.
+====
+
+
 == `ignore_alerts`
 
 [horizontal]
@@ -69,8 +91,6 @@ default::
 components:
   elasticsearch:
     enabled: true
-    alerts: 'release-${openshift4_logging:version}'
-    ignore_alerts: []
     kibana_host: null
     predict_elasticsearch_storage_alert:
       enabled: true
@@ -82,28 +102,6 @@ components:
 ----
 
 Configuration of the elasticsearch component.
-
-
-=== `components.elasticsearch.alerts`
-
-[horizontal]
-type:: string
-default:: `release-${openshift4_logging:version}`
-
-Release version of the alerting rules.
-If you specify the logging stack version through parameter `version`, you shouldn't need to modify this parameter.
-
-The component uses this parameter to determine the version to download for both Elasticsearch Operator and fluentd alert rules.
-
-Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.6`, you should use `alerts: release-5.6`.
-
-[WARNING]
-====
-RedHat moved the YAML file containing the alert rules between cluster-logging version 5.4 and 5.5.
-To ensure the component can deploy alert rules for version 5.5, we've implemented support for the different file locations through a lookup map in the component class.
-However, due to limitations of reclass, there's no way to specify a fallback value in case the lookup map doesn't contain a key.
-Because of this, the component no longer automatically supports new versions of the logging stack.
-====
 
 
 === `components.elasticsearch.kibana_host`
@@ -189,6 +187,87 @@ type:: string
 default:: `warning`
 
 The severity of the fired alert.
+
+
+== `components.lokistack`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+components:
+  lokistack:
+    enabled: false
+    logStore:
+      access_key_id: ''
+      access_key_secret: ''
+      endpoint: ''
+      bucketnames: '${cluster:name}-logstore'
+    spec:
+      size: 1x.extra-small
+      storage:
+        schemas:
+          - version: v12
+            effectiveDate: '2022-06-01'
+        secret:
+          type: s3
+          name: loki-logstore
+      storageClassName: ''
+      tenants:
+        mode: openshift-logging
+----
+
+Configuration of the lokistack component.
+
+
+=== `components.lokistack.logStore`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+logStore:
+  access_key_id: ''
+  access_key_secret: ''
+  endpoint: ''
+  bucketnames: '${cluster:name}-logstore'
+----
+
+A dictionary holding the connection information for the s3 storage used by the lokistack.
+
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-loki.html#logging-loki-deploy_cluster-logging-loki[Openshift Docs] or
+https://loki-operator.dev/docs/object_storage.md[Lokistack Operator Docs] for available parameters.
+
+
+=== `components.lokistack.spec`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+spec:
+  size: 1x.extra-small
+  storage:
+    schemas:
+      - version: v12
+        effectiveDate: '2022-06-01'
+    secret:
+      type: s3
+      name: loki-logstore
+  storageClassName: ''
+  tenants:
+    mode: openshift-logging
+----
+
+A dictionary holding the `.spec` for the LokiStack resource.
+
+See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-loki.html#logging-loki-deploy_cluster-logging-loki[Openshift Docs] for available parameters.
 
 
 == `clusterLogging`

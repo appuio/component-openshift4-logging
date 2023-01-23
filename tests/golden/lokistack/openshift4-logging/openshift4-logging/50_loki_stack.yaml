@@ -1,0 +1,52 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  annotations: {}
+  labels:
+    name: loki
+  name: loki
+spec:
+  size: 1x.extra-small
+  storage:
+    schemas:
+      - effectiveDate: '2022-06-01'
+        version: v12
+    secret:
+      name: loki-logstore
+      type: s3
+  storageClassName: ''
+  template:
+    compactor:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 1
+    distributor:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 2
+    gateway:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 1
+    indexGateway:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 2
+    ingester:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 2
+    querier:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 1
+    queryFrontend:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 1
+    ruler:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ''
+      replicas: 1
+  tenants:
+    mode: openshift-logging

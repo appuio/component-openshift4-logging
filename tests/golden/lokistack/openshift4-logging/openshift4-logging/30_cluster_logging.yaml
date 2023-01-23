@@ -1,0 +1,26 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogging
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    name: instance
+  name: instance
+  namespace: openshift-logging
+spec:
+  collection:
+    logs:
+      fluentd: {}
+      type: fluentd
+  logStore:
+    lokistack:
+      name: loki
+    retentionPolicy:
+      application:
+        maxAge: 7d
+      audit:
+        maxAge: 30d
+      infra:
+        maxAge: 30d
+    type: lokistack
+  managementState: Managed

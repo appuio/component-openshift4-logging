@@ -11,3 +11,7 @@ https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.4/f
 https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.5/files/prometheus_alerts.yml release-5.5/elasticsearch_operator_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.6/files/prometheus_alerts.yml release-5.6/elasticsearch_operator_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/elasticsearch-operator/master/files/prometheus_alerts.yml master/elasticsearch_operator_prometheus_alerts.yaml
+
+https://raw.githubusercontent.com/openshift/loki/release-5.5/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml release-5.5/lokistack_prometheus_alerts.yaml
+https://raw.githubusercontent.com/openshift/loki/release-5.6/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml release-5.6/lokistack_prometheus_alerts.yaml
+https://raw.githubusercontent.com/openshift/loki/main/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml master/lokistack_prometheus_alerts.yaml
