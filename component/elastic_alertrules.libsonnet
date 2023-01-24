@@ -19,23 +19,27 @@ assert
 local predict_storage_alert = elasticsearch.predict_elasticsearch_storage_alert + (
   if std.objectHas(params, 'predict_elasticsearch_storage_alert') then
     std.trace(
-      'parameter predict_elasticsearch_storage_alert is deprecated, please use parameter `elasticsearch.predict_elasticsearch_storage_alert instead`',
+      'parameter predict_elasticsearch_storage_alert is deprecated, please use parameter `components.elasticsearch.predict_elasticsearch_storage_alert instead`',
       com.makeMergeable(params.predict_elasticsearch_storage_alert)
     )
   else {}
 );
 local alerts =
-  if std.objectHas(params, 'alerts') then params.alerts
+  if std.objectHas(params, 'alerts') then
+    std.trace(
+      'parameter alerts is deprecated, please use parameter `components.elasticsearch.alerts instead`',
+      params.alerts
+    )
   else elasticsearch.alerts;
 
-// Keep only alerts from elasticsearch.ignore_alerts for which the last
+// Keep only alerts from params.ignore_alerts for which the last
 // array entry wasn't prefixed with `~`.
 local user_ignore_alerts = com.renderArray(params.ignore_alerts);
 
 // Upstream alerts to ignore
 local ignore_alerts = std.set(
   // Add set of upstream alerts that should be ignored from processed value of
-  // `elasticsearch.ignore_alerts`
+  // `params.ignore_alerts`
   user_ignore_alerts
 );
 
