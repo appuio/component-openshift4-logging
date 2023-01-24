@@ -3,8 +3,8 @@ kind: PrometheusRule
 metadata:
   annotations: {}
   labels:
-    name: syn-logging-rules
-  name: syn-logging-rules
+    name: syn-elasticsearch-logging-rules
+  name: syn-elasticsearch-logging-rules
   namespace: openshift-logging
 spec:
   groups:

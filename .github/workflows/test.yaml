@@ -33,7 +33,6 @@ jobs:
       matrix:
         instance:
           - defaults
-          - syn-monitoring
           - release-5.4
           - master
     defaults:
@@ -51,7 +50,6 @@ jobs:
       matrix:
         instance:
           - defaults
-          - syn-monitoring
           - release-5.4
           - master
     defaults:
