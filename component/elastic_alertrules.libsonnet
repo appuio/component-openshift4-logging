@@ -17,21 +17,20 @@ assert
 
 // Keep config backwards compatible
 local predict_storage_alert = elasticsearch.predict_elasticsearch_storage_alert + (
-  if std.objectHas(params, 'predict_elasticsearch_storage_alert') then params.predict_elasticsearch_storage_alert
+  if std.objectHas(params, 'predict_elasticsearch_storage_alert') then
+    std.trace(
+      'parameter predict_elasticsearch_storage_alert is deprecated, please use parameter `elasticsearch.predict_elasticsearch_storage_alert instead`',
+      com.makeMergeable(params.predict_elasticsearch_storage_alert)
+    )
   else {}
 );
-local alerts = elasticsearch.alerts + (
+local alerts =
   if std.objectHas(params, 'alerts') then params.alerts
-  else ''
-);
-local list_ignore_alerts = elasticsearch.ignore_alerts + (
-  if std.objectHas(params, 'ignore_alerts') then params.ignore_alerts
-  else []
-);
+  else elasticsearch.alerts;
 
 // Keep only alerts from elasticsearch.ignore_alerts for which the last
 // array entry wasn't prefixed with `~`.
-local user_ignore_alerts = com.renderArray(list_ignore_alerts);
+local user_ignore_alerts = com.renderArray(params.ignore_alerts);
 
 // Upstream alerts to ignore
 local ignore_alerts = std.set(
@@ -92,7 +91,7 @@ local groups =
     if predict_storage_alert.enabled then esStorageGroup,
   ];
 
-local prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-logging-rules') {
+local prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-elasticsearch-logging-rules') {
   metadata+: {
     namespace: params.namespace,
   },

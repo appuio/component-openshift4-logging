@@ -3,8 +3,8 @@ kind: PrometheusRule
 metadata:
   annotations: {}
   labels:
-    name: syn-logging-rules
-  name: syn-logging-rules
+    name: syn-elasticsearch-logging-rules
+  name: syn-elasticsearch-logging-rules
   namespace: openshift-logging
 spec:
   groups:
@@ -253,15 +253,17 @@ spec:
       rules:
         - alert: SYN_FluentdNodeDown
           annotations:
-            message: Prometheus could not scrape fluentd {{ $labels.instance }} for
+            message: Prometheus could not scrape fluentd {{ $labels.container }} for
               more than 10m.
             summary: Fluentd cannot be scraped
-          expr: 'up{job="collector"} == 0 or absent(up{job="collector"}) == 1
+          expr: 'up{job = "collector", container = "collector"} == 0 or absent(up{job="collector",
+            container="collector"}) == 1
 
             '
           for: 10m
           labels:
-            service: fluentd
+            namespace: openshift-logging
+            service: collector
             severity: critical
             syn: 'true'
             syn_component: openshift4-logging
@@ -278,7 +280,8 @@ spec:
             '
           for: 12h
           labels:
-            service: fluentd
+            namespace: openshift-logging
+            service: collector
             severity: Warning
             syn: 'true'
             syn_component: openshift4-logging
@@ -292,6 +295,7 @@ spec:
             ) > 10\n"
           for: 15m
           labels:
+            namespace: openshift-logging
             severity: warning
             syn: 'true'
             syn_component: openshift4-logging
@@ -305,6 +309,7 @@ spec:
             ) > 25\n"
           for: 15m
           labels:
+            namespace: openshift-logging
             severity: critical
             syn: 'true'
             syn_component: openshift4-logging

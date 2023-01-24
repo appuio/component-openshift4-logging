@@ -48,6 +48,16 @@ However, since there's potential for changes in configuration between logging st
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
 
 
+== `ignore_alerts`
+
+[horizontal]
+type:: list
+default:: []
+
+This parameter can be used to disable alerts provided by openshift cluster-logging-operator.
+The component supports removing entries in this parameter by providing the entry prefixed with `~`.
+
+
 == `components.elasticsearch`
 
 [horizontal]
@@ -94,16 +104,6 @@ To ensure the component can deploy alert rules for version 5.5, we've implemente
 However, due to limitations of reclass, there's no way to specify a fallback value in case the lookup map doesn't contain a key.
 Because of this, the component no longer automatically supports new versions of the logging stack.
 ====
-
-
-=== `components.elasticsearch.ignore_alerts`
-
-[horizontal]
-type:: list
-default:: []
-
-This parameter can be used to disable alerts provided by openshift cluster-logging-operator.
-The component supports removing entries in this parameter by providing the entry prefixed with `~`.
 
 
 === `components.elasticsearch.kibana_host`

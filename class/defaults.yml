@@ -4,11 +4,12 @@ parameters:
     version: '5.5'
     channel: 'stable-${openshift4_logging:version}'
 
+    ignore_alerts: []
+
     components:
       elasticsearch:
         enabled: true
         alerts: 'release-${openshift4_logging:version}'
-        ignore_alerts: []
         kibana_host: null
         predict_elasticsearch_storage_alert:
           enabled: true

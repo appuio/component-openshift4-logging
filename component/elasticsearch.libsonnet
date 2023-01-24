@@ -9,7 +9,7 @@ local elasticsearch = inv.parameters.openshift4_logging.components.elasticsearch
 
 
 local machineconfig_journald = [
-  kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '41-' + role + '-journald') {
+  kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
     metadata+: {
       labels+: {
         'machineconfiguration.openshift.io/role': role,
@@ -114,14 +114,13 @@ local alertrules = import 'elastic_alertrules.libsonnet';
 // Define outputs below
 if elasticsearch.enabled then
   {
-    '41_es_machineconfig': machineconfig_journald,
-    '42_es_netpol': netpol_operator,
-    '43_es_alertrules': alertrules.prometheus_rules,
-    [if elasticsearch.kibana_host != null then '44_es_kibana_host']: kibana_patchWithAdditionalPermissions,
+    '40_es_machineconfig': machineconfig_journald,
+    '40_es_netpol': netpol_operator,
+    '40_es_alertrules': alertrules.prometheus_rules,
+    [if elasticsearch.kibana_host != null then '40_es_kibana_host']: kibana_patchWithAdditionalPermissions,
   }
 else
   std.trace(
-    'Elasticsearch disabled, '
-    + 'not deploying Elasticsearch stack',
+    'Elasticsearch disabled, not deploying Elasticsearch stack',
     {}
   )
