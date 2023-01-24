@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations: {}
-  labels:
-    monitoring.syn.tools/monitoring: 'true'
-    name: syn-monitoring-openshift4-logging
-  name: syn-monitoring-openshift4-logging
