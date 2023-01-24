@@ -4,8 +4,8 @@ metadata:
   annotations: {}
   labels:
     machineconfiguration.openshift.io/role: master
-    name: 40-master-journald
-  name: 40-master-journald
+    name: 41-master-journald
+  name: 41-master-journald
 spec:
   config:
     ignition:
@@ -24,8 +24,8 @@ metadata:
   annotations: {}
   labels:
     machineconfiguration.openshift.io/role: worker
-    name: 40-worker-journald
-  name: 40-worker-journald
+    name: 41-worker-journald
+  name: 41-worker-journald
 spec:
   config:
     ignition:

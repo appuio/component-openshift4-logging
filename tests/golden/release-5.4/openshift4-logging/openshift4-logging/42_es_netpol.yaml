@@ -5,7 +5,6 @@ metadata:
   labels:
     name: allow-from-openshift-operators-redhat
   name: allow-from-openshift-operators-redhat
-  namespace: openshift-logging
 spec:
   ingress:
     - from:

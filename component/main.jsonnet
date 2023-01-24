@@ -9,9 +9,6 @@ local params = inv.parameters.openshift4_logging;
 local group = 'operators.coreos.com/';
 local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 
-local alert_rules = import 'alertrules.libsonnet';
-local metrics = import 'metrics.libsonnet';
-
 local namespace_groups = (
   if std.objectHas(params.clusterLogForwarding, 'namespaces') then
     {
@@ -47,18 +44,21 @@ local namespace_groups = (
     },
   },
   '20_subscriptions': [
-    operatorlib.managedSubscription(
-      'openshift-operators-redhat',
-      'elasticsearch-operator',
-      params.channel
-    ),
     operatorlib.namespacedSubscription(
       params.namespace,
       'cluster-logging',
       params.channel,
       'redhat-operators'
     ),
-  ],
+  ] + (
+    if params.components.elasticsearch.enabled then [
+      operatorlib.managedSubscription(
+        'openshift-operators-redhat',
+        'elasticsearch-operator',
+        params.channel
+      ),
+    ] else []
+  ),
   '30_cluster_logging': kube._Object(clusterLoggingGroupVersion, 'ClusterLogging', 'instance') {
     metadata+: {
       namespace: params.namespace,
@@ -139,70 +139,5 @@ local namespace_groups = (
       }
     ),
   },
-  '40_journald_configs': [ kube._Object('machineconfiguration.openshift.io/v1', 'MachineConfig', '40-' + role + '-journald') {
-    metadata+: {
-      labels+: {
-        'machineconfiguration.openshift.io/role': role,
-      },
-    },
-    spec: {
-      config: {
-        ignition: {
-          version: '2.2.0',
-        },
-        storage: {
-          files: [
-            {
-              contents: {
-                // See https://docs.openshift.com/container-platform/latest/logging/config/cluster-logging-systemd.html
-                source: 'data:text/plain;charset=utf-8;base64,' + std.base64(|||
-                  MaxRetentionSec=1month
-                  RateLimitBurst=10000
-                  RateLimitInterval=1s
-                  Storage=persistent
-                  SyncIntervalSec=1s
-                |||),
-              },
-              filesystem: 'root',
-              mode: 420,
-              path: '/etc/systemd/journald.conf',
-            },
-          ],
-        },
-      },
-    },
-  } for role in [ 'master', 'worker' ] ],
-  '50_networkpolicy':
-    // Allow cluster-scoped ES operator to access ES pods in openshift-logging
-    kube._Object('networking.k8s.io/v1', 'NetworkPolicy', 'allow-from-openshift-operators-redhat')
-    {
-      metadata+: {
-        namespace: params.namespace,
-      },
-      spec: {
-        ingress: [
-          {
-            from: [
-              {
-                namespaceSelector: {
-                  matchLabels: {
-                    name: 'openshift-operators-redhat',
-                  },
-                },
-              },
-              {
-                podSelector: {
-                  matchLabels: {
-                    name: 'elasticsearch-operator',
-                  },
-                },
-              },
-            ],
-          },
-        ],
-        podSelector: {},
-        policyTypes: [ 'Ingress' ],
-      },
-    },
-  '60_prometheus_rules': alert_rules.rules,
-} + (import 'kibana-host.libsonnet')
+}
++ (import 'elasticsearch.libsonnet')

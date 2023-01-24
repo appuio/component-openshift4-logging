@@ -7,7 +7,7 @@
       "name": "OpenShift4 Logging",
       "slug": "openshift4-logging",
       "parameter_key": "openshift4_logging",
-      "test_cases": "defaults syn-monitoring release-5.4 master",
+      "test_cases": "defaults release-5.4 master",
       "add_lib": "n",
       "add_pp": "n",
       "add_golden": "y",

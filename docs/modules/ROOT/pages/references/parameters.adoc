@@ -47,7 +47,34 @@ However, since there's potential for changes in configuration between logging st
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
 
-== `alerts`
+
+== `components.elasticsearch`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+components:
+  elasticsearch:
+    enabled: true
+    alerts: 'release-${openshift4_logging:version}'
+    ignore_alerts: []
+    kibana_host: null
+    predict_elasticsearch_storage_alert:
+      enabled: true
+      lookback_range: 72h
+      predict_hours_from_now: 72
+      threshold: 85
+      for: 6h
+      severity: warning
+----
+
+Configuration of the elasticsearch component.
+
+
+=== `components.elasticsearch.alerts`
 
 [horizontal]
 type:: string
@@ -68,7 +95,18 @@ However, due to limitations of reclass, there's no way to specify a fallback val
 Because of this, the component no longer automatically supports new versions of the logging stack.
 ====
 
-== `kibana_host`
+
+=== `components.elasticsearch.ignore_alerts`
+
+[horizontal]
+type:: list
+default:: []
+
+This parameter can be used to disable alerts provided by openshift cluster-logging-operator.
+The component supports removing entries in this parameter by providing the entry prefixed with `~`.
+
+
+=== `components.elasticsearch.kibana_host`
 
 [horizontal]
 type:: string
@@ -78,7 +116,7 @@ example:: `kibana.apps.cluster.syn.tools`
 Host name of the Kibana route.
 
 
-== `predict_elasticsearch_storage_alert`
+=== `components.elasticsearch.predict_elasticsearch_storage_alert`
 
 [horizontal]
 type:: dict
@@ -86,18 +124,20 @@ example::
 +
 [source,yaml]
 ----
-predict_elasticsearch_storage_alert:
-  enabled: true
-  lookback_range: 72h
-  predict_hours_from_now: 72
-  threshold: 85
-  for: 6h
-  severity: warning
+components:
+  elasticsearch:
+    predict_elasticsearch_storage_alert:
+      enabled: true
+      lookback_range: 72h
+      predict_hours_from_now: 72
+      threshold: 85
+      for: 6h
+      severity: warning
 ----
 
 Create an alert `SYN_ElasticsearchExpectNodeToReachDiskWatermark` if the storage allocated for Elasticsearch is predicted to reach the low storage watermark.
 
-=== `predict_elasticsearch_storage_alert.enabled`
+==== `components.elasticsearch.predict_elasticsearch_storage_alert.enabled`
 
 [horizontal]
 type:: boolean
@@ -105,7 +145,7 @@ default:: `true`
 
 Enable or disable this alert.
 
-=== `predict_elasticsearch_storage_alert.lookback_range`
+==== `components.elasticsearch.predict_elasticsearch_storage_alert.lookback_range`
 
 [horizontal]
 type:: prometheus duration
@@ -114,7 +154,7 @@ default:: `72h`
 How for to look back to calculate the prediction.
 
 
-=== `predict_elasticsearch_storage_alert.predict_hours_from_now`
+==== `components.elasticsearch.predict_elasticsearch_storage_alert.predict_hours_from_now`
 
 [horizontal]
 type:: number
@@ -123,7 +163,7 @@ default:: `72`
 How far in the future the prediction is calculated.
 
 
-=== `predict_elasticsearch_storage_alert.threshold`
+==== `components.elasticsearch.predict_elasticsearch_storage_alert.threshold`
 
 [horizontal]
 type:: number
@@ -133,7 +173,7 @@ The threshold for the alert.
 Percentage of disk fill.
 
 
-=== `predict_elasticsearch_storage_alert.for`
+==== `components.elasticsearch.predict_elasticsearch_storage_alert.for`
 
 [horizontal]
 type:: prometheus duration
@@ -142,23 +182,13 @@ default:: `6h`
 The alert is firing once the threshold has been reached for this long.
 
 
-=== `predict_elasticsearch_storage_alert.severity`
+==== `components.elasticsearch.predict_elasticsearch_storage_alert.severity`
 
 [horizontal]
 type:: string
 default:: `warning`
 
 The severity of the fired alert.
-
-
-== `ignore_alerts`
-
-[horizontal]
-type:: list
-default:: []
-
-This parameter can be used to disable alerts provided by openshift cluster-logging-operator.
-The component supports removing entries in this parameter by providing the entry prefixed with `~`.
 
 
 == `clusterLogging`

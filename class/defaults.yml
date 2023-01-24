@@ -3,18 +3,20 @@ parameters:
     namespace: openshift-logging
     version: '5.5'
     channel: 'stable-${openshift4_logging:version}'
-    alerts: 'release-${openshift4_logging:version}'
-    kibana_host: null
-    predict_elasticsearch_storage_alert:
-      enabled: true
-      lookback_range: 72h
-      predict_hours_from_now: 72
-      threshold: 85
-      for: 6h
-      severity: warning
 
-    # TBD: move to `monitoring` key?
-    ignore_alerts: []
+    components:
+      elasticsearch:
+        enabled: true
+        alerts: 'release-${openshift4_logging:version}'
+        ignore_alerts: []
+        kibana_host: null
+        predict_elasticsearch_storage_alert:
+          enabled: true
+          lookback_range: 72h
+          predict_hours_from_now: 72
+          threshold: 85
+          for: 6h
+          severity: warning
 
     clusterLogging:
       managementState: Managed
