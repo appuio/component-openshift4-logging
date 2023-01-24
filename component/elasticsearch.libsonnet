@@ -5,6 +5,7 @@ local resourceLocker = import 'lib/resource-locker.libjsonnet';
 
 // The hiera parameters for the component
 local inv = kap.inventory();
+local params = inv.parameters.openshift4_logging;
 local elasticsearch = inv.parameters.openshift4_logging.components.elasticsearch;
 
 
@@ -73,6 +74,15 @@ local netpol_operator = kube.NetworkPolicy('allow-from-openshift-operators-redha
   },
 };
 
+// Keep config backwards compatible
+local kibana_host =
+  if std.objectHas(params, 'kibana_host') then
+    std.trace(
+      'parameter kibana_host is deprecated, please use parameter `components.elasticsearch.kibana_host instead`',
+      params.kibana_host
+    )
+  else elasticsearch.kibana_host;
+
 local kibana_routeToPatch = kube._Object('route.openshift.io/v1', 'Route', 'kibana') {
   metadata+: {
     namespace: inv.parameters.openshift4_logging.namespace,
@@ -81,7 +91,7 @@ local kibana_routeToPatch = kube._Object('route.openshift.io/v1', 'Route', 'kiba
 
 local kibana_patch = resourceLocker.Patch(kibana_routeToPatch, {
   spec: {
-    host: elasticsearch.kibana_host,
+    host: kibana_host,
   },
 });
 
@@ -117,7 +127,7 @@ if elasticsearch.enabled then
     '40_es_machineconfig': machineconfig_journald,
     '40_es_netpol': netpol_operator,
     '40_es_alertrules': alertrules.prometheus_rules,
-    [if elasticsearch.kibana_host != null then '40_es_kibana_host']: kibana_patchWithAdditionalPermissions,
+    [if kibana_host != null then '40_es_kibana_host']: kibana_patchWithAdditionalPermissions,
   }
 else
   std.trace(
