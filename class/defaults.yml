@@ -15,13 +15,6 @@ parameters:
 
     # TBD: move to `monitoring` key?
     ignore_alerts: []
-    monitoring:
-      enabled: true
-      instance: null
-      enableServiceMonitors:
-        cluster-logging-operator: true
-        fluentd: true
-        elasticsearch-cluster: true
 
     clusterLogging:
       managementState: Managed
