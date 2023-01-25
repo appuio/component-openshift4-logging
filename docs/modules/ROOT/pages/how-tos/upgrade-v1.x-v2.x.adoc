@@ -1,0 +1,70 @@
+= Upgrade from v1.x to v2.x
+
+To support Loki Stack some Elasticsearch parameters have moved. The component is backwards compatible,
+but moving the parameters is highly encouraged.
+
+
+== Migrate `kibana_host` and `predict_elasticsearch_storage_alert`
+
+Move the `kibana_host` parameter to `components.elasticsearch.kibana_host`:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    kibana_host: logging.cluster.local <1>
+    predict_elasticsearch_storage_alert: <2>
+      enabled: true
+      lookback_range: 72h
+      predict_hours_from_now: 72
+      threshold: 85
+      for: 6h
+      severity: warning
+----
+<1> Move `kibana_host` to `components.elasticsearch.kibana_host`
+<2> Move section `predict_elasticsearch_storage_alert` to `components.elasticsearch.predict_elasticsearch_storage_alert`
+
+Example for v2.x:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    components:
+      elasticsearch:
+        kibana_host: logging.cluster.local
+        predict_elasticsearch_storage_alert:
+          enabled: true
+          lookback_range: 72h
+          predict_hours_from_now: 72
+          threshold: 85
+          for: 6h
+          severity: warning
+----
+
+== Removed Parameters
+
+=== `clusterLogging.curator`
+
+Curator deployment was removed with Openshift 4.7.
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    clusterLogging:
+      curation: <1>
+----
+<1> Entire section `monitoring` is deprecated
+
+=== `monitoring`
+
+Monitoring with component prometheus was removed.
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    monitoring: <1>
+----
+<1> Entire section `monitoring` is deprecated
