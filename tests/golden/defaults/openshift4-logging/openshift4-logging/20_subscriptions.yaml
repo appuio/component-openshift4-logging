@@ -7,7 +7,7 @@ metadata:
   name: cluster-logging
   namespace: openshift-logging
 spec:
-  channel: stable-5.5
+  channel: stable-5.6
   installPlanApproval: Automatic
   name: cluster-logging
   source: redhat-operators
@@ -22,7 +22,7 @@ metadata:
   name: elasticsearch-operator
   namespace: openshift-operators-redhat
 spec:
-  channel: stable-5.5
+  channel: stable-5.6
   installPlanApproval: Automatic
   name: elasticsearch-operator
   source: openshift-operators-redhat

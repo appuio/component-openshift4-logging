@@ -18,7 +18,7 @@ The namespace in which to install the operator.
 
 [horizontal]
 type:: string
-default:: `5.5`
+default:: `5.6`
 
 The logging stack version to deploy.
 This parameter is used in the default values for parameters `channel` and `alerts`.
@@ -95,7 +95,7 @@ If you specify the logging stack version through parameter `version`, you should
 
 The component uses this parameter to determine the version to download for both Elasticsearch Operator and fluentd alert rules.
 
-Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.5`, you should use `alerts: release-5.5`.
+Generally, the value for parameter `alerts` should match the value for parameter `channel`: if you specify `channel: stable-5.6`, you should use `alerts: release-5.6`.
 
 [WARNING]
 ====
