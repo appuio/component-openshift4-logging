@@ -119,14 +119,11 @@ local kibana_patchWithAdditionalPermissions = std.map(
   , kibana_patch
 );
 
-local alertrules = import 'elastic_alertrules.libsonnet';
-
 // Define outputs below
 if elasticsearch.enabled then
   {
     '40_es_machineconfig': machineconfig_journald,
     '40_es_netpol': netpol_operator,
-    '40_es_alertrules': alertrules.prometheus_rules,
     [if kibana_host != null then '40_es_kibana_host']: kibana_patchWithAdditionalPermissions,
   }
 else

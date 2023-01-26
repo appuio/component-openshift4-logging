@@ -22,6 +22,7 @@ local namespace_groups = (
     {}
 ) + params.clusterLogForwarding.namespace_groups;
 
+
 {
   '00_namespace': kube.Namespace(params.namespace) {
     metadata+: {
@@ -51,6 +52,14 @@ local namespace_groups = (
       'redhat-operators'
     ),
   ] + (
+    if params.components.lokistack.enabled then [
+      operatorlib.managedSubscription(
+        'openshift-operators-redhat',
+        'loki-operator',
+        params.channel
+      ),
+    ] else []
+  ) + (
     if params.components.elasticsearch.enabled then [
       operatorlib.managedSubscription(
         'openshift-operators-redhat',
@@ -59,15 +68,28 @@ local namespace_groups = (
       ),
     ] else []
   ),
-  '30_cluster_logging': kube._Object(clusterLoggingGroupVersion, 'ClusterLogging', 'instance') {
-    metadata+: {
-      namespace: params.namespace,
-      annotations+: {
-        'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+  '30_cluster_logging': std.mergePatch(
+    // ClusterLogging resource from inventory
+    kube._Object(clusterLoggingGroupVersion, 'ClusterLogging', 'instance') {
+      metadata+: {
+        namespace: params.namespace,
+        annotations+: {
+          'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+        },
       },
-    },
-    spec: params.clusterLogging,
-  },
+      spec: params.clusterLogging,
+    }, {
+      // Patch to remove certain keys, as the ClusterLogging operator would just
+      // deploy elasticsearch or kibana if they are configured
+      spec: {
+        logStore: {
+          [if !params.components.elasticsearch.enabled then 'elasticsearch']: null,
+          [if !params.components.lokistack.enabled then 'lokistack']: null,
+        },
+        [if !params.components.elasticsearch.enabled then 'visualization']: null,
+      },
+    }
+  ),
   [if params.clusterLogForwarding.enabled then '31_cluster_logforwarding']: kube._Object(clusterLoggingGroupVersion, 'ClusterLogForwarder', 'instance') {
     metadata+: {
       namespace: params.namespace,
@@ -140,4 +162,6 @@ local namespace_groups = (
     ),
   },
 }
++ (import 'loki.libsonnet')
 + (import 'elasticsearch.libsonnet')
++ (import 'alertrules.libsonnet')

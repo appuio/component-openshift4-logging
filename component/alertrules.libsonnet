@@ -6,6 +6,7 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 local elasticsearch = inv.parameters.openshift4_logging.components.elasticsearch;
+local loki = inv.parameters.openshift4_logging.components.lokistack;
 
 
 local runbook(alertname) =
@@ -24,13 +25,6 @@ local predict_storage_alert = elasticsearch.predict_elasticsearch_storage_alert 
     )
   else {}
 );
-local alerts =
-  if std.objectHas(params, 'alerts') then
-    std.trace(
-      'parameter alerts is deprecated, please use parameter `components.elasticsearch.alerts instead`',
-      params.alerts
-    )
-  else elasticsearch.alerts;
 
 // Keep only alerts from params.ignore_alerts for which the last
 // array entry wasn't prefixed with `~`.
@@ -54,7 +48,7 @@ local patch_alerts = {
 };
 
 local loadFile(file) =
-  local fpath = 'openshift4-logging/component/extracted_alerts/%s/%s' % [ alerts, file ];
+  local fpath = 'openshift4-logging/component/extracted_alerts/%s/%s' % [ params.alerts, file ];
   std.parseJson(kap.yaml_load_stream(fpath));
 
 
@@ -88,14 +82,16 @@ local esStorageGroup = {
   rules: [ predictESStorage ],
 };
 
-local groups =
+local esGroups =
   loadFile('elasticsearch_operator_prometheus_alerts.yaml')[0].groups +
   loadFile('fluentd_prometheus_alerts.yaml')[0].groups +
   [
     if predict_storage_alert.enabled then esStorageGroup,
   ];
 
-local prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-elasticsearch-logging-rules') {
+local lokiGroups = loadFile('lokistack_prometheus_alerts.yaml')[0].groups;
+
+local es_prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-elasticsearch-logging-rules') {
   metadata+: {
     namespace: params.namespace,
   },
@@ -107,12 +103,31 @@ local prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRul
           g, ignore_alerts, patch_alerts
         );
         if std.length(r.rules) > 0 then r
-        for g in groups
+        for g in esGroups
+      ],
+    ),
+  },
+};
+
+local loki_prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-loki-logging-rules') {
+  metadata+: {
+    namespace: params.namespace,
+  },
+  spec: {
+    groups: std.filter(
+      function(it) it != null,
+      [
+        local r = alertpatching.filterPatchRules(
+          g, ignore_alerts, patch_alerts
+        );
+        if std.length(r.rules) > 0 then r
+        for g in lokiGroups
       ],
     ),
   },
 };
 
 {
-  prometheus_rules: prometheus_rules,
+  [if elasticsearch.enabled then '60_elasticsearch_alerts']: es_prometheus_rules,
+  [if loki.enabled then '60_lokistack_alerts']: loki_prometheus_rules,
 }
