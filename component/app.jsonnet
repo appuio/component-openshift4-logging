@@ -3,7 +3,7 @@ local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 local argocd = import 'lib/argocd.libjsonnet';
 
-local app = argocd.App('openshift4-logging', params.namespace, secrets=false);
+local app = argocd.App('openshift4-logging', params.namespace);
 
 {
   'openshift4-logging': app,
