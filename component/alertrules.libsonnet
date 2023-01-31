@@ -10,7 +10,6 @@ local loki = inv.parameters.openshift4_logging.components.lokistack;
 
 
 local runbook(alertname) = 'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
-local runbookLoki(alertname) = '' % alertname;
 
 assert
   std.member(inv.applications, 'openshift4-monitoring')
