@@ -54,10 +54,13 @@ parameters:
         retentionPolicy:
           application:
             maxAge: 7d
+            pruneNamespacesInterval: 15m
           infra:
             maxAge: 30d
+            pruneNamespacesInterval: 15m
           audit:
             maxAge: 30d
+            pruneNamespacesInterval: 15m
       visualization:
         type: kibana
         kibana:
