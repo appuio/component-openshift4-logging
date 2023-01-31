@@ -9,8 +9,8 @@ local elasticsearch = inv.parameters.openshift4_logging.components.elasticsearch
 local loki = inv.parameters.openshift4_logging.components.lokistack;
 
 
-local runbook(alertname) =
-  'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
+local runbook(alertname) = 'https://hub.syn.tools/openshift4-logging/runbooks/%s.html' % alertname;
+local runbookLoki(alertname) = '' % alertname;
 
 assert
   std.member(inv.applications, 'openshift4-monitoring')
@@ -77,6 +77,47 @@ local predictESStorage = {
   },
 };
 
+local renderRunbookBaseURL(group, baseURL) = {
+  name: group.name,
+  rules: std.map(
+    function(rule)
+      if (
+        std.objectHas(rule, 'annotations') &&
+        std.objectHas(rule.annotations, 'runbook_url') && (
+          std.length(std.findSubstr('[[.RunbookBaseURL]]', rule.annotations.runbook_url)) > 0 ||
+          std.length(std.findSubstr('[[ .RunbookURL ]]', rule.annotations.runbook_url)) > 0
+        )
+      ) then rule {
+        annotations+: {
+          local round1 = std.strReplace(rule.annotations.runbook_url, '[[.RunbookBaseURL]]', baseURL),
+          local round2 = std.strReplace(round1, '[[ .RunbookURL ]]', baseURL),
+          runbook_url: round2,
+        },
+      } else rule,
+    group.rules
+  ),
+};
+
+local prometheus_rules(groups, baseURL) = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-elasticsearch-logging-rules') {
+  metadata+: {
+    namespace: params.namespace,
+  },
+  spec: {
+    groups: std.filter(
+      function(it) it != null,
+      [
+        local r = alertpatching.filterPatchRules(g, ignore_alerts, patch_alerts);
+        local s = renderRunbookBaseURL(r, baseURL);
+        if std.length(s.rules) > 0 then s
+        for g in groups
+      ],
+    ),
+  },
+};
+
+
+// Elasticstack alerts
+
 local esStorageGroup = {
   name: 'elasticsearch_node_storage.alerts',
   rules: [ predictESStorage ],
@@ -88,46 +129,14 @@ local esGroups =
   [
     if predict_storage_alert.enabled then esStorageGroup,
   ];
+local esBaseURL = 'https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md';
+
+// Lokistack alerts
 
 local lokiGroups = loadFile('lokistack_prometheus_alerts.yaml')[0].groups;
-
-local es_prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-elasticsearch-logging-rules') {
-  metadata+: {
-    namespace: params.namespace,
-  },
-  spec: {
-    groups: std.filter(
-      function(it) it != null,
-      [
-        local r = alertpatching.filterPatchRules(
-          g, ignore_alerts, patch_alerts
-        );
-        if std.length(r.rules) > 0 then r
-        for g in esGroups
-      ],
-    ),
-  },
-};
-
-local loki_prometheus_rules = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-loki-logging-rules') {
-  metadata+: {
-    namespace: params.namespace,
-  },
-  spec: {
-    groups: std.filter(
-      function(it) it != null,
-      [
-        local r = alertpatching.filterPatchRules(
-          g, ignore_alerts, patch_alerts
-        );
-        if std.length(r.rules) > 0 then r
-        for g in lokiGroups
-      ],
-    ),
-  },
-};
+local lokiBaseURL = 'https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md';
 
 {
-  [if elasticsearch.enabled then '60_elasticsearch_alerts']: es_prometheus_rules,
-  [if loki.enabled then '60_lokistack_alerts']: loki_prometheus_rules,
+  [if elasticsearch.enabled then '60_elasticsearch_alerts']: prometheus_rules(esGroups, esBaseURL),
+  [if loki.enabled then '60_lokistack_alerts']: prometheus_rules(lokiGroups, lokiBaseURL),
 }
