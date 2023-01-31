@@ -97,7 +97,7 @@ local renderRunbookBaseURL(group, baseURL) = {
   ),
 };
 
-local prometheus_rules(groups, baseURL) = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', 'syn-elasticsearch-logging-rules') {
+local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', name) {
   metadata+: {
     namespace: params.namespace,
   },
@@ -136,6 +136,6 @@ local lokiGroups = loadFile('lokistack_prometheus_alerts.yaml')[0].groups;
 local lokiBaseURL = 'https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md';
 
 {
-  [if elasticsearch.enabled then '60_elasticsearch_alerts']: prometheus_rules(esGroups, esBaseURL),
-  [if loki.enabled then '60_lokistack_alerts']: prometheus_rules(lokiGroups, lokiBaseURL),
+  [if elasticsearch.enabled then '60_elasticsearch_alerts']: prometheus_rules('syn-elasticsearch-logging-rules', esGroups, esBaseURL),
+  [if loki.enabled then '60_lokistack_alerts']: prometheus_rules('syn-loki-logging-rules', lokiGroups, lokiBaseURL),
 }
