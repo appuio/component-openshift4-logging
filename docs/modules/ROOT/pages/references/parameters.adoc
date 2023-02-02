@@ -263,11 +263,17 @@ spec:
   storageClassName: ''
   tenants:
     mode: openshift-logging
+  limits:
+    global:
+      ingestion:
+        ingestionBurstSize: 1000
+        ingestionRate: 10000
 ----
 
 A dictionary holding the `.spec` for the LokiStack resource.
 
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-loki.html#logging-loki-deploy_cluster-logging-loki[Openshift Docs] for available parameters.
+See the https://loki-operator.dev/docs/api.md/[Loki Operator Docs] for available Lokistack specs.
 
 
 == `clusterLogging`
