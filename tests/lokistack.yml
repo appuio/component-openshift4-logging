@@ -11,6 +11,14 @@ parameters:
       - type: https
         source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/v2.9.0/lib/openshift4-monitoring-alert-patching.libsonnet
         output_path: vendor/lib/alert-patching.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-patch-operator/v1.0.0/lib/patch-operator.libsonnet
+        output_path: vendor/lib/patch-operator.libsonnet
+
+  patch_operator:
+    namespace: syn-patch-operator
+    patch_serviceaccount:
+      name: syn-patch-operator
 
   openshift4_operators:
     defaultInstallPlanApproval: Automatic
