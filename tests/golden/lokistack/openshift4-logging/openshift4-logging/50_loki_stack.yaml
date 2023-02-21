@@ -9,8 +9,8 @@ spec:
   limits:
     global:
       ingestion:
-        ingestionBurstSize: 1000
-        ingestionRate: 10000
+        ingestionBurstSize: 9
+        ingestionRate: 5
   size: 1x.extra-small
   storage:
     schemas:

@@ -266,8 +266,8 @@ spec:
   limits:
     global:
       ingestion:
-        ingestionBurstSize: 1000
-        ingestionRate: 10000
+        ingestionBurstSize: 9
+        ingestionRate: 5
 ----
 
 A dictionary holding the `.spec` for the LokiStack resource.

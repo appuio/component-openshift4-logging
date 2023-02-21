@@ -30,8 +30,8 @@ parameters:
           limits:
             global:
               ingestion:
-                ingestionBurstSize: 1000
-                ingestionRate: 10000
+                ingestionBurstSize: 9
+                ingestionRate: 5
       elasticsearch:
         enabled: true
         kibana_host: null
