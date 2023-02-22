@@ -263,11 +263,35 @@ spec:
   storageClassName: ''
   tenants:
     mode: openshift-logging
+  limits:
+    global:
+      ingestion:
+        ingestionBurstSize: 9 <1>
+        ingestionRate: 5 <2>
 ----
+<1> value in MiB (per push event)
+<2> value in MiB/s
 
 A dictionary holding the `.spec` for the LokiStack resource.
 
+The component configures fluentd as the default log forwarder.
+The default chunk size limit in fluentd is 8 MiB which the burst size limit of 9 MiB accounts for.
+The ingestion rate defines the MiB/s limit for a tenant.
+OpenShift Logging uses the following three tenants:
+
+* application
+* audit
+* infrastructure
+
+The max allowed volume for a tenant per day can be calculated with the following formula:
+[stem]
+++++
+"volumePerDay"_"tenant" ("in GiB/s") = ("ingestionRate"_"tenant" ("in MiB/s") * 60 * 60 * 24) / 1024
+++++
+The default of 5 MiB/s allows up to ~420 GiB of logs per day for a tenant.
+
 See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-loki.html#logging-loki-deploy_cluster-logging-loki[Openshift Docs] for available parameters.
+See the https://loki-operator.dev/docs/api.md/[Loki Operator Docs] for available Lokistack specs.
 
 
 == `clusterLogging`

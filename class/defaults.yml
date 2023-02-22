@@ -27,6 +27,11 @@ parameters:
           storageClassName: ''
           tenants:
             mode: openshift-logging
+          limits:
+            global:
+              ingestion:
+                ingestionBurstSize: 9
+                ingestionRate: 5
       elasticsearch:
         enabled: true
         kibana_host: null
