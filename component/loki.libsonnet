@@ -2,6 +2,7 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
+local po = import 'lib/patch-operator.libsonnet';
 
 // The hiera parameters for the component
 local inv = kap.inventory();
@@ -92,12 +93,22 @@ local netpol_lokigateway = kube.NetworkPolicy('allow-console-logging-lokistack-g
   },
 };
 
+local console_patch = po.Patch(
+  kube._Object('operator.openshift.io/v1', 'Console', 'cluster'),
+  {
+    spec: {
+      plugins: [ 'logging-view-plugin' ],
+    },
+  },
+);
+
 // Define outputs below
 if loki.enabled then
   {
     '50_loki_stack': lokistack,
     '50_loki_logstore': logstore,
     '50_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
+    '50_loki_console_patch': console_patch,
   }
 else
   std.trace(
