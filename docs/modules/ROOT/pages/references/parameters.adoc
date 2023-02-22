@@ -278,9 +278,11 @@ The component configures fluentd as the default log forwarder.
 The default chunk size limit in fluentd is 8 MiB which the burst size limit of 9 MiB accounts for.
 The ingestion rate defines the MiB/s limit for a tenant.
 OpenShift Logging uses the following three tenants:
+
 * application
 * audit
 * infrastructure
+
 The max allowed volume for a tenant per day can be calculated with the following formula:
 [stem]
 ++++
