@@ -1,5 +1,12 @@
 parameters:
   openshift4_logging:
+    =_openshift4_console:
+      "True":
+        config:
+          plugins:
+            - "logging-view-plugin"
+      "False":
+
     namespace: openshift-logging
     version: '5.6'
     channel: 'stable-${openshift4_logging:version}'
@@ -94,3 +101,5 @@ parameters:
   openshift4_elasticsearch_operator:
     targetNamespaces:
       - ${openshift4_logging:namespace}
+
+  openshift4_console: ${openshift4_logging:_openshift4_console:${openshift4_logging:components:lokistack:enabled}}
