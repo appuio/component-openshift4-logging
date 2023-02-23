@@ -100,6 +100,7 @@ local console_patch = po.Patch(
       plugins: [ 'logging-view-plugin' ],
     },
   },
+  'application/merge-patch+json'
 );
 
 // Define outputs below
