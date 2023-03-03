@@ -31,6 +31,10 @@ components:
     enabled: true
   lokistack:
     enabled: true
+
+clusterLogging:
+  logStore:
+    type: lokistack
 ----
 
 === Configure Lokistack
@@ -70,6 +74,11 @@ kubectl -n openshift-logging delete pvc -l logging-cluster=elasticsearch
 
 === Remove Operators
 
+[WARNING]
+====
+Before you remove the operator, make sure no other deployments are using the Elasticsearch operator.
+====
+
 Remove the Elasticsearch operator:
 [source,bash]
 ----
@@ -78,6 +87,11 @@ kubectl -n openshift-operators-redhat delete csv -l operators.coreos.com/elastic
 
 
 === Remove Custom Resource Definitions
+
+[WARNING]
+====
+Before you remove the CRDs, make sure no other deployments are using these resources.
+====
 
 The only thing left now are the CRDs from the Elasticsearch operator:
 [source,bash]
