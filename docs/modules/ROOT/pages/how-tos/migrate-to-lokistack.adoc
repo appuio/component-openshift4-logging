@@ -1,0 +1,86 @@
+= Migrate to Lokistack
+
+Instructions to migrate from Elasticsearch Logging to Lokistack.
+
+Migrating the logs isn't part of this How-To, instead you can keep Elasticsearch logging until the retention time is expired. Then it's safe to remove Elasticsearch Logging.
+
+[TIP]
+====
+Running Lokistack and Elasticsearch Logging at the same time might exceed the resources of the infra nodes. Check in advance that you have enough resources available.
+====
+
+
+== Keep Elasticsearch
+
+To keep Elasticseach Logging just make sure the component is enabled:
+[source,yaml]
+----
+components:
+  elasticsearch:
+    enabled: true
+----
+
+
+== Enable Lokistack and make it default
+
+Enable the Lokistack component:
+[source,yaml]
+----
+components:
+  elasticsearch:
+    enabled: true
+  lokistack:
+    enabled: true
+----
+
+=== Configure Lokistack
+
+See the xref:references/parameters.adoc#_components_lokistack[Lokistack parameters reference] for configuration options.
+
+
+== Remove Elasticsearch
+
+[TIP]
+====
+You might want to keep Elasticsearch Logging to access the logs until the retention time is expired.
+====
+
+Disable the Elasticsearch component:
+[source,yaml]
+----
+components:
+  elasticsearch:
+    enabled: false
+----
+
+This will remove the subscriptions and the Kibana deployment.
+
+
+=== Remove Deployments
+
+The Elasticsearch deployment has to be removed manually.
+
+Remove the Elasticsearch custom resource and pvc:
+[source,bash]
+----
+kubectl -n openshift-logging delete elasticsearches.logging.openshift.io elasticsearch
+kubectl -n openshift-logging delete pvc -l logging-cluster=elasticsearch
+----
+
+
+=== Remove Operators
+
+Remove the Elasticsearch operator:
+[source,bash]
+----
+kubectl -n openshift-operators-redhat delete csv -l operators.coreos.com/elasticsearch-operator.openshift-operators-redhat=""
+----
+
+
+=== Remove Custom Resource Definitions
+
+The only thing left now are the CRDs from the Elasticsearch operator:
+[source,bash]
+----
+kubectl delete crd -l app.kubernetes.io/instance=elastic-operator
+----
