@@ -45,9 +45,9 @@ VALE_ARGS ?= --minAlertLevel=error --config=/pages/ROOT/pages/.vale.ini /pages
 
 ANTORA_PREVIEW_CMD ?= $(DOCKER_CMD) run --rm --publish 35729:35729 --publish 2020:2020 $(antora_git_volume) --volume "${PWD}/docs":/preview/antora/docs docker.io/vshn/antora-preview:3.0.1.1 --style=syn --antora=docs
 
-COMMODORE_CMD  ?= $(DOCKER_CMD) $(DOCKER_ARGS) $(git_volume) $(root_volume) docker.io/projectsyn/commodore:latest
+COMMODORE_CMD  ?= $(DOCKER_CMD) $(DOCKER_ARGS) $(git_volume) $(root_volume) docker.io/projectsyn/commodore:v1.14.0
 COMPILE_CMD    ?= $(COMMODORE_CMD) component compile . $(commodore_args)
-JB_CMD         ?= $(DOCKER_CMD) $(DOCKER_ARGS) --entrypoint /usr/local/bin/jb docker.io/projectsyn/commodore:latest install
+JB_CMD         ?= $(DOCKER_CMD) $(DOCKER_ARGS) --entrypoint /usr/local/bin/jb docker.io/projectsyn/commodore:v1.14.0 install
 
 GOLDEN_FILES    ?= $(shell find tests/golden/$(instance) -type f)
 
