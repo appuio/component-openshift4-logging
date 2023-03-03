@@ -1,6 +1,6 @@
-= Migrate to Lokistack
+= Switch to Lokistack
 
-Instructions to migrate from Elasticsearch Logging to Lokistack.
+Instructions to switch from Elasticsearch Logging to Lokistack.
 
 Migrating the logs isn't part of this How-To, instead you can keep Elasticsearch logging until the retention time is expired. Then it's safe to remove Elasticsearch Logging.
 
@@ -28,14 +28,16 @@ Enable the Lokistack component:
 ----
 components:
   elasticsearch:
-    enabled: true
+    enabled: true <1>
   lokistack:
     enabled: true
 
 clusterLogging:
   logStore:
-    type: lokistack
+    type: lokistack <2>
 ----
+<1> Keep the existing Elasticsearch
+<2> Make Lokistack the default logstore
 
 === Configure Lokistack
 
@@ -76,7 +78,11 @@ kubectl -n openshift-logging delete pvc -l logging-cluster=elasticsearch
 
 [WARNING]
 ====
-Before you remove the operator, make sure no other deployments are using the Elasticsearch operator.
+Verify that no other Elasticsearches, using this operator, exists:
+[source,bash]
+----
+kubectl get elasticsearches.logging.openshift.io -A
+----
 ====
 
 Remove the Elasticsearch operator:
