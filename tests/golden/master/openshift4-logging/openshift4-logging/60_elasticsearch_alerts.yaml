@@ -17,9 +17,8 @@ spec:
               master node hasn't been elected yet.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Cluster-Health-is-Red
             summary: Cluster health status is RED
-          expr: 'sum by (cluster) (es_cluster_status == 2)
-
-            '
+          expr: |
+            sum by (cluster) (es_cluster_status == 2)
           for: 7m
           labels:
             namespace: openshift-logging
@@ -32,9 +31,8 @@ spec:
               at least 20m. Some shard replicas are not allocated.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Cluster-Health-is-Yellow
             summary: Cluster health status is YELLOW
-          expr: 'sum by (cluster) (es_cluster_status == 1)
-
-            '
+          expr: |
+            sum by (cluster) (es_cluster_status == 1)
           for: 20m
           labels:
             namespace: openshift-logging
@@ -47,9 +45,8 @@ spec:
               }} cluster. This node may not be keeping up with the indexing speed.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Write-Requests-Rejection-Jumps
             summary: High Write Rejection Ratio - {{ $value }}%
-          expr: 'round( writing:reject_ratio:rate2m * 100, 0.001 ) > 5
-
-            '
+          expr: |
+            round( writing:reject_ratio:rate2m * 100, 0.001 ) > 5
           for: 10m
           labels:
             namespace: openshift-logging
@@ -63,9 +60,15 @@ spec:
               disk to the node.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Node-Disk-Low-Watermark-Reached
             summary: Disk Low Watermark Reached - disk saturation is {{ $value }}%
-          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      es_fs_path_available_bytes\
-            \ /\n      es_fs_path_total_bytes\n    )\n  ) * 100, 0.001)\n) > on(instance,\
-            \ pod) es_cluster_routing_allocation_disk_watermark_low_pct\n"
+          expr: |
+            sum by (instance, pod) (
+              round(
+                (1 - (
+                  es_fs_path_available_bytes /
+                  es_fs_path_total_bytes
+                )
+              ) * 100, 0.001)
+            ) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_low_pct
           for: 5m
           labels:
             namespace: openshift-logging
@@ -80,9 +83,15 @@ spec:
               node.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Node-Disk-High-Watermark-Reached
             summary: Disk High Watermark Reached - disk saturation is {{ $value }}%
-          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      es_fs_path_available_bytes\
-            \ /\n      es_fs_path_total_bytes\n    )\n  ) * 100, 0.001)\n) > on(instance,\
-            \ pod) es_cluster_routing_allocation_disk_watermark_high_pct\n"
+          expr: |
+            sum by (instance, pod) (
+              round(
+                (1 - (
+                  es_fs_path_available_bytes /
+                  es_fs_path_total_bytes
+                )
+              ) * 100, 0.001)
+            ) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_high_pct
           for: 5m
           labels:
             namespace: openshift-logging
@@ -98,9 +107,15 @@ spec:
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Node-Disk-Flood-Watermark-Reached
             summary: Disk Flood Stage Watermark Reached - disk saturation is {{ $value
               }}%
-          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      es_fs_path_available_bytes\
-            \ /\n      es_fs_path_total_bytes\n    )\n  ) * 100, 0.001)\n) > on(instance,\
-            \ pod) es_cluster_routing_allocation_disk_watermark_flood_stage_pct\n"
+          expr: |
+            sum by (instance, pod) (
+              round(
+                (1 - (
+                  es_fs_path_available_bytes /
+                  es_fs_path_total_bytes
+                )
+              ) * 100, 0.001)
+            ) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_flood_stage_pct
           for: 5m
           labels:
             namespace: openshift-logging
@@ -113,10 +128,8 @@ spec:
               }} cluster is {{ $value }}%.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-JVM-Heap-Use-is-High
             summary: JVM Heap usage on the node is high
-          expr: 'sum by (cluster, instance, node) (es_jvm_mem_heap_used_percent) >
-            75
-
-            '
+          expr: |
+            sum by (cluster, instance, node) (es_jvm_mem_heap_used_percent) > 75
           for: 10m
           labels:
             namespace: openshift-logging
@@ -129,9 +142,8 @@ spec:
               }} cluster is {{ $value }}%.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Aggregated-Logging-System-CPU-is-High
             summary: System CPU usage is high
-          expr: 'sum by (cluster, instance, node) (es_os_cpu_percent) > 90
-
-            '
+          expr: |
+            sum by (cluster, instance, node) (es_os_cpu_percent) > 90
           for: 1m
           labels:
             namespace: openshift-logging
@@ -144,9 +156,8 @@ spec:
               }} cluster is {{ $value }}%.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Process-CPU-is-High
             summary: ES process CPU usage is high
-          expr: 'sum by (cluster, instance, node) (es_process_cpu_percent) > 90
-
-            '
+          expr: |
+            sum by (cluster, instance, node) (es_process_cpu_percent) > 90
           for: 1m
           labels:
             namespace: openshift-logging
@@ -159,9 +170,8 @@ spec:
               space within the next 6h.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Disk-Space-is-Running-Low
             summary: Cluster low on disk space
-          expr: 'sum(predict_linear(es_fs_path_available_bytes[6h], 6 * 3600)) < 0
-
-            '
+          expr: |
+            sum(predict_linear(es_fs_path_available_bytes[6h], 6 * 3600)) < 0
           for: 1h
           labels:
             namespace: openshift-logging
@@ -174,11 +184,8 @@ spec:
               descriptors within the next hour.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-FileDescriptor-Usage-is-high
             summary: Cluster low on file descriptors
-          expr: 'predict_linear(es_process_file_descriptors_max_number[1h], 3600)
-            - predict_linear(es_process_file_descriptors_open_number[1h], 3600) <
-            0
-
-            '
+          expr: |
+            predict_linear(es_process_file_descriptors_max_number[1h], 3600) - predict_linear(es_process_file_descriptors_open_number[1h], 3600) < 0
           for: 10m
           labels:
             namespace: openshift-logging
@@ -189,9 +196,8 @@ spec:
           annotations:
             message: Elasticsearch Operator CSV has not reconciled succesfully.
             summary: Elasticsearch Operator CSV Not Successful
-          expr: 'csv_succeeded{name =~ "elasticsearch-operator.*"} == 0
-
-            '
+          expr: |
+            csv_succeeded{name =~ "elasticsearch-operator.*"} == 0
           for: 10m
           labels:
             namespace: openshift-logging
@@ -205,9 +211,15 @@ spec:
               anymore. You should consider adding more disk to the node.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Node-Disk-Low-Watermark-Reached
             summary: Disk Low Watermark is predicted to be reached within next 6h.
-          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      predict_linear(es_fs_path_available_bytes[3h],\
-            \ 6 * 3600) /\n      predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)\n\
-            \    )\n  ) * 100, 0.001)\n) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_low_pct\n"
+          expr: |
+            sum by (instance, pod) (
+              round(
+                (1 - (
+                  predict_linear(es_fs_path_available_bytes[3h], 6 * 3600) /
+                  predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)
+                )
+              ) * 100, 0.001)
+            ) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_low_pct
           for: 1h
           labels:
             namespace: openshift-logging
@@ -222,9 +234,15 @@ spec:
               drop old indices allocated to this node.
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Node-Disk-High-Watermark-Reached
             summary: Disk High Watermark is predicted to be reached within next 6h.
-          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      predict_linear(es_fs_path_available_bytes[3h],\
-            \ 6 * 3600) /\n      predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)\n\
-            \    )\n  ) * 100, 0.001)\n) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_high_pct\n"
+          expr: |
+            sum by (instance, pod) (
+              round(
+                (1 - (
+                  predict_linear(es_fs_path_available_bytes[3h], 6 * 3600) /
+                  predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)
+                )
+              ) * 100, 0.001)
+            ) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_high_pct
           for: 1h
           labels:
             namespace: openshift-logging
@@ -240,9 +258,15 @@ spec:
             runbook_url: https://github.com/openshift/elasticsearch-operator/blob/master/docs/alerts.md#Elasticsearch-Node-Disk-Flood-Watermark-Reached
             summary: Disk Flood Stage Watermark is predicted to be reached within
               next 6h.
-          expr: "sum by (instance, pod) (\n  round(\n    (1 - (\n      predict_linear(es_fs_path_available_bytes[3h],\
-            \ 6 * 3600) /\n      predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)\n\
-            \    )\n  ) * 100, 0.001)\n) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_flood_stage_pct\n"
+          expr: |
+            sum by (instance, pod) (
+              round(
+                (1 - (
+                  predict_linear(es_fs_path_available_bytes[3h], 6 * 3600) /
+                  predict_linear(es_fs_path_total_bytes[3h], 6 * 3600)
+                )
+              ) * 100, 0.001)
+            ) > on(instance, pod) es_cluster_routing_allocation_disk_watermark_flood_stage_pct
           for: 1h
           labels:
             namespace: openshift-logging
@@ -256,10 +280,8 @@ spec:
             message: Prometheus could not scrape fluentd {{ $labels.container }} for
               more than 10m.
             summary: Fluentd cannot be scraped
-          expr: 'up{job = "collector", container = "collector"} == 0 or absent(up{job="collector",
-            container="collector"}) == 1
-
-            '
+          expr: |
+            up{job = "collector", container = "collector"} == 0 or absent(up{job="collector", container="collector"}) == 1
           for: 10m
           labels:
             namespace: openshift-logging
@@ -273,11 +295,8 @@ spec:
               }}' average buffer queue length has increased continuously.
             summary: Fluentd pod {{ $labels.pod }} is unable to keep up with traffic
               over time for forwarder output {{ $labels.plugin_id }}.
-          expr: 'sum by (pod,plugin_id) ( 0 * (deriv(fluentd_output_status_emit_records[1m]
-            offset 1h)))  + on(pod,plugin_id)  ( deriv(fluentd_output_status_buffer_queue_length[10m])
-            > 0 and delta(fluentd_output_status_buffer_queue_length[1h]) > 1 )
-
-            '
+          expr: |
+            sum by (pod,plugin_id) ( 0 * (deriv(fluentd_output_status_emit_records[1m] offset 1h)))  + on(pod,plugin_id)  ( deriv(fluentd_output_status_buffer_queue_length[10m]) > 0 and delta(fluentd_output_status_buffer_queue_length[1h]) > 1 )
           for: 12h
           labels:
             namespace: openshift-logging
@@ -290,9 +309,12 @@ spec:
             message: '{{ $value }}% of records have resulted in an error by fluentd
               {{ $labels.instance }}.'
             summary: FluentD output errors are high
-          expr: "100 * (\n  sum by(instance)(rate(fluentd_output_status_num_errors[2m]))\n\
-            /\n  sum by(instance)(rate(fluentd_output_status_emit_records[2m]))\n\
-            ) > 10\n"
+          expr: |
+            100 * (
+              sum by(instance)(rate(fluentd_output_status_num_errors[2m]))
+            /
+              sum by(instance)(rate(fluentd_output_status_emit_records[2m]))
+            ) > 10
           for: 15m
           labels:
             namespace: openshift-logging
@@ -304,9 +326,12 @@ spec:
             message: '{{ $value }}% of records have resulted in an error by fluentd
               {{ $labels.instance }}.'
             summary: FluentD output errors are very high
-          expr: "100 * (\n  sum by(instance)(rate(fluentd_output_status_num_errors[2m]))\n\
-            /\n  sum by(instance)(rate(fluentd_output_status_emit_records[2m]))\n\
-            ) > 25\n"
+          expr: |
+            100 * (
+              sum by(instance)(rate(fluentd_output_status_num_errors[2m]))
+            /
+              sum by(instance)(rate(fluentd_output_status_emit_records[2m]))
+            ) > 25
           for: 15m
           labels:
             namespace: openshift-logging
@@ -323,8 +348,10 @@ spec:
               adding more disk to the node.
             runbook_url: https://hub.syn.tools/openshift4-logging/runbooks/SYN_ElasticsearchExpectNodeToReachDiskWatermark.html
             summary: Expecting to Reach Disk Low Watermark in 72 Hours
-          expr: "sum by(cluster, instance, node) (\n  (1 - (predict_linear(es_fs_path_available_bytes[72h],\
-            \ 259200) / es_fs_path_total_bytes)) * 100\n) > 85\n"
+          expr: |
+            sum by(cluster, instance, node) (
+              (1 - (predict_linear(es_fs_path_available_bytes[72h], 259200) / es_fs_path_total_bytes)) * 100
+            ) > 85
           for: 6h
           labels:
             severity: warning
