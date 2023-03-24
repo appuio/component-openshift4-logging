@@ -16,9 +16,16 @@ spec:
               "%.2f" $value }}% errors.'
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Request-Errors
             summary: At least 10% of requests are responded by 5xx server errors.
-          expr: "sum(\n  job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m{status_code=~\"\
-            5..\"}\n) by (job, namespace, route)\n/\nsum(\n  job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m\n\
-            ) by (job, namespace, route)\n* 100\n> 10\n"
+          expr: |
+            sum(
+              job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m{status_code=~"5.."}
+            ) by (job, namespace, route)
+            /
+            sum(
+              job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m
+            ) by (job, namespace, route)
+            * 100
+            > 10
           for: 15m
           labels:
             severity: critical
@@ -31,9 +38,16 @@ spec:
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#LokiStack-Write-Request-Errors
             summary: At least 10% of write requests to the lokistack-gateway are responded
               with 5xx server errors.
-          expr: "sum(\n  code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{code=~\"\
-            5..\", handler=\"push\"}\n) by (job, namespace)\n/\nsum(\n  code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{handler=\"\
-            push\"}\n) by (job, namespace)\n* 100\n> 10\n"
+          expr: |
+            sum(
+              code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{code=~"5..", handler="push"}
+            ) by (job, namespace)
+            /
+            sum(
+              code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{handler="push"}
+            ) by (job, namespace)
+            * 100
+            > 10
           for: 15m
           labels:
             severity: critical
@@ -46,11 +60,16 @@ spec:
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#LokiStack-Read-Request-Errors
             summary: At least 10% of query requests to the lokistack-gateway are responded
               with 5xx server errors.
-          expr: "sum(\n  code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{code=~\"\
-            5..\", handler=~\"query|query_range|label|labels|label_values\"}\n) by\
-            \ (job, namespace)\n/\nsum(\n  code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{handler=~\"\
-            query|query_range|label|labels|label_values\"}\n) by (job, namespace)\n\
-            * 100\n> 10\n"
+          expr: |
+            sum(
+              code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{code=~"5..", handler=~"query|query_range|label|labels|label_values"}
+            ) by (job, namespace)
+            /
+            sum(
+              code_handler_job_namespace:lokistack_gateway_http_requests:irate1m{handler=~"query|query_range|label|labels|label_values"}
+            ) by (job, namespace)
+            * 100
+            > 10
           for: 15m
           labels:
             severity: critical
@@ -62,8 +81,13 @@ spec:
               panics.'
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Request-Panics
             summary: A panic was triggered.
-          expr: "sum(\n  increase(\n    loki_panic_total[10m]\n  )\n) by (job, namespace)\n\
-            > 0\n"
+          expr: |
+            sum(
+              increase(
+                loki_panic_total[10m]
+              )
+            ) by (job, namespace)
+            > 0
           labels:
             severity: critical
             syn: 'true'
@@ -75,8 +99,15 @@ spec:
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Request-Latency
             summary: The 99th percentile is experiencing high latency (higher than
               1 second).
-          expr: "histogram_quantile(0.99,\n  sum(\n    irate(\n      loki_request_duration_seconds_bucket{route!~\"\
-            (?i).*tail.*\"}[1m]\n    )\n  ) by (job, le, namespace, route)\n)\n> 1\n"
+          expr: |
+            histogram_quantile(0.99,
+              sum(
+                irate(
+                  loki_request_duration_seconds_bucket{route!~"(?i).*tail.*"}[1m]
+                )
+              ) by (job, le, namespace, route)
+            )
+            > 1
           for: 15m
           labels:
             severity: critical
@@ -88,9 +119,16 @@ spec:
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Tenant-Rate-Limit
             summary: At least 10% of requests are responded with the rate limit error
               code.
-          expr: "sum(\n  job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m{status_code=\"\
-            429\"}\n) by (job, namespace, route)\n/\nsum(\n  job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m\n\
-            ) by (job, namespace, route)\n* 100\n> 10\n"
+          expr: |
+            sum(
+              job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m{status_code="429"}
+            ) by (job, namespace, route)
+            /
+            sum(
+              job_namespace_route_statuscode:loki_request_duration_seconds_count:irate1m
+            ) by (job, namespace, route)
+            * 100
+            > 10
           for: 15m
           labels:
             severity: warning
@@ -101,8 +139,13 @@ spec:
             message: The storage path is experiencing slow write response rates.
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Storage-Slow-Write
             summary: The storage path is experiencing slow write response rates.
-          expr: "histogram_quantile(0.99,\n  sum(\n    job_le_namespace_operation:loki_boltdb_shipper_request_duration_seconds_bucket:rate5m{operation=\"\
-            WRITE\"}\n  ) by (job, le, namespace)\n)\n> 1\n"
+          expr: |
+            histogram_quantile(0.99,
+              sum(
+                job_le_namespace_operation:loki_boltdb_shipper_request_duration_seconds_bucket:rate5m{operation="WRITE"}
+              ) by (job, le, namespace)
+            )
+            > 1
           for: 15m
           labels:
             severity: warning
@@ -113,8 +156,13 @@ spec:
             message: The storage path is experiencing slow read response rates.
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Storage-Slow-Read
             summary: The storage path is experiencing slow read response rates.
-          expr: "histogram_quantile(0.99,\n  sum(\n    job_le_namespace_operation:loki_boltdb_shipper_request_duration_seconds_bucket:rate5m{operation=\"\
-            Shipper.Query\"}\n  ) by (job, le, namespace)\n)\n> 5\n"
+          expr: |
+            histogram_quantile(0.99,
+              sum(
+                job_le_namespace_operation:loki_boltdb_shipper_request_duration_seconds_bucket:rate5m{operation="Shipper.Query"}
+              ) by (job, le, namespace)
+            )
+            > 5
           for: 15m
           labels:
             severity: warning
@@ -126,8 +174,11 @@ spec:
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Write-Path-High-Load
             summary: The write path is experiencing high load, causing backpressure
               storage flushing.
-          expr: "sum(\n  loki_ingester_wal_replay_flushing\n) by (job, namespace)\n\
-            > 0\n"
+          expr: |
+            sum(
+              loki_ingester_wal_replay_flushing
+            ) by (job, namespace)
+            > 0
           for: 15m
           labels:
             severity: warning
@@ -139,8 +190,15 @@ spec:
             runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Loki-Read-Path-High-Load
             summary: The read path has high volume of queries, causing longer response
               times.
-          expr: "histogram_quantile(0.99,\n  sum(\n    rate(\n      loki_logql_querystats_latency_seconds_bucket[5m]\n\
-            \    )\n  ) by (job, le, namespace)\n)\n> 30\n"
+          expr: |
+            histogram_quantile(0.99,
+              sum(
+                rate(
+                  loki_logql_querystats_latency_seconds_bucket[5m]
+                )
+              ) by (job, le, namespace)
+            )
+            > 30
           for: 15m
           labels:
             severity: warning
