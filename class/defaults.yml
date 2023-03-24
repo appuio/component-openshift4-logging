@@ -5,7 +5,7 @@ parameters:
         config:
           plugins:
             - "logging-view-plugin"
-      "False":
+      "False": {}
 
     namespace: openshift-logging
     version: '5.6'
