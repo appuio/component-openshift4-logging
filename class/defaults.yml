@@ -98,6 +98,26 @@ parameters:
         typekey: 'kubernetes.labels.logFormat'
         typename: 'nologformat'
 
+    operatorResources:
+      clusterLogging:
+        requests:
+          memory: 128Mi
+          cpu: 10m
+        limits:
+          memory: 256Mi
+      lokistack:
+        requests:
+          memory: 381Mi
+          cpu: 50m
+        limits:
+          memory: 512Mi
+      elasticsearch:
+        requests:
+          memory: 1Gi
+          cpu: 100m
+        limits:
+          memory: 1.5Gi
+
   openshift4_elasticsearch_operator:
     targetNamespaces:
       - ${openshift4_logging:namespace}

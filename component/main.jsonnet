@@ -50,14 +50,26 @@ local namespace_groups = (
       'cluster-logging',
       params.channel,
       'redhat-operators'
-    ),
+    ) {
+      spec+: {
+        config+: {
+          resources: params.operatorResources.clusterLogging,
+        },
+      },
+    },
   ] + (
     if params.components.lokistack.enabled then [
       operatorlib.managedSubscription(
         'openshift-operators-redhat',
         'loki-operator',
         params.channel
-      ),
+      ) {
+        spec+: {
+          config+: {
+            resources: params.operatorResources.lokistack,
+          },
+        },
+      },
     ] else []
   ) + (
     if params.components.elasticsearch.enabled then [
@@ -65,7 +77,13 @@ local namespace_groups = (
         'openshift-operators-redhat',
         'elasticsearch-operator',
         params.channel
-      ),
+      ) {
+        spec+: {
+          config+: {
+            resources: params.operatorResources.elasticsearch,
+          },
+        },
+      },
     ] else []
   ),
   '30_cluster_logging': std.mergePatch(
