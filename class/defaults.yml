@@ -12,7 +12,10 @@ parameters:
     channel: 'stable-${openshift4_logging:version}'
     alerts: 'release-${openshift4_logging:version}'
 
-    ignore_alerts: []
+    ignore_alerts:
+      - ElasticsearchHighFileDescriptorUsage
+      - ElasticsearchOperatorCSVNotSuccessful
+      - FluentdQueueLengthIncreasing
 
     components:
       lokistack:
