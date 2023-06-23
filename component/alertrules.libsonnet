@@ -97,6 +97,14 @@ local renderRunbookBaseURL(group, baseURL) = {
   ),
 };
 
+local dropInfoRules =
+  local drop(rule) =
+    local rlbls = std.get(rule, 'labels', {});
+    std.get(rlbls, 'severity', '') == 'info';
+  {
+    rules: std.filter(function(rule) !drop(rule), super.rules),
+  };
+
 local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', name) {
   metadata+: {
     namespace: params.namespace,
@@ -105,7 +113,7 @@ local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.
     groups: std.filter(
       function(it) it != null,
       [
-        local r = alertpatching.filterPatchRules(g, ignore_alerts, patch_alerts);
+        local r = alertpatching.filterPatchRules(g + dropInfoRules, ignore_alerts, patch_alerts);
         local s = renderRunbookBaseURL(r, baseURL);
         if std.length(s.rules) > 0 then s
         for g in groups
