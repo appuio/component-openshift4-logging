@@ -99,12 +99,30 @@ local netpol_lokigateway = kube.NetworkPolicy('allow-console-logging-lokistack-g
   },
 };
 
+// Aggregate permission to view all logs to `cluster-reader` role
+local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
+  metadata+: {
+    labels+: {
+      'rbac.authorization.k8s.io/aggregate-to-cluster-reader': 'true',
+    },
+  },
+  rules: [
+    {
+      apiGroups: [ 'loki.grafana.com' ],
+      resources: com.renderArray(loki.clusterReaderLogAccess),
+      resourceNames: [ 'logs' ],
+      verbs: [ 'get' ],
+    },
+  ],
+};
+
 // Define outputs below
 if loki.enabled then
   {
     '50_loki_stack': lokistack,
     '50_loki_logstore': logstore,
     '50_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
+    '50_loki_rbac': [ aggregate_loki_log_access ],
   }
 else
   std.trace(

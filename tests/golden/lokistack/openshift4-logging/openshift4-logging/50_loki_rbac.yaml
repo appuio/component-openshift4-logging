@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations: {}
+  labels:
+    name: syn-loki-cluster-reader
+    rbac.authorization.k8s.io/aggregate-to-cluster-reader: 'true'
+  name: syn:loki:cluster-reader
+rules:
+  - apiGroups:
+      - loki.grafana.com
+    resourceNames:
+      - logs
+    resources:
+      - application
+      - infrastructure
+    verbs:
+      - get
