@@ -20,6 +20,9 @@ parameters:
     components:
       lokistack:
         enabled: false
+        clusterReaderLogAccess:
+          - application
+          - infrastructure
         logStore:
           access_key_id: ''
           access_key_secret: ''

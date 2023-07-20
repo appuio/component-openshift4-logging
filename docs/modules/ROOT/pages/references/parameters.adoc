@@ -191,36 +191,34 @@ The severity of the fired alert.
 
 == `components.lokistack`
 
+Configuration of the lokistack component.
+See subsections for supported keys.
+
+=== `components.lokistack.enabled`
+
 [horizontal]
-type:: dictionary
+type:: boolean
+default:: `false`
+
+Whether to deploy the LokiStack on the cluster.
+
+
+=== `components.lokistack.clusterReaderLogAccess`
+
+[horizontal]
+type:: list
 default::
 +
 [source,yaml]
 ----
-components:
-  lokistack:
-    enabled: false
-    logStore:
-      access_key_id: ''
-      access_key_secret: ''
-      endpoint: ''
-      bucketnames: '${cluster:name}-logstore'
-    spec:
-      size: 1x.extra-small
-      storage:
-        schemas:
-          - version: v12
-            effectiveDate: '2022-06-01'
-        secret:
-          type: s3
-          name: loki-logstore
-      storageClassName: ''
-      tenants:
-        mode: openshift-logging
+- application
+- infrastructure
 ----
 
-Configuration of the lokistack component.
+A list of log categories (supported values are `application`, `infrastructure` and `audit`) which can be viewed by users which have `cluster-reader` permissions.
+Entries in the list can be removed in the hierarchy by prefixing them with `~`.
 
+NOTE: We don't grant access to audit logs to `cluster-reader` by default since audit logs can contain sensitive information.
 
 === `components.lokistack.logStore`
 
