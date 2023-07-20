@@ -47,6 +47,12 @@ local lokistack_spec = {
 };
 
 local lokistack = kube._Object('loki.grafana.com/v1', 'LokiStack', 'loki') {
+  metadata+: {
+    annotations+: {
+      // Allow ArgoCD to do the dry run when the CRD doesn't exist yet
+      'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+    },
+  },
   spec: lokistack_spec + com.makeMergeable(loki.spec),
 };
 
