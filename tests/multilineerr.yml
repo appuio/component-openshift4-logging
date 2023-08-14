@@ -1,3 +1,30 @@
-# Overwrite parameters here
+applications:
+  - openshift4-operators as openshift-operators-redhat
+  - openshift4-monitoring
 
-# parameters: {...}
+parameters:
+  kapitan:
+    dependencies:
+      - type: https
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-operators/v1.0.2/lib/openshift4-operators.libsonnet
+        output_path: vendor/lib/openshift4-operators.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/v2.9.0/lib/openshift4-monitoring-alert-patching.libsonnet
+        output_path: vendor/lib/alert-patching.libsonnet
+    compile:
+      - input_type: jsonnet
+        input_paths:
+          - tests/console-patch.jsonnet
+        output_path: console-patching/
+
+  openshift4_operators:
+    defaultInstallPlanApproval: Automatic
+    defaultSource: openshift-operators-redhat
+    defaultSourceNamespace: openshift-operators-redhat
+
+  openshift4_logging:
+    clusterLogForwarding:
+      enabled: true
+      application_logs:
+        json: true
+        detectMultilineErrors: true
