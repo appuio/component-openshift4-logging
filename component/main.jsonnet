@@ -134,16 +134,19 @@ local namespace_groups = (
       ],
       [if std.length(namespace_groups) > 0 then 'pipelines']: [
         local enable_json = com.getValueOrDefault(namespace_groups[group], 'json', false);
+        local enable_multilineErrors = com.getValueOrDefault(namespace_groups[group], 'detectMultilineErrors', false);
         local patch_json = { outputRefs: [ 'default' ], parse: 'json' };
         {
           name: group,
           inputRefs: [ group ],
           outputRefs: com.getValueOrDefault(namespace_groups[group], 'forwarders', []),
         } + com.makeMergeable(if enable_json then patch_json else {})
+        + com.makeMergeable(if enable_multilineErrors then { detectMultilineErrors: true } else {})
         for group in std.objectFields(namespace_groups)
       ],
     } + com.makeMergeable(
       local enable_json = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'json', false);
+      local enable_multilineErrors = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'detectMultilineErrors', false);
       {
         pipelines: [
           {
@@ -151,11 +154,13 @@ local namespace_groups = (
             inputRefs: [ 'application' ],
             outputRefs: com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'forwarders', []) + [ 'default' ],
             [if enable_json then 'parse']: 'json',
+            [if enable_multilineErrors then 'detectMultilineErrors']: true,
           },
         ],
       }
     ) + com.makeMergeable(
       local enable_json = com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'json', false);
+      local enable_multilineErrors = com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'detectMultilineErrors', false);
       {
         [if params.clusterLogForwarding.infrastructure_logs.enabled then 'pipelines']: [
           {
@@ -163,6 +168,7 @@ local namespace_groups = (
             inputRefs: [ 'infrastructure' ],
             outputRefs: com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'forwarders', []) + [ 'default' ],
             [if enable_json then 'parse']: 'json',
+            [if enable_multilineErrors then 'detectMultilineErrors']: true,
           },
         ],
       }

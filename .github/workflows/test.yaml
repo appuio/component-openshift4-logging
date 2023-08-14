@@ -36,6 +36,7 @@ jobs:
           - release-5.4
           - master
           - lokistack
+          - multilineerr
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -54,6 +55,7 @@ jobs:
           - release-5.4
           - master
           - lokistack
+          - multilineerr
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}

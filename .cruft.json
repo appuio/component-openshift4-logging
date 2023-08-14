@@ -1,13 +1,13 @@
 {
   "template": "https://github.com/projectsyn/commodore-component-template.git",
-  "commit": "fc8ae18a6798d5b232442630883e5ec9b8636d09",
+  "commit": "3b16d0bdb15df8db3467d456afe2ab8a52dd096e",
   "checkout": "main",
   "context": {
     "cookiecutter": {
       "name": "OpenShift4 Logging",
       "slug": "openshift4-logging",
       "parameter_key": "openshift4_logging",
-      "test_cases": "defaults release-5.4 master lokistack",
+      "test_cases": "defaults release-5.4 master lokistack multilineerr",
       "add_lib": "n",
       "add_pp": "n",
       "add_golden": "y",
