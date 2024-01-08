@@ -8,7 +8,7 @@ parameters:
       "False": {}
 
     namespace: openshift-logging
-    version: '5.7'
+    version: '5.8'
     channel: 'stable-${openshift4_logging:version}'
     alerts: 'release-${openshift4_logging:version}'
 
@@ -29,7 +29,7 @@ parameters:
           endpoint: ''
           bucketnames: '${cluster:name}-logstore'
         spec:
-          size: 1x.extra-small
+          size: 1x.demo
           storage:
             schemas:
               - version: v12
