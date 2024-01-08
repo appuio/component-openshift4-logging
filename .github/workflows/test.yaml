@@ -52,7 +52,6 @@ jobs:
       matrix:
         instance:
           - defaults
-          - release-5.4
           - master
           - lokistack
           - multilineerr

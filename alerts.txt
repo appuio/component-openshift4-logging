@@ -1,20 +1,11 @@
-https://raw.githubusercontent.com/openshift/cluster-logging-operator/release-5.2/files/fluentd/fluentd_prometheus_alerts.yaml release-5.2/fluentd_prometheus_alerts.yaml
-https://raw.githubusercontent.com/openshift/cluster-logging-operator/release-5.3/files/fluentd/fluentd_prometheus_alerts.yaml release-5.3/fluentd_prometheus_alerts.yaml
-https://raw.githubusercontent.com/openshift/cluster-logging-operator/release-5.4/files/fluentd/fluentd_prometheus_alerts.yaml release-5.4/fluentd_prometheus_alerts.yaml
-https://raw.githubusercontent.com/openshift/cluster-logging-operator/release-5.5/files/collector/fluentd_prometheus_alerts.yaml release-5.5/fluentd_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/cluster-logging-operator/release-5.6/internal/metrics/alerts/fluentd.go.FluentdPrometheusAlert release-5.6/fluentd_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/cluster-logging-operator/release-5.7/internal/metrics/alerts/fluentd.go.FluentdPrometheusAlert release-5.7/fluentd_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/cluster-logging-operator/master/internal/metrics/alerts/fluentd.go.FluentdPrometheusAlert master/fluentd_prometheus_alerts.yaml
 
-https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.2/files/prometheus_alerts.yml release-5.2/elasticsearch_operator_prometheus_alerts.yaml
-https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.3/files/prometheus_alerts.yml release-5.3/elasticsearch_operator_prometheus_alerts.yaml
-https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.4/files/prometheus_alerts.yml release-5.4/elasticsearch_operator_prometheus_alerts.yaml
-https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.5/files/prometheus_alerts.yml release-5.5/elasticsearch_operator_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.6/files/prometheus_alerts.yml release-5.6/elasticsearch_operator_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/elasticsearch-operator/release-5.7/files/prometheus_alerts.yml release-5.7/elasticsearch_operator_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/elasticsearch-operator/master/files/prometheus_alerts.yml master/elasticsearch_operator_prometheus_alerts.yaml
 
-https://raw.githubusercontent.com/openshift/loki/release-5.5/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml release-5.5/lokistack_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/loki/release-5.6/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml release-5.6/lokistack_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/loki/release-5.7/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml release-5.7/lokistack_prometheus_alerts.yaml
 https://raw.githubusercontent.com/openshift/loki/main/operator/internal/manifests/internal/alerts/prometheus-alerts.yaml master/lokistack_prometheus_alerts.yaml
