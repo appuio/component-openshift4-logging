@@ -125,14 +125,17 @@ local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.
 
 // Elasticstack alerts
 
+local isVersion58 = if params.version == '5.8' || params.version == 'master' then true else false;
+
 local esStorageGroup = {
   name: 'elasticsearch_node_storage.alerts',
   rules: [ predictESStorage ],
 };
+local fluentdGroup = if !isVersion58 then loadFile('fluentd_prometheus_alerts.yaml')[0].groups else [];
 
 local esGroups =
   loadFile('elasticsearch_operator_prometheus_alerts.yaml')[0].groups +
-  loadFile('fluentd_prometheus_alerts.yaml')[0].groups +
+  fluentdGroup +
   [
     if predict_storage_alert.enabled then esStorageGroup,
   ];
@@ -143,7 +146,12 @@ local esBaseURL = 'https://github.com/openshift/elasticsearch-operator/blob/mast
 local lokiGroups = loadFile('lokistack_prometheus_alerts.yaml')[0].groups;
 local lokiBaseURL = 'https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md';
 
+// Collector alerts
+
+local collectorGroups = loadFile('collector_prometheus_alerts.yaml')[0].spec.groups;
+
 {
   [if elasticsearch.enabled then '60_elasticsearch_alerts']: prometheus_rules('syn-elasticsearch-logging-rules', esGroups, esBaseURL),
   [if loki.enabled then '60_lokistack_alerts']: prometheus_rules('syn-loki-logging-rules', lokiGroups, lokiBaseURL),
+  [if isVersion58 then '60_collector_alerts']: prometheus_rules('syn-collector-rules', collectorGroups, ''),
 }

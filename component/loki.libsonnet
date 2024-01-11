@@ -12,35 +12,35 @@ local loki = inv.parameters.openshift4_logging.components.lokistack;
 local lokistack_spec = {
   template: {
     compactor: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 1,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 1,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     distributor: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 2,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 2,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     gateway: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 1,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 1,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     indexGateway: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 2,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 2,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     ingester: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 2,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 2,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     querier: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 1,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 1,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     queryFrontend: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 1,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 1,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
     ruler: {
-      [if loki.spec.size == '1x.extra-small' then 'replicas']: 1,
+      [if loki.spec.size == '1x.demo' then 'replicas']: 1,
       nodeSelector: { 'node-role.kubernetes.io/infra': '' },
     },
   },

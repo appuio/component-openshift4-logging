@@ -24,6 +24,4 @@ parameters:
 
   openshift4_logging:
     channel: 'stable'
-    components:
-      elasticsearch:
-        alerts: 'master'
+    alerts: 'master'

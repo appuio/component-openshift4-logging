@@ -12,7 +12,7 @@ spec:
       ingestion:
         ingestionBurstSize: 9
         ingestionRate: 5
-  size: 1x.extra-small
+  size: 1x.demo
   storage:
     schemas:
       - effectiveDate: '2022-06-01'
