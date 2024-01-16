@@ -33,7 +33,7 @@ spec:
     gateway:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 1
+      replicas: 2
     indexGateway:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
@@ -45,11 +45,11 @@ spec:
     querier:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 1
+      replicas: 2
     queryFrontend:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 1
+      replicas: 2
     ruler:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
