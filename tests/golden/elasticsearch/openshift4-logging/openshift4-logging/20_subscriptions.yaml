@@ -25,19 +25,19 @@ kind: Subscription
 metadata:
   annotations: {}
   labels:
-    name: loki-operator
-  name: loki-operator
+    name: elasticsearch-operator
+  name: elasticsearch-operator
   namespace: openshift-operators-redhat
 spec:
   channel: stable-5.8
   config:
     resources:
       limits:
-        memory: 512Mi
+        memory: 1.5Gi
       requests:
-        cpu: 50m
-        memory: 381Mi
+        cpu: 100m
+        memory: 1Gi
   installPlanApproval: Automatic
-  name: loki-operator
+  name: elasticsearch-operator
   source: openshift-operators-redhat
   sourceNamespace: openshift-operators-redhat
