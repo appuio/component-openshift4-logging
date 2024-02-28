@@ -19,7 +19,7 @@ parameters:
 
     components:
       lokistack:
-        enabled: false
+        enabled: true
         clusterReaderLogAccess:
           - application
           - infrastructure
@@ -46,7 +46,7 @@ parameters:
                 ingestionBurstSize: 9
                 ingestionRate: 5
       elasticsearch:
-        enabled: true
+        enabled: false
         kibana_host: null
         predict_elasticsearch_storage_alert:
           enabled: true
@@ -59,7 +59,7 @@ parameters:
     clusterLogging:
       managementState: Managed
       logStore:
-        type: elasticsearch
+        type: lokistack
         lokistack:
           name: loki
         elasticsearch:
@@ -86,9 +86,7 @@ parameters:
           nodeSelector:
             node-role.kubernetes.io/infra: ''
       collection:
-        logs:
-          type: fluentd
-          fluentd: {}
+        type: fluentd
 
     clusterLogForwarding:
       enabled: false

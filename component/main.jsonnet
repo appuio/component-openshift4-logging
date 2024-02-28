@@ -22,6 +22,27 @@ local namespace_groups = (
     {}
 ) + params.clusterLogForwarding.namespace_groups;
 
+// --- Patch deprecated logging resource
+local legacyCollectionConfig = std.get(params.clusterLogging.collection, 'logs', {});
+local legacyCollectionPatch = if std.length(legacyCollectionConfig) > 0 then std.trace(
+  'Parameter `clusterLogging.collector.logs` is deprecated. Please update your config to use `clusterLogging.collector`',
+  {
+    local type = std.get(legacyCollectionConfig, 'type', ''),
+    local fluentd = std.get(legacyCollectionConfig, 'fluentd', {}),
+    collection+: {
+      [if type != '' then 'type']: type,
+    } + if std.length(fluentd) > 0 then fluentd,
+  }
+) else {};
+
+local clusterLogging = params.clusterLogging {
+  collection: {
+    [it]: params.clusterLogging.collection[it]
+    for it in std.objectFields(params.clusterLogging.collection)
+    if it != 'logs'
+  },
+} + legacyCollectionPatch;
+// --- End patch
 
 {
   '00_namespace': kube.Namespace(params.namespace) {
@@ -95,7 +116,7 @@ local namespace_groups = (
           'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
         },
       },
-      spec: params.clusterLogging,
+      spec: clusterLogging,
     }, {
       // Patch to remove certain keys, as the ClusterLogging operator would just
       // deploy elasticsearch or kibana if they are configured

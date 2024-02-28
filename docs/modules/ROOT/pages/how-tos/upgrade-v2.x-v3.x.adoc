@@ -1,0 +1,67 @@
+= Upgrade from v2.x to v3.x
+
+Elasticsearch is deprecated.
+The component will deploy Lokistack by default, for keeping elasticsearch apply config below.
+
+The parameter `clusterLogging.collector.logs` is deprecated.
+The component is backwards compatible, but moving the parameters to `clusterLogging.collector` is highly encouraged.
+
+See https://docs.openshift.com/container-platform/latest/logging/log_collection_forwarding/cluster-logging-collector.html[OpenShift Documentation] for reference.
+
+
+== Keep Elasticsearch as Logging stack
+
+Enable Elasticsearch in `components`:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    components:
+      lokistack:
+        enabled: false <1>
+      elasticsearch:
+        enabled: true <2>
+
+    clusterLogging:
+      logStore:
+        type: elasticsearch <3>
+----
+<1> Disable Lokistack in `components`
+<2> Enable Elasticsearch in `components`
+<3> Set Elasticsearch in `clusterLogging`
+
+
+== Move `clusterLogging.collector.logs`
+
+Move the `clusterLogging.collector.logs` parameters:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    clusterLogging:
+      collection:
+        logs:
+          type: fluentd <1>
+          fluentd: <2>
+            tolerations:
+              - key: storagenode
+                operator: Exists
+----
+<1> Move `clusterLogging.collector.logs.type` to `clusterLogging.collector.type`
+<2> Move section `clusterLogging.collector.logs.fluentd` to `clusterLogging.collector` directly
+
+Example for v3.x:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    clusterLogging:
+      collection:
+        type: fluentd
+        tolerations:
+          - key: storagenode
+            operator: Exists
+----

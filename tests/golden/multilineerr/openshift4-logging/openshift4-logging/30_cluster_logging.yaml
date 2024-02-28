@@ -9,17 +9,10 @@ metadata:
   namespace: openshift-logging
 spec:
   collection:
-    logs:
-      fluentd: {}
-      type: fluentd
+    type: fluentd
   logStore:
-    elasticsearch:
-      nodeCount: 3
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      redundancyPolicy: SingleRedundancy
-      storage:
-        size: 200Gi
+    lokistack:
+      name: loki
     retentionPolicy:
       application:
         maxAge: 7d
@@ -30,11 +23,5 @@ spec:
       infra:
         maxAge: 30d
         pruneNamespacesInterval: 15m
-    type: elasticsearch
+    type: lokistack
   managementState: Managed
-  visualization:
-    kibana:
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      replicas: 2
-    type: kibana

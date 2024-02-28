@@ -35,7 +35,7 @@ jobs:
           - defaults
           - release-5.4
           - master
-          - lokistack
+          - elasticsearch
           - multilineerr
     defaults:
       run:
@@ -53,7 +53,7 @@ jobs:
         instance:
           - defaults
           - master
-          - lokistack
+          - elasticsearch
           - multilineerr
     defaults:
       run:

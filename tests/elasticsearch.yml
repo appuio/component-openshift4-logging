@@ -33,9 +33,9 @@ parameters:
   openshift4_logging:
     components:
       lokistack:
-        enabled: true
-      elasticsearch:
         enabled: false
+      elasticsearch:
+        enabled: true
     clusterLogging:
       logStore:
         type: lokistack
