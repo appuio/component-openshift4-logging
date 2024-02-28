@@ -9,9 +9,7 @@ metadata:
   namespace: openshift-logging
 spec:
   collection:
-    logs:
-      fluentd: {}
-      type: fluentd
+    type: fluentd
   logStore:
     elasticsearch:
       nodeCount: 3
