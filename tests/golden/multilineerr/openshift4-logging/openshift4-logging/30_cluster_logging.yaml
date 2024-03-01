@@ -9,7 +9,7 @@ metadata:
   namespace: openshift-logging
 spec:
   collection:
-    type: fluentd
+    type: vector
   logStore:
     lokistack:
       name: loki

@@ -28,7 +28,7 @@ spec:
       infra:
         maxAge: 30d
         pruneNamespacesInterval: 15m
-    type: lokistack
+    type: elasticsearch
   managementState: Managed
   visualization:
     kibana:

@@ -86,7 +86,7 @@ parameters:
           nodeSelector:
             node-role.kubernetes.io/infra: ''
       collection:
-        type: fluentd
+        type: vector
 
     clusterLogForwarding:
       enabled: false

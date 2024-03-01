@@ -204,3 +204,14 @@ spec:
             severity: warning
             syn: 'true'
             syn_component: openshift4-logging
+        - alert: SYN_LokistackSchemaUpgradesRequired
+          annotations:
+            message: Object storage schema needs upgrade.
+            runbook_url: https://github.com/grafana/loki/blob/main/operator/docs/lokistack/sop.md#Lokistack-Schema-Upgrades-Required
+            summary: The applied storage schema config is old and should be upgraded.
+          expr: sum by(stack_id) (lokistack_warnings_count) > 0
+          labels:
+            resource: '{{ $labels.stack_id}}'
+            severity: warning
+            syn: 'true'
+            syn_component: openshift4-logging
