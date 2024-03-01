@@ -37,5 +37,7 @@ parameters:
       elasticsearch:
         enabled: true
     clusterLogging:
+      collection:
+        type: fluentd
       logStore:
-        type: lokistack
+        type: elasticsearch

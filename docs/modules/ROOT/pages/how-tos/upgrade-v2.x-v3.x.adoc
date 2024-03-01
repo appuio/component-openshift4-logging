@@ -3,6 +3,10 @@
 Elasticsearch is deprecated.
 The component will deploy Lokistack by default, for keeping elasticsearch apply config below.
 
+Fluentd collector is deprecated.
+The component will deploy Vector by default, for keeping Fluentd apply config below.
+Vector does not support all forwarding protocols, see https://docs.openshift.com/container-platform/4.15/logging/log_collection_forwarding/log-forwarding.html#log-forwarding-collector-outputs_log-forwarding[OpenShift Documentation].
+
 The parameter `clusterLogging.collector.logs` is deprecated.
 The component is backwards compatible, but moving the parameters to `clusterLogging.collector` is highly encouraged.
 
@@ -30,6 +34,21 @@ parameters:
 <1> Disable Lokistack in `components`
 <2> Enable Elasticsearch in `components`
 <3> Set Elasticsearch in `clusterLogging`
+
+
+== Keep Fluentd as Log collector
+
+Set `clusterLogging.collection.type` to `fluentd`:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    clusterLogging:
+      collection:
+        type: fluentd <1>
+----
+<1> Set Fluentd in `clusterLogging`
 
 
 == Move `clusterLogging.collector.logs`
