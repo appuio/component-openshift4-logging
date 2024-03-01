@@ -90,7 +90,7 @@ default::
 ----
 components:
   elasticsearch:
-    enabled: true
+    enabled: false
     kibana_host: null
     predict_elasticsearch_storage_alert:
       enabled: true
@@ -103,6 +103,10 @@ components:
 
 Configuration of the elasticsearch component.
 
+[NOTE]
+====
+Elasticsearch is deprecated.
+====
 
 === `components.elasticsearch.kibana_host`
 
@@ -198,7 +202,7 @@ See subsections for supported keys.
 
 [horizontal]
 type:: boolean
-default:: `false`
+default:: `true`
 
 Whether to deploy the LokiStack on the cluster.
 
