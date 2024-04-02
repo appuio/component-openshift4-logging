@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+    kubernetes.io/service-account.name: loki-operator-controller-manager-metrics-reader
+  labels:
+    name: loki-operator-controller-manager-metrics-token
+  name: loki-operator-controller-manager-metrics-token
+  namespace: openshift-operators-redhat
+type: kubernetes.io/service-account-token
