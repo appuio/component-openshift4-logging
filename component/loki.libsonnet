@@ -116,6 +116,28 @@ local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
   ],
 };
 
+// Generate missing metrics SA token for Loki Operator.
+//
+// The ServiceMonitor for the Loki Operator references a SA token secret
+// called `loki-operator-controller-manager-metrics-token` which doesn't exist
+// on the cluster after the operator is installed or upgraded to 5.8.5 via
+// OLM.
+local operator_metrics_sa_token =
+  kube.Secret('loki-operator-controller-manager-metrics-token') {
+    metadata+: {
+      // Loki operator is deployed in openshift-operators-redhat
+      namespace: 'openshift-operators-redhat',
+      annotations+: {
+        'kubernetes.io/service-account.name': 'loki-operator-controller-manager-metrics-reader',
+        // disable argocd prune/delete so removing the workaround should be
+        // fairly easy in case the Loki Operator OLM install fixes the issue.
+        'argocd.argoproj.io/sync-options': 'Prune=false,Delete=false',
+      },
+    },
+    data:: {},
+    type: 'kubernetes.io/service-account-token',
+  };
+
 // Define outputs below
 if loki.enabled then
   {
@@ -123,6 +145,7 @@ if loki.enabled then
     '50_loki_logstore': logstore,
     '50_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
     '50_loki_rbac': [ aggregate_loki_log_access ],
+    '50_loki_operator_metrics_token': [ operator_metrics_sa_token ],
   }
 else
   std.trace(
