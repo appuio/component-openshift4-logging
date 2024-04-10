@@ -122,6 +122,17 @@ parameters:
         limits:
           memory: 1.5Gi
 
+    images:
+      kubectl:
+        registry: quay.io
+        repository: appuio/oc
+        tag: v4.14
+
+    workaround:
+      ingester_fix:
+        schedule: '0,30 * * * *'
+        sleep_time: 2m
+
   openshift4_elasticsearch_operator:
     targetNamespaces:
       - ${openshift4_logging:namespace}
