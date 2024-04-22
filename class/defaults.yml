@@ -130,7 +130,7 @@ parameters:
 
     workaround:
       ingester_fix:
-        schedule: '0,30 * * * *'
+        schedule: '*/10 * * * *'
         sleep_time: 2m
 
   openshift4_elasticsearch_operator:
