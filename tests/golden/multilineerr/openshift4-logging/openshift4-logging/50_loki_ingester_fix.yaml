@@ -150,4 +150,4 @@ spec:
                 defaultMode: 364
                 name: loki-ingester-check
               name: wal-check
-  schedule: 0,30 * * * *
+  schedule: '*/10 * * * *'
