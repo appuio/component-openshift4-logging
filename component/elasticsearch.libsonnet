@@ -1,4 +1,5 @@
 // main template for openshift4-lokistack
+local workaround = import 'es_workaround.libsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local resourceLocker = import 'lib/resource-locker.libjsonnet';
@@ -125,6 +126,7 @@ if elasticsearch.enabled then
     '40_es_machineconfig': machineconfig_journald,
     '40_es_netpol': netpol_operator,
     [if kibana_host != null then '40_es_kibana_host']: kibana_patchWithAdditionalPermissions,
+    '40_es_operator_metrics_token': workaround.missing_metrics_token,
   }
 else
   std.trace(
