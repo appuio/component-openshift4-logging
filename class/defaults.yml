@@ -56,37 +56,7 @@ parameters:
           for: 6h
           severity: warning
 
-    clusterLogging:
-      managementState: Managed
-      logStore:
-        type: lokistack
-        lokistack:
-          name: loki
-        elasticsearch:
-          nodeCount: 3
-          storage:
-            size: 200Gi
-          redundancyPolicy: SingleRedundancy
-          nodeSelector:
-            node-role.kubernetes.io/infra: ''
-        retentionPolicy:
-          application:
-            maxAge: 7d
-            pruneNamespacesInterval: 15m
-          infra:
-            maxAge: 30d
-            pruneNamespacesInterval: 15m
-          audit:
-            maxAge: 30d
-            pruneNamespacesInterval: 15m
-      visualization:
-        type: kibana
-        kibana:
-          replicas: 2
-          nodeSelector:
-            node-role.kubernetes.io/infra: ''
-      collection:
-        type: vector
+    clusterLogging: {}
 
     clusterLogForwarding:
       enabled: false
