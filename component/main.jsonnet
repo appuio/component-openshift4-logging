@@ -6,6 +6,9 @@ local operatorlib = import 'lib/openshift4-operators.libsonnet';
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 
+local deployLokistack = params.components.lokistack.enabled;
+local deployElasticsearch = params.components.elasticsearch.enabled;
+
 local group = 'operators.coreos.com/';
 local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 
@@ -57,69 +60,82 @@ local pipelineOutputRefs(pipeline) =
   local default = if forwardingOnly then [] else [ 'default' ];
   std.get(pipeline, 'forwarders', []) + default;
 
-{
-  '00_namespace': kube.Namespace(params.namespace) {
-    metadata+: {
-      annotations+: {
-        'openshift.io/node-selector': '',
-      },
-      labels+: {
-        'openshift.io/cluster-monitoring': 'true',
-      },
+// Namespace
+
+local namespace = kube.Namespace(params.namespace) {
+  metadata+: {
+    annotations+: {
+      'openshift.io/node-selector': '',
+    },
+    labels+: {
+      'openshift.io/cluster-monitoring': 'true',
     },
   },
-  '10_operator_group': operatorlib.OperatorGroup('cluster-logging') {
-    metadata+: {
-      namespace: params.namespace,
-    },
-    spec: {
-      targetNamespaces: [
-        params.namespace,
-      ],
-    },
+};
+
+// OperatorGroup
+
+local operatorGroup = operatorlib.OperatorGroup('cluster-logging') {
+  metadata+: {
+    namespace: params.namespace,
   },
-  '20_subscriptions': [
-    operatorlib.namespacedSubscription(
+  spec: {
+    targetNamespaces: [
       params.namespace,
-      'cluster-logging',
-      params.channel,
-      'redhat-operators'
-    ) {
-      spec+: {
-        config+: {
-          resources: params.operatorResources.clusterLogging,
-        },
-      },
+    ],
+  },
+};
+
+// Subscriptions
+
+local logging = operatorlib.namespacedSubscription(
+  params.namespace,
+  'cluster-logging',
+  params.channel,
+  'redhat-operators'
+) {
+  spec+: {
+    config+: {
+      resources: params.operatorResources.clusterLogging,
     },
-  ] + (
-    if params.components.lokistack.enabled then [
-      operatorlib.managedSubscription(
-        'openshift-operators-redhat',
-        'loki-operator',
-        params.channel
-      ) {
-        spec+: {
-          config+: {
-            resources: params.operatorResources.lokistack,
-          },
-        },
-      },
-    ] else []
-  ) + (
-    if params.components.elasticsearch.enabled then [
-      operatorlib.managedSubscription(
-        'openshift-operators-redhat',
-        'elasticsearch-operator',
-        params.channel
-      ) {
-        spec+: {
-          config+: {
-            resources: params.operatorResources.elasticsearch,
-          },
-        },
-      },
-    ] else []
-  ),
+  },
+};
+
+local lokistack = if deployLokistack then operatorlib.managedSubscription(
+  'openshift-operators-redhat',
+  'loki-operator',
+  params.channel
+) {
+  spec+: {
+    config+: {
+      resources: params.operatorResources.lokistack,
+    },
+  },
+};
+
+local elasticsearch = if deployElasticsearch then operatorlib.managedSubscription(
+  'openshift-operators-redhat',
+  'elasticsearch-operator',
+  params.channel
+) {
+  spec+: {
+    config+: {
+      resources: params.operatorResources.elasticsearch,
+    },
+  },
+};
+
+local subscriptions = std.filter(function(it) it != null, [
+  logging,
+  lokistack,
+  elasticsearch,
+]);
+
+// Define outputs below
+{
+  '00_namespace': namespace,
+  '10_operator_group': operatorGroup,
+  '20_subscriptions': subscriptions,
   '30_cluster_logging': std.mergePatch(
     // ClusterLogging resource from inventory
     kube._Object(clusterLoggingGroupVersion, 'ClusterLogging', 'instance') {
