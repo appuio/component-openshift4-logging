@@ -1,13 +1,13 @@
 {
   "template": "https://github.com/projectsyn/commodore-component-template.git",
-  "commit": "ea12efff947bce80cf31a3f1ed4412eab40e8b33",
+  "commit": "689cbccb0e39543542eee6d308eb652fd6eb1344",
   "checkout": "main",
   "context": {
     "cookiecutter": {
       "name": "OpenShift4 Logging",
       "slug": "openshift4-logging",
       "parameter_key": "openshift4_logging",
-      "test_cases": "defaults master elasticsearch multilineerr",
+      "test_cases": "defaults master elasticsearch multilineerr forwardingonly",
       "add_lib": "n",
       "add_pp": "n",
       "add_golden": "y",

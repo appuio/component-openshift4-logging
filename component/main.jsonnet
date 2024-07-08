@@ -9,6 +9,8 @@ local params = inv.parameters.openshift4_logging;
 local group = 'operators.coreos.com/';
 local clusterLoggingGroupVersion = 'logging.openshift.io/v1';
 
+local forwardingOnly = !params.components.elasticsearch.enabled && !params.components.lokistack.enabled;
+
 local namespace_groups = (
   if std.objectHas(params.clusterLogForwarding, 'namespaces') then
     {
@@ -35,14 +37,25 @@ local legacyCollectionPatch = if std.length(legacyCollectionConfig) > 0 then std
   }
 ) else {};
 
-local clusterLogging = params.clusterLogging {
-  collection: {
-    [it]: params.clusterLogging.collection[it]
-    for it in std.objectFields(params.clusterLogging.collection)
-    if it != 'logs'
-  },
-} + legacyCollectionPatch;
+local clusterLogging = std.mergePatch(
+  params.clusterLogging {
+    collection: {
+      [it]: params.clusterLogging.collection[it]
+      for it in std.objectFields(params.clusterLogging.collection)
+      if it != 'logs'
+    },
+  } + legacyCollectionPatch,
+  {
+    // Patch to remove certain keys, as the ClusterLogging operator would just
+    // deploy elasticsearch or kibana if they are configured
+    [if forwardingOnly then 'logStore']: null,
+  }
+);
 // --- End patch
+
+local pipelineOutputRefs(pipeline) =
+  local default = if forwardingOnly then [] else [ 'default' ];
+  std.get(pipeline, 'forwarders', []) + default;
 
 {
   '00_namespace': kube.Namespace(params.namespace) {
@@ -166,41 +179,44 @@ local clusterLogging = params.clusterLogging {
         for group in std.objectFields(namespace_groups)
       ],
     } + com.makeMergeable(
+      local enable_pipeline = std.length(pipelineOutputRefs(params.clusterLogForwarding.application_logs)) > 0;
       local enable_json = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'json', false);
       local enable_multilineErrors = com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'detectMultilineErrors', false);
       {
-        pipelines: [
+        [if enable_pipeline then 'pipelines']: [
           {
             name: 'application-logs',
             inputRefs: [ 'application' ],
-            outputRefs: com.getValueOrDefault(params.clusterLogForwarding.application_logs, 'forwarders', []) + [ 'default' ],
+            outputRefs: pipelineOutputRefs(params.clusterLogForwarding.application_logs),
             [if enable_json then 'parse']: 'json',
             [if enable_multilineErrors then 'detectMultilineErrors']: true,
           },
         ],
       }
     ) + com.makeMergeable(
+      local enable_pipeline = params.clusterLogForwarding.infrastructure_logs.enabled && std.length(pipelineOutputRefs(params.clusterLogForwarding.infrastructure_logs)) > 0;
       local enable_json = com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'json', false);
       local enable_multilineErrors = com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'detectMultilineErrors', false);
       {
-        [if params.clusterLogForwarding.infrastructure_logs.enabled then 'pipelines']: [
+        [if enable_pipeline then 'pipelines']: [
           {
             name: 'infrastructure-logs',
             inputRefs: [ 'infrastructure' ],
-            outputRefs: com.getValueOrDefault(params.clusterLogForwarding.infrastructure_logs, 'forwarders', []) + [ 'default' ],
+            outputRefs: pipelineOutputRefs(params.clusterLogForwarding.infrastructure_logs),
             [if enable_json then 'parse']: 'json',
             [if enable_multilineErrors then 'detectMultilineErrors']: true,
           },
         ],
       }
     ) + com.makeMergeable(
+      local enable_pipeline = params.clusterLogForwarding.audit_logs.enabled && std.length(pipelineOutputRefs(params.clusterLogForwarding.application_logs)) > 0;
       local enable_json = com.getValueOrDefault(params.clusterLogForwarding.audit_logs, 'json', false);
       {
         [if params.clusterLogForwarding.audit_logs.enabled then 'pipelines']: [
           {
             name: 'audit-logs',
             inputRefs: [ 'audit' ],
-            outputRefs: com.getValueOrDefault(params.clusterLogForwarding.audit_logs, 'forwarders', []) + [ 'default' ],
+            outputRefs: pipelineOutputRefs(params.clusterLogForwarding.audit_logs),
           },
         ],
       }
