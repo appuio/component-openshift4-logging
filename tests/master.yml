@@ -25,3 +25,17 @@ parameters:
   openshift4_logging:
     channel: 'stable'
     alerts: 'master'
+
+    clusterLogForwarding:
+      enabled: true
+      forwarders:
+        custom-forwarder:
+          type: syslog
+      namespace_groups:
+        my-apps:
+          namespaces:
+            - app-one
+            - app-two
+          forwarders:
+            - custom-forwarder
+          json: true

@@ -10,5 +10,4 @@ metadata:
 spec:
   collection:
     type: vector
-  logStore: {}
   managementState: Managed

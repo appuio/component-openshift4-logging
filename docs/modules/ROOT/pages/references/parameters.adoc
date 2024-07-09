@@ -292,7 +292,7 @@ The max allowed volume for a tenant per day can be calculated with the following
 ++++
 The default of 5 MiB/s allows up to ~420 GiB of logs per day for a tenant.
 
-See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-loki.html#logging-loki-deploy_cluster-logging-loki[Openshift Docs] for available parameters.
+See the https://docs.openshift.com/container-platform/latest/observability/logging/cluster-logging-deploying.html#configuring-log-storage-cr_cluster-logging-deploying[Openshift Docs] for available parameters.
 See the https://loki-operator.dev/docs/api.md/[Loki Operator Docs] for available Lokistack specs.
 
 == `operatorResources`
@@ -312,7 +312,7 @@ default:: see `defaults.yml`
 
 A dictionary holding the `.spec` for cluster logging.
 
-See the https://docs.openshift.com/container-platform/latest/logging/config/cluster-logging-configuring-cr.html[OpenShift docs] for available parameters.
+See the https://docs.openshift.com/container-platform/latest/observability/logging/cluster-logging-deploying.html#create-cluster-logging-cli_cluster-logging-deploying[OpenShift docs] for available parameters.
 
 
 == `clusterLogForwarding`
@@ -333,7 +333,7 @@ default:: {}
 
 Each key in this dictionary holds the parameters for an `.spec.outputs` object.
 
-See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-external.html[OpenShift docs] for available parameters.
+See the https://docs.openshift.com/container-platform/4.16/observability/logging/log_collection_forwarding/configuring-log-forwarding.html#logging-create-clf_configuring-log-forwarding[OpenShift docs] for available parameters.
 
 === `clusterLogForwarding.namespace_groups`
 
@@ -481,7 +481,7 @@ clusterLogForwarding:
 <2> The value of that field, if present, is used to construct the index name.
 <3> If `typekey` isn't set or its key isn't present, the value of this field is used to construct the index name.
 
-See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-enabling-json-logging.html#cluster-logging-configuration-of-json-log-data-for-default-elasticsearch_cluster-logging-enabling-json-logging[OpenShift docs] for a detailed explanation.
+See the https://docs.openshift.com/container-platform/latest/observability/logging/log_collection_forwarding/cluster-logging-enabling-json-logging.html[OpenShift docs] for a detailed explanation.
 
 
 == Example
