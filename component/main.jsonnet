@@ -65,7 +65,7 @@ local lokistack = if deployLokistack then operatorlib.managedSubscription(
 local elasticsearch = if deployElasticsearch then operatorlib.managedSubscription(
   'openshift-operators-redhat',
   'elasticsearch-operator',
-  params.channel
+  'stable-5.8'
 ) {
   spec+: {
     config+: {

@@ -29,7 +29,7 @@ metadata:
   name: elasticsearch-operator
   namespace: openshift-operators-redhat
 spec:
-  channel: stable-5.9
+  channel: stable-5.8
   config:
     resources:
       limits:
