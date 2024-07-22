@@ -17,6 +17,8 @@ spec:
     schemas:
       - effectiveDate: '2022-06-01'
         version: v12
+      - effectiveDate: '2024-09-01'
+        version: v13
     secret:
       name: loki-logstore
       type: s3
