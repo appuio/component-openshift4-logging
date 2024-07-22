@@ -2,6 +2,7 @@ local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local operatorlib = import 'lib/openshift4-operators.libsonnet';
+local utils = import 'utils.libsonnet';
 
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
@@ -62,10 +63,13 @@ local lokistack = if deployLokistack then operatorlib.managedSubscription(
   },
 };
 
+// With version 5.9 of the logging stack, elasticsearch is deprecated,
+// this will clamp elasticsearch-operator subscription to stable-5.8.
+local esChannel = if utils.isVersion59 then 'stable-5.8' else params.channel;
 local elasticsearch = if deployElasticsearch then operatorlib.managedSubscription(
   'openshift-operators-redhat',
   'elasticsearch-operator',
-  'stable-5.8'
+  esChannel
 ) {
   spec+: {
     config+: {

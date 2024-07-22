@@ -2,6 +2,7 @@ local alertpatching = import 'lib/alert-patching.libsonnet';
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
+local utils = import 'utils.libsonnet';
 
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
@@ -125,19 +126,11 @@ local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.
 
 // Elasticstack alerts
 
-local isVersion58 =
-  local major = std.split(params.version, '.')[0];
-  local minor = std.split(params.version, '.')[1];
-  if major == 'master' then true
-  else if std.parseInt(major) >= 6 then true
-  else if std.parseInt(major) == 5 && std.parseInt(minor) >= 8 then true
-  else false;
-
 local esStorageGroup = {
   name: 'elasticsearch_node_storage.alerts',
   rules: [ predictESStorage ],
 };
-local fluentdGroup = if !isVersion58 then loadFile('fluentd_prometheus_alerts.yaml')[0].groups else [];
+local fluentdGroup = if !utils.isVersion58 then loadFile('fluentd_prometheus_alerts.yaml')[0].groups else [];
 
 local esGroups =
   loadFile('elasticsearch_operator_prometheus_alerts.yaml')[0].groups +
@@ -159,5 +152,5 @@ local collectorGroups = loadFile('collector_prometheus_alerts.yaml')[0].spec.gro
 {
   [if elasticsearch.enabled then '60_elasticsearch_alerts']: prometheus_rules('syn-elasticsearch-logging-rules', esGroups, esBaseURL),
   [if loki.enabled then '60_lokistack_alerts']: prometheus_rules('syn-loki-logging-rules', lokiGroups, lokiBaseURL),
-  [if isVersion58 then '60_collector_alerts']: prometheus_rules('syn-collector-rules', collectorGroups, ''),
+  [if utils.isVersion58 then '60_collector_alerts']: prometheus_rules('syn-collector-rules', collectorGroups, ''),
 }
