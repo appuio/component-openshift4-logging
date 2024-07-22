@@ -125,7 +125,13 @@ local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.
 
 // Elasticstack alerts
 
-local isVersion58 = if params.version == '5.8' || params.version == 'master' then true else false;
+local isVersion58 =
+  local major = std.split(params.version, '.')[0];
+  local minor = std.split(params.version, '.')[1];
+  if major == 'master' then true
+  else if std.parseInt(major) >= 6 then true
+  else if std.parseInt(major) == 5 && std.parseInt(minor) >= 8 then true
+  else false;
 
 local esStorageGroup = {
   name: 'elasticsearch_node_storage.alerts',

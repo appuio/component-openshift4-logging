@@ -8,7 +8,7 @@ parameters:
       "False": {}
 
     namespace: openshift-logging
-    version: '5.8'
+    version: '5.9'
     channel: 'stable-${openshift4_logging:version}'
     alerts: 'release-${openshift4_logging:version}'
 
