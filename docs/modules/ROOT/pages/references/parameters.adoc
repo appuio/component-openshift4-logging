@@ -257,8 +257,8 @@ spec:
   size: 1x.extra-small
   storage:
     schemas:
-      - version: v12
-        effectiveDate: '2022-06-01'
+      - version: v13
+        effectiveDate: '2022-09-01'
     secret:
       type: s3
       name: loki-logstore
