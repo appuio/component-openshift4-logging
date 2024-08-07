@@ -295,6 +295,46 @@ The default of 5 MiB/s allows up to ~420 GiB of logs per day for a tenant.
 See the https://docs.openshift.com/container-platform/latest/observability/logging/cluster-logging-deploying.html#configuring-log-storage-cr_cluster-logging-deploying[Openshift Docs] for available parameters.
 See the https://loki-operator.dev/docs/api.md/[Loki Operator Docs] for available Lokistack specs.
 
+
+== `components.logmetrics`
+
+Configuration of the logfile metrics component.
+See subsections for supported keys.
+
+=== `components.logmetrics.enabled`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+Whether to deploy the LogFileMetricsExporter on the cluster.
+
+
+=== `components.logmetrics.spec`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+spec:
+  nodeSelector: <1>
+    node-role.kubernetes.io/infra: ''
+  resources: <2>
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
+----
+<1> configure nodeSelector
+<2> configure resources
+
+See the https://docs.openshift.com/container-platform/latest/observability/logging/log_collection_forwarding/cluster-logging-collector.html#creating-logfilesmetricexporter_cluster-logging-collector[LogCollection Docs] for available specs.
+
+
 == `operatorResources`
 
 [horizontal]

@@ -95,3 +95,4 @@ local subscriptions = std.filter(function(it) it != null, [
 + (import 'loki.libsonnet')
 + (import 'elasticsearch.libsonnet')
 + (import 'alertrules.libsonnet')
++ (import 'logmetrics.libsonnet')
