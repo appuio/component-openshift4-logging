@@ -57,6 +57,18 @@ parameters:
           threshold: 85
           for: 6h
           severity: warning
+      logmetrics:
+        enabled: false
+        spec:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ''
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 200m
+              memory: 128Mi
 
     clusterLogging: {}
 
