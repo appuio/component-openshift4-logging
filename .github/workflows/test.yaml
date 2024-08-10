@@ -38,6 +38,7 @@ jobs:
           - elasticsearch
           - multilineerr
           - forwardingonly
+          - legacy
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -57,6 +58,7 @@ jobs:
           - elasticsearch
           - multilineerr
           - forwardingonly
+          - legacy
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
