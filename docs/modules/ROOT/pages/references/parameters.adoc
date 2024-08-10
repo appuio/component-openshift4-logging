@@ -103,10 +103,7 @@ components:
 
 Configuration of the elasticsearch component.
 
-[NOTE]
-====
-Elasticsearch is deprecated.
-====
+IMPORTANT: Elasticsearch is deprecated.
 
 === `components.elasticsearch.kibana_host`
 
@@ -348,183 +345,30 @@ A dictionary holding the `.spec.config.resources` for OLM subscriptions maintain
 
 [horizontal]
 type:: dictionary
-default:: see `defaults.yml`
+default:: {}
 
 A dictionary holding the `.spec` for cluster logging.
 
 See the https://docs.openshift.com/container-platform/latest/observability/logging/cluster-logging-deploying.html#create-cluster-logging-cli_cluster-logging-deploying[OpenShift docs] for available parameters.
 
 
+== `clusterLogForwarder`
+
+[horizontal]
+type:: dictionary
+default:: {}
+
+A dictionary holding the `.spec` for cluster log forwarding.
+
+See the https://docs.openshift.com/container-platform/latest/observability/logging/log_collection_forwarding/log-forwarding.html[OpenShift docs] for available parameters.
+
+
 == `clusterLogForwarding`
 
-=== `clusterLogForwarding.enabled`
-
-[horizontal]
-type:: boolean
-default:: `false`
-
-Enables log forwarding for the cluster.
-
-=== `clusterLogForwarding.forwarders`
-
-[horizontal]
-type:: dictionary
-default:: {}
-
-Each key in this dictionary holds the parameters for an `.spec.outputs` object.
-
-See the https://docs.openshift.com/container-platform/4.16/observability/logging/log_collection_forwarding/configuring-log-forwarding.html#logging-create-clf_configuring-log-forwarding[OpenShift docs] for available parameters.
-
-=== `clusterLogForwarding.namespace_groups`
-
-[horizontal]
-type:: dictionary
-default:: {}
-
-Customization for the logging of a specified group of namespaces.
-
-Enabling forwarders will send the logs of the specified namespaces to a third-party log aggregator.
-For some log aggregation systems you may need to deploy a separate log forwarder.
-
-Enable json parsing for a 'namespace_group' only makes sense if the logs are forwarded to the clusters default elasticsearch instance. Therefor 'default' will automatically be added to the forwarders.
-
-[source,yaml]
-----
-clusterLogForwarding:
-  namespace_groups:
-    my-group: <1>
-      namespaces: <2>
-        - my-namespace
-      forwarders: <3>
-        - splunk-forwarder
-      json: true <4>
-      detectMultilineErrors: true <5>
-----
-
-<1> Namespace to configure.
-<2> List of namespaces.
-<3> List of forwarders (defined in `clusterLogForwarding.forwarders`).
-<4> Enable json logging only for defined namespaces.
-<5> Enable detecting multiline errors for defined namespaces.
+IMPORTANT: `clusterLogForwarding` is deprecated, please use `clusterLogForwarder`
 
 
-=== `clusterLogForwarding.application_logs`
-
-[horizontal]
-type:: dictionary
-default:: {}
-
-Customization for the logging of all applications.
-
-Enabling forwarders will send the logs of all namespaces to a third-party log aggregator.
-For some log aggregation systems you may need to deploy a separate log forwarder.
-
-[source,yaml]
-----
-clusterLogForwarding:
-  application_logs:
-    forwarders: <1>
-      - splunk-forwarder
-    json: true <2>
-    detectMultilineErrors: true <3>
-----
-
-<1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
-<2> Enable json logging for all applications.
-<3> Enable detecting multiline errors for all applications.
-
-
-=== `clusterLogForwarding.infrastructure_logs`
-
-[horizontal]
-type:: dictionary
-default::
-+
-[source,yaml]
-----
-clusterLogForwarding:
-  infrastructure_logs:
-    enabled: true
-----
-
-Customization for the logging of `openshift*`, `kube*`, or `default` projects.
-
-Enabled by default.
-
-Enabling forwarders will send the logs of all namespaces to a third-party log aggregator.
-For some log aggregation systems you may need to deploy a separate log forwarder.
-
-[source,yaml]
-----
-clusterLogForwarding:
-  infrastructure_logs:
-    forwarders: <1>
-      - splunk-forwarder
-    json: true <2>
-----
-
-<1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
-<2> Enable json logging for all applications.
-
-
-=== `clusterLogForwarding.audit_logs`
-
-[horizontal]
-type:: dictionary
-default::
-+
-[source,yaml]
-----
-clusterLogForwarding:
-  audit_logs:
-    enabled: false
-----
-
-Customization for the logging of https://docs.openshift.com/container-platform/latest/security/audit-log-policy-config.html[audit logs].
-
-Disabled by default.
-
-Enabling forwarders will send the logs of all namespaces to a third-party log aggregator.
-For some log aggregation systems you may need to deploy a separate log forwarder.
-
-[source,yaml]
-----
-clusterLogForwarding:
-  audit_logs:
-    forwarders: <1>
-      - splunk-forwarder
-    json: true <2>
-----
-
-<1> List of forwarders (defined in `clusterLogForwarding.forwarders`).
-<2> Enable json logging for all applications.
-
-
-=== `clusterLogForwarding.json`
-
-[horizontal]
-type:: dictionary
-default:: see below
-
-Setting `json.enabled` is required for json parsing to be available. You need to additionally enable it in `clusterLogForwarding.application_logs` or `clusterLogForwarding.namespace_groups`, based on your needs, to actually parse the logs.
-
-[source,yaml]
-----
-clusterLogForwarding:
-  json:
-    enabled: false <1>
-    typekey: 'kubernetes.labels.logFormat' <2>
-    typename: 'nologformat' <3>
-----
-
-<1> By default JSON parsing is disabled.
-<2> The value of that field, if present, is used to construct the index name.
-<3> If `typekey` isn't set or its key isn't present, the value of this field is used to construct the index name.
-
-See the https://docs.openshift.com/container-platform/latest/observability/logging/log_collection_forwarding/cluster-logging-enabling-json-logging.html[OpenShift docs] for a detailed explanation.
-
-
-== Example
+== Examples
 
 [source,yaml]
 ----
@@ -541,36 +385,40 @@ clusterLogging:
 
 [source,yaml]
 ----
-clusterLogForwarding:
-  enabled: true
-  forwarders:
+clusterLogForwarder:
+  outputs:
     splunk-forwarder:
       secret:
         name: splunk-forwarder
       type: fluentdForward
       url: tls://splunk-forwarder:24224
-  application_logs:
-    forwarders:
-      - splunk-forwarder
+  pipelines:
+    application-logs:
+      outputRefs:
+        - splunk-forwarder
 ----
 
 === Forward logs for certain namespaces to third-party
 
 [source,yaml]
 ----
-clusterLogForwarding:
-  enabled: true
-  forwarders:
+clusterLogForwarder:
+  inputs:
+    my-apps:
+      application:
+        namespaces:
+          - my-namespace
+  outputs:
     splunk-forwarder:
       secret:
         name: splunk-forwarder
       type: fluentdForward
       url: tls://splunk-forwarder:24224
-  namespace_groups:
-    my-group:
-      namespaces:
-        - my-namespace
-      forwarders:
+  pipelines:
+    my-apps:
+      inputRefs:
+        - my-apps
+      outputRefs:
         - splunk-forwarder
 ----
 
@@ -578,25 +426,27 @@ clusterLogForwarding:
 
 [source,yaml]
 ----
-clusterLogForwarding:
-  enabled: true
-  application_logs:
-    json: true
-  json:
-    enabled: true
+clusterLogForwarder:
+  pipelines:
+    application-logs:
+      parse: json
 ----
 
 === Enable JSON parsing for certain namespaces
 
 [source,yaml]
 ----
-clusterLogForwarding:
-  enabled: true
-  namespace_groups:
-    my-group:
-      namespaces:
-        - my-namespace
-      json: true
-  json:
-    enabled: true
+clusterLogForwarder:
+  inputs:
+    my-apps:
+      application:
+        namespaces:
+          - my-namespace
+  pipelines:
+    my-apps:
+      inputRefs:
+        - my-apps
+      outputRefs:
+        - default
+      parse: json
 ----

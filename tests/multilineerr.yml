@@ -23,8 +23,8 @@ parameters:
     defaultSourceNamespace: openshift-operators-redhat
 
   openshift4_logging:
-    clusterLogForwarding:
-      enabled: true
-      application_logs:
-        json: true
-        detectMultilineErrors: true
+    clusterLogForwarder:
+      pipelines:
+        application-logs:
+          parse: json
+          detectMultilineErrors: true

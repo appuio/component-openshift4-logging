@@ -26,16 +26,26 @@ parameters:
     channel: 'stable'
     alerts: 'master'
 
-    clusterLogForwarding:
-      enabled: true
-      forwarders:
+    clusterLogForwarder:
+      inputs:
+        my-apps:
+          application:
+            namespaces:
+              - app-one
+              - app-two
+      outputs:
         custom-forwarder:
           type: syslog
-      namespace_groups:
-        my-apps:
-          namespaces:
-            - app-one
-            - app-two
-          forwarders:
+      pipelines:
+        application-logs:
+          outputRefs:
             - custom-forwarder
-          json: true
+        my-apps:
+          parse: json
+          inputRefs:
+            - my-apps
+          outputRefs:
+            - custom-forwarder
+        audit-logs:
+          outputRefs:
+            - custom-forwarder
