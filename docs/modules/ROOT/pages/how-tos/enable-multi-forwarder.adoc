@@ -1,0 +1,69 @@
+= Enable Multi LogForwarder
+
+Red Hat OpenShift Logging Operator only watches the `openshift-logging` namespace.
+If you want the Red Hat OpenShift Logging Operator to watch all namespaces on your cluster, you must redeploy the Operator.
+You can complete the following procedure to redeploy the Operator without deleting your logging components.
+
+
+== Disable ArgoCD sync
+
+Disable ArgoCD sync of component-openshift4-logging:
+[source,bash]
+----
+kubectl --as=cluster-admin -n syn patch apps root --type=json \
+  -p '[{"op":"replace", "path":"/spec/syncPolicy", "value": {}}]'
+kubectl --as=cluster-admin -n syn patch apps openshift4-logging --type=json \
+  -p '[{"op":"replace", "path":"/spec/syncPolicy", "value": {}}]'
+----
+
+== Remove Cluster Logging Opeartor Group
+
+1. Remove Subscription:
++
+[source,bash]
+----
+kubectl --as=cluster-admin -n openshift-logging delete sub cluster-logging
+----
+
+1. Remove OperatorGroup:
++
+[source,bash]
+----
+kubectl --as=cluster-admin -n openshift-logging delete og cluster-logging
+----
+
+1. Remove ClusterServiceVersion:
++
+[source,bash]
+----
+kubectl --as=cluster-admin -n openshift-logging delete csv -l operators.coreos.com/cluster-logging.openshift-logging=
+----
+
+== Enable namespaced LogForwarding
+
+1. Enable the following parameter in the tenant repo:
++
+[source,bash]
+----
+parameters:
+  openshift4_logging:
+    namespaceLogForwarderEnabled: true
+----
+
+1. Compile and push catalog
+
+
+== Enable ArgoCD sync
+
+NOTE: Make sure ArgoCD is refreshed before enabling the sync again.
+
+Enable ArgoCD sync of component-openshift4-logging:
+[source,bash]
+----
+kubectl --as=cluster-admin -n syn patch apps root --type=json \
+  -p '[{
+    "op":"replace",
+    "path":"/spec/syncPolicy",
+    "value": {"automated": {"prune": true, "selfHeal": true}}
+  }]'
+----

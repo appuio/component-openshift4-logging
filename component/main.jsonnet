@@ -30,7 +30,7 @@ local operatorGroup = operatorlib.OperatorGroup('cluster-logging') {
     namespace: params.namespace,
   },
   spec: {
-    targetNamespaces: [
+    [if !params.namespaceLogForwarderEnabled then 'targetNamespaces']: [
       params.namespace,
     ],
   },

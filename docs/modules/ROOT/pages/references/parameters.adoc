@@ -368,6 +368,26 @@ See the https://docs.openshift.com/container-platform/latest/observability/loggi
 IMPORTANT: `clusterLogForwarding` is deprecated, please use `clusterLogForwarder`
 
 
+== `namespaceLogForwarderEnabled`
+
+[horizontal]
+type:: bool
+default:: false
+
+NOTE: Enabling namespaced log forwarding requires redeploying the logging operator. See xref:how-tos/enable-multi-forwarder.adoc[How-To] for instructions.
+
+
+== `namespaceLogForwarder`
+
+[horizontal]
+type:: dictionary
+default:: {}
+
+A dictionary holding the `.spec` for namespaced log forwarding.
+
+See in examples below for configuration.
+
+
 == Examples
 
 [source,yaml]
@@ -379,6 +399,29 @@ clusterLogging:
         maxAge: 15d
     elasticsearch:
       nodeCount: 5
+----
+
+=== Use namespaced ClusterLogForwarder
+
+Example creates a `ClusterLogForwarder`, `ServiceAccount` and `RoleBinding` in namespace `my-namespace`.
+
+[source,yaml]
+----
+namespaceLogForwarderEnabled: true
+namespaceLogForwarder:
+  my-namespace/my-forwarder:
+    outputs:
+      splunk-forwarder:
+        secret:
+          name: splunk-forwarder
+        type: fluentdForward
+        url: tls://splunk-forwarder:24224
+    pipelines:
+      application-logs:
+        inputRefs:
+          - application
+        outputRefs:
+          - splunk-forwarder
 ----
 
 === Forward logs for all application logs to third-party

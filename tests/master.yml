@@ -49,3 +49,36 @@ parameters:
         audit-logs:
           outputRefs:
             - custom-forwarder
+
+    namespaceLogForwarderEnabled: true
+    namespaceLogForwarder:
+      jazz/hands:
+        outputs:
+          splunk-forwarder:
+            secret:
+              name: splunk-forwarder
+            type: fluentdForward
+            url: tls://splunk-forwarder:24224
+        pipelines:
+          application-logs:
+            inputRefs:
+              - application
+            outputRefs:
+              - splunk-forwarder
+      foo/bar:
+        serviceAccountName: ueli
+        inputs:
+          my-apps:
+            application:
+              namespaces:
+                - app-one
+                - app-two
+        outputs:
+          custom-forwarder:
+            type: syslog
+        pipelines:
+          my-apps:
+            inputRefs:
+              - my-apps
+            outputRefs:
+              - custom-forwarder
