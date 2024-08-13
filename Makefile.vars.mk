@@ -57,4 +57,4 @@ KUBENT_IMAGE    ?= ghcr.io/doitintl/kube-no-trouble:latest
 KUBENT_DOCKER   ?= $(DOCKER_CMD) $(DOCKER_ARGS) $(root_volume) --entrypoint=/app/kubent $(KUBENT_IMAGE)
 
 instance ?= defaults
-test_instances = tests/defaults.yml tests/master.yml tests/elasticsearch.yml tests/multilineerr.yml tests/forwardingonly.yml
+test_instances = tests/defaults.yml tests/master.yml tests/elasticsearch.yml tests/multilineerr.yml tests/forwardingonly.yml tests/legacy.yml

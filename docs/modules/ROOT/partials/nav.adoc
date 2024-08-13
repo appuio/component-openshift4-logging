@@ -7,6 +7,7 @@
 * xref:how-tos/upgrade-v0.1-v1.x.adoc[Upgrade from v0.1.0 to v1.x]
 * xref:how-tos/upgrade-v1.x-v2.x.adoc[Upgrade from v1.x to v2.x]
 * xref:how-tos/upgrade-v2.x-v3.x.adoc[Upgrade from v2.x to v3.x]
+* xref:how-tos/upgrade-v3.x-v4.x.adoc[Upgrade from v3.x to v4.x]
 * xref:how-tos/switch-to-lokistack.adoc[Switch to Lokistack]
 
 .Alert runbooks

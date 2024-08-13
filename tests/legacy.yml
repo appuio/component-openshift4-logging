@@ -23,29 +23,35 @@ parameters:
     defaultSourceNamespace: openshift-operators-redhat
 
   openshift4_logging:
-    channel: 'stable'
-    alerts: 'master'
-
-    clusterLogForwarder:
-      inputs:
-        my-apps:
-          application:
-            namespaces:
-              - app-one
-              - app-two
-      outputs:
+    clusterLogForwarding:
+      enabled: true
+      forwarders:
         custom-forwarder:
           type: syslog
+        my-other-forwarder:
+          type: elasticsearch
+          elasticsearch:
+            version: 8
+      namespace_groups:
+        my-apps:
+          namespaces:
+            - app-one
+            - app-two
+          forwarders:
+            - custom-forwarder
+          json: true
+      json:
+        enabled: true
+      application_logs:
+        json: true
+        forwarders:
+          - my-other-forwarder
+      infrastructure_logs:
+        json: true
+        detectMultilineErrors: true
+
+    clusterLogForwarder:
       pipelines:
         application-logs:
           outputRefs:
-            - custom-forwarder
-        my-apps:
-          parse: json
-          inputRefs:
-            - my-apps
-          outputRefs:
-            - custom-forwarder
-        audit-logs:
-          outputRefs:
-            - custom-forwarder
+            - my-forwarder

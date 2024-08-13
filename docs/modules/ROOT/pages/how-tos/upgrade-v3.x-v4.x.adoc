@@ -1,0 +1,6 @@
+= Upgrade from v3.x to v4.x
+
+The parameter `clusterLogForwarding` is deprecated.
+The component is backwards compatible, but moving the parameters to `clusterLogForwarder` is highly encouraged.
+
+See xref:references/parameters.adoc#_examples[Examples] for reference.

@@ -1,3 +1,4 @@
+local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local lib = import 'lib/openshift4-logging.libsonnet';
 
@@ -8,72 +9,88 @@ local deployLokistack = params.components.lokistack.enabled;
 local deployElasticsearch = params.components.elasticsearch.enabled;
 local forwardingOnly = !deployLokistack && !deployElasticsearch;
 
+// Make sure the default output is added to the pipelines `outputRefs`,
+// if the logging stack is not disabled.
 local pipelineOutputRefs(pipeline) =
   local default = if forwardingOnly then [] else [ 'default' ];
   std.get(pipeline, 'forwarders', []) + default;
 
-// Apply default config for application logs.
-local patchAppLogDefaults = {
-  local outputRefs = pipelineOutputRefs(params.clusterLogForwarding.application_logs),
-  local enablePipeline = std.length(outputRefs) > 0,
+// -----------------------------------------------------------------------------
+//   Legacy Rendering
+// -----------------------------------------------------------------------------
 
-  pipelines: {
-    [if enablePipeline then 'application-logs']: {
+local legacyConfig = std.get(params, 'clusterLogForwarding', {});
+local hasLegacyConfig = if std.length(legacyConfig) > 0 then std.trace(
+  'Parameter `clusterLogForwarding` is deprecated. Please update your config to use `clusterLogForwarder`',
+  true
+) else false;
+
+// Apply default config for application logs.
+local patchLegacyAppLogDefaults = {
+  local pipeline = std.get(legacyConfig, 'application_logs', { enabled: true }),
+  local pipelineOutputs = pipelineOutputRefs(pipeline),
+  local pipelineEnabled = std.length(pipelineOutputs) > 0,
+
+  [if hasLegacyConfig then 'pipelines']: {
+    [if pipelineEnabled then 'application-logs']: {
       inputRefs: [ 'application' ],
-      outputRefs: outputRefs,
+      outputRefs: pipelineOutputs,
     },
   },
 };
 
 // Apply default config for infra logs.
-local patchInfraLogDefaults = {
-  local outputRefs = pipelineOutputRefs(params.clusterLogForwarding.infrastructure_logs),
-  local enablePipeline = params.clusterLogForwarding.infrastructure_logs.enabled && std.length(outputRefs) > 0,
+local patchLegacyInfraLogDefaults = {
+  local pipeline = { enabled: true } + std.get(legacyConfig, 'infrastructure_logs', {}),
+  local pipelineOutputs = pipelineOutputRefs(pipeline),
+  local pipelineEnabled = pipeline.enabled && std.length(pipelineOutputs) > 0,
 
-  pipelines: {
-    [if enablePipeline then 'infrastructure-logs']: {
+  [if hasLegacyConfig then 'pipelines']: {
+    [if pipelineEnabled then 'infrastructure-logs']: {
       inputRefs: [ 'infrastructure' ],
-      outputRefs: outputRefs,
+      outputRefs: pipelineOutputs,
     },
   },
 };
 
 // Apply default config for audit logs.
-local patchAuditLogDefaults = {
-  local outputRefs = pipelineOutputRefs(params.clusterLogForwarding.audit_logs),
-  local enablePipeline = params.clusterLogForwarding.audit_logs.enabled && std.length(outputRefs) > 0,
+local patchLegacyAuditLogDefaults = {
+  local pipeline = std.get(legacyConfig, 'audit_logs', { enabled: false }),
+  local pipelineOutputs = pipelineOutputRefs(pipeline),
+  local pipelineEnabled = pipeline.enabled && std.length(pipelineOutputs) > 0,
 
-  pipelines: {
-    [if enablePipeline then 'audit-logs']: {
+  [if hasLegacyConfig then 'pipelines']: {
+    [if pipelineEnabled then 'audit-logs']: {
       inputRefs: [ 'audit' ],
-      outputRefs: outputRefs,
+      outputRefs: pipelineOutputs,
     },
   },
 };
 
 // Enable json parsing for default pipelines if configured.
-local patchJsonLogging = {
-  local enableAppLogs = std.get(params.clusterLogForwarding.application_logs, 'json', false),
-  local enableInfraLogs = std.get(params.clusterLogForwarding.infrastructure_logs, 'json', false),
+local legacyEnableJson = std.get(std.get(legacyConfig, 'json', {}), 'enabled', false);
+local patchLegacyJsonLogging = {
+  local enableAppLogs = std.get(std.get(legacyConfig, 'application_logs', {}), 'json', false),
+  local enableInfraLogs = std.get(std.get(legacyConfig, 'infrastructure_logs', {}), 'json', false),
 
-  pipelines: {
+  [if hasLegacyConfig then 'pipelines']: {
     [if enableAppLogs then 'application-logs']: { parse: 'json' },
     [if enableInfraLogs then 'infrastructure-logs']: { parse: 'json' },
   },
-  [if deployElasticsearch && params.clusterLogForwarding.json.enabled then 'outputDefaults']: {
+  [if deployElasticsearch && legacyEnableJson then 'outputDefaults']: {
     elasticsearch: {
-      structuredTypeKey: params.clusterLogForwarding.json.typekey,
-      structuredTypeName: params.clusterLogForwarding.json.typename,
+      structuredTypeKey: std.get(legacyConfig.json, 'typekey', 'kubernetes.labels.logFormat'),
+      structuredTypeName: std.get(legacyConfig.json, 'typename', 'nologformat'),
     },
   },
 };
 
 // Enable detectMultilineErrors for default pipelines if configured.
-local patchMultilineErrors = {
-  local enableAppLogs = std.get(params.clusterLogForwarding.application_logs, 'detectMultilineErrors', false),
-  local enableInfraLogs = std.get(params.clusterLogForwarding.infrastructure_logs, 'detectMultilineErrors', false),
+local patchLegacyMultilineErrors = {
+  local enableAppLogs = std.get(std.get(legacyConfig, 'application_logs', {}), 'detectMultilineErrors', false),
+  local enableInfraLogs = std.get(std.get(legacyConfig, 'infrastructure_logs', {}), 'detectMultilineErrors', false),
 
-  pipelines: {
+  [if hasLegacyConfig then 'pipelines']: {
     [if enableAppLogs then 'application-logs']: { detectMultilineErrors: true },
     [if enableInfraLogs then 'infrastructure-logs']: { detectMultilineErrors: true },
   },
@@ -81,19 +98,19 @@ local patchMultilineErrors = {
 
 // --- patch deprecated `clusterLogForwarding.namespace` config
 local namespaceGroups = (
-  if std.objectHas(params.clusterLogForwarding, 'namespaces') then
+  if std.objectHas(legacyConfig, 'namespaces') then
     {
       [ns]: {
         namespaces: [ ns ],
-        forwarders: [ params.clusterLogForwarding.namespaces[ns].forwarder ],
+        forwarders: [ legacyConfig.namespaces[ns].forwarder ],
       }
-      for ns in std.objectFields(params.clusterLogForwarding.namespaces)
+      for ns in std.objectFields(legacyConfig.namespaces)
     } else {}
-) + params.clusterLogForwarding.namespace_groups;
+) + std.get(legacyConfig, 'namespace_groups', {});
 // --- patch end
 
 // Add inputs entry for every namespace_group defined in `clusterLogForwarding.namespace_groups`.
-local patchCustomInputs = {
+local patchLegacyCustomInputs = {
   [if std.length(namespaceGroups) > 0 then 'inputs']: {
     [group]: {
       application: {
@@ -101,11 +118,12 @@ local patchCustomInputs = {
       },
     }
     for group in std.objectFields(namespaceGroups)
+    if hasLegacyConfig
   },
 };
 
 // Add pipelines entry for every namespace_group defined in `clusterLogForwarding.namespace_groups`.
-local patchCustomPipelines = {
+local patchLegacyCustomPipelines = {
   [if std.length(namespaceGroups) > 0 then 'pipelines']: {
     local enableJson = std.get(namespaceGroups[group], 'json', false),
     local enableMultilineError = std.get(namespaceGroups[group], 'detectMultilineErrors', false),
@@ -117,39 +135,68 @@ local patchCustomPipelines = {
       [if enableMultilineError then 'detectMultilineErrors']: true,
     }
     for group in std.objectFields(namespaceGroups)
+    if hasLegacyConfig
   },
 };
 
 // Add outputs entry for every forwarder defined in `clusterLogForwarding.forwarders`.
-local patchCustomOutputs = {
-  [if std.length(params.clusterLogForwarding.forwarders) > 0 then 'outputs']: {
-    [name]: params.clusterLogForwarding.forwarders[name]
-    for name in std.objectFields(params.clusterLogForwarding.forwarders)
+local patchLegacyCustomOutputs = {
+  [if std.length(std.get(legacyConfig, 'forwarders', {})) > 0 then 'outputs']: {
+    [name]: legacyConfig.forwarders[name]
+    for name in std.objectFields(legacyConfig.forwarders)
+    if hasLegacyConfig
   },
 };
 
-// ClusterLogForwarderSpecs:
+// -----------------------------------------------------------------------------
+//   End Legacy Rendering
+// -----------------------------------------------------------------------------
+
+// Add defaults to pipelines config
+local patchPipelineDefaults = {
+  local appsPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'application-logs', {}),
+  local infraPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'infrastructure-logs', {}),
+  local auditPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'audit-logs', {}),
+
+  pipelines: {
+    'application-logs': {
+      inputRefs: [ 'application' ],
+      outputRefs: pipelineOutputRefs(appsPipeline),
+    },
+    'infrastructure-logs': {
+      inputRefs: [ 'infrastructure' ],
+      outputRefs: pipelineOutputRefs(infraPipeline),
+    },
+    [if std.length(auditPipeline) > 0 then 'audit-logs']: {
+      inputRefs: [ 'audit' ],
+    },
+  },
+};
+
+// clusterLogForwarderSpec:
 // Consecutively apply patches to result of previous apply.
 local clusterLogForwarderSpec = std.foldl(
   // we use std.mergePatch here, because this way we don't need
   // to make each patch object mergeable by suffixing all keys with a +.
   function(manifest, patch) std.mergePatch(manifest, patch),
   [
-    patchAppLogDefaults,
-    patchInfraLogDefaults,
-    patchAuditLogDefaults,
-    patchJsonLogging,
-    patchMultilineErrors,
-    patchCustomInputs,
-    patchCustomOutputs,
-    patchCustomPipelines,
+    patchPipelineDefaults,
+    // Apply legacy patches / defaults
+    patchLegacyAppLogDefaults,
+    patchLegacyInfraLogDefaults,
+    patchLegacyAuditLogDefaults,
+    patchLegacyJsonLogging,
+    patchLegacyMultilineErrors,
+    patchLegacyCustomInputs,
+    patchLegacyCustomOutputs,
+    patchLegacyCustomPipelines,
   ],
   {
     inputs: {},
     outputs: {},
     pipelines: {},
-  }
-);
+  },
+) + com.makeMergeable(params.clusterLogForwarder);
 
 // ClusterLogForwarder:
 // Create definitive ClusterLogForwarder resource from specs.
@@ -176,8 +223,10 @@ local clusterLogForwarder = lib.ClusterLogForwarder(params.namespace, 'instance'
   },
 };
 
+local enableLogForwarder = std.length(params.clusterLogForwarder) > 0 || std.get(legacyConfig, 'enabled', false);
+
 // Define outputs below
-if params.clusterLogForwarding.enabled then
+if enableLogForwarder then
   {
     '31_cluster_logforwarding': clusterLogForwarder,
   }

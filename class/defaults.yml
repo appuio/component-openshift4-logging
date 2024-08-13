@@ -71,20 +71,7 @@ parameters:
               memory: 128Mi
 
     clusterLogging: {}
-
-    clusterLogForwarding:
-      enabled: false
-      forwarders: {}
-      namespace_groups: {}
-      application_logs: {}
-      audit_logs:
-        enabled: false
-      infrastructure_logs:
-        enabled: true
-      json:
-        enabled: false
-        typekey: 'kubernetes.labels.logFormat'
-        typename: 'nologformat'
+    clusterLogForwarder: {}
 
     operatorResources:
       clusterLogging:

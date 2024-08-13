@@ -28,6 +28,3 @@ parameters:
         enabled: false
       elasticsearch:
         enabled: false
-
-    clusterLogForwarding:
-      enabled: true
