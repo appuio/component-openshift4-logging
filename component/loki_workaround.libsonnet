@@ -1,7 +1,6 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
-local po = import 'lib/patch-operator.libsonnet';
 
 // The hiera parameters for the component
 local inv = kap.inventory();
@@ -28,6 +27,22 @@ local missing_metrics_token =
     },
     data:: {},
     type: 'kubernetes.io/service-account-token',
+  };
+
+// ClusterRole to aggregate to `admin`.
+local app_logs_reader =
+  kube.ClusterRole('logging-application-logs-reader-aggregate') {
+    metadata+: {
+      labels+: {
+        'rbac.authorization.k8s.io/aggregate-to-admin': 'true',
+      },
+    },
+    rules: [ {
+      apiGroups: [ 'loki.grafana.com' ],
+      resourceNames: [ 'logs' ],
+      resources: [ 'application' ],
+      verbs: [ 'get' ],
+    } ],
   };
 
 
@@ -134,4 +149,5 @@ local ingester_stuck = [
 {
   missing_metrics_token: [ missing_metrics_token ],
   ingester_stuck: ingester_stuck,
+  app_logs_reader: app_logs_reader,
 }

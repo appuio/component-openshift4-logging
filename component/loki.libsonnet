@@ -126,6 +126,7 @@ if loki.enabled then
     '50_loki_rbac': [ aggregate_loki_log_access ],
     '50_loki_operator_metrics_token': workaround.missing_metrics_token,
     '50_loki_ingester_fix': workaround.ingester_stuck,
+    '50_loki_logreader_fix': workaround.app_logs_reader,
   }
 else
   std.trace(
