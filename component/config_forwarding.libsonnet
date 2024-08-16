@@ -1,6 +1,8 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
+local kube = import 'lib/kube.libjsonnet';
 local lib = import 'lib/openshift4-logging.libsonnet';
+local utils = import 'utils.libsonnet';
 
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
@@ -198,30 +200,96 @@ local clusterLogForwarderSpec = std.foldl(
   },
 ) + com.makeMergeable(params.clusterLogForwarder);
 
+// Unfold objects into array for ClusterLogForwarder resource.
+local unfoldSpecs(specs) = {
+  // Unfold objects into array.
+  [if std.length(specs.inputs) > 0 then 'inputs']: [
+    { name: name } + specs.inputs[name]
+    for name in std.objectFields(specs.inputs)
+  ],
+  [if std.length(specs.outputs) > 0 then 'outputs']: [
+    { name: name } + specs.outputs[name]
+    for name in std.objectFields(specs.outputs)
+  ],
+  [if std.length(specs.pipelines) > 0 then 'pipelines']: [
+    { name: name } + specs.pipelines[name]
+    for name in std.objectFields(specs.pipelines)
+  ],
+} + {
+  // Import remaining specs as is.
+  [key]: specs[key]
+  for key in std.objectFields(specs)
+  if !std.member([ 'inputs', 'outputs', 'pipelines' ], key)
+};
+
 // ClusterLogForwarder:
 // Create definitive ClusterLogForwarder resource from specs.
 local clusterLogForwarder = lib.ClusterLogForwarder(params.namespace, 'instance') {
-  spec: {
-    // Unfold objects into array.
-    [if std.length(clusterLogForwarderSpec.inputs) > 0 then 'inputs']: [
-      { name: name } + clusterLogForwarderSpec.inputs[name]
-      for name in std.objectFields(clusterLogForwarderSpec.inputs)
-    ],
-    [if std.length(clusterLogForwarderSpec.outputs) > 0 then 'outputs']: [
-      { name: name } + clusterLogForwarderSpec.outputs[name]
-      for name in std.objectFields(clusterLogForwarderSpec.outputs)
-    ],
-    [if std.length(clusterLogForwarderSpec.pipelines) > 0 then 'pipelines']: [
-      { name: name } + clusterLogForwarderSpec.pipelines[name]
-      for name in std.objectFields(clusterLogForwarderSpec.pipelines)
-    ],
-  } + {
-    // Import remaining specs as is.
-    [key]: clusterLogForwarderSpec[key]
-    for key in std.objectFields(clusterLogForwarderSpec)
-    if !std.member([ 'inputs', 'outputs', 'pipelines' ], key)
-  },
+  spec: unfoldSpecs(clusterLogForwarderSpec),
 };
+
+// namespaceLogForwarderIgnoreKeys
+// List of keys to ignore in namespaceLogForwarder
+local namespaceLogForwarderIgnoreKeys = [
+  'instance',
+  'openshift-logging/instance',
+];
+// namespaceLogForwarder:
+// Create namespaced LogForwarder resource from specs.
+local namespaceLogForwarder = [
+  local specs = { inputs: {}, outputs: {}, pipelines: {} } + com.makeMergeable(params.namespaceLogForwarder[forwarder]);
+  local name = utils.namespacedName(forwarder).name;
+  local namespace = utils.namespacedName(forwarder).namespace;
+  local serviceAccount = std.get(specs, 'serviceAccountName', utils.namespacedName(forwarder).name);
+
+  lib.ClusterLogForwarder(namespace, name) {
+    spec: { serviceAccountName: serviceAccount } + com.makeMergeable(unfoldSpecs(specs)),
+  }
+  for forwarder in std.objectFields(params.namespaceLogForwarder)
+  if !std.member(namespaceLogForwarderIgnoreKeys, forwarder)
+];
+
+// namespaceServiceAccount:
+// Create ServiceAccount for namespaced LogForwarder specs.
+local namespaceServiceAccount = [
+  local specs = params.namespaceLogForwarder[forwarder];
+  local namespace = utils.namespacedName(forwarder).namespace;
+  local serviceAccount = std.get(specs, 'serviceAccountName', utils.namespacedName(forwarder).name);
+
+  kube.ServiceAccount(serviceAccount) {
+    metadata+: {
+      namespace: namespace,
+    },
+  }
+  for forwarder in std.objectFields(params.namespaceLogForwarder)
+  if !std.member(namespaceLogForwarderIgnoreKeys, forwarder)
+];
+
+// namespaceRoleBinding:
+// Create RoleBinding for namespaced LogForwarder.
+local namespaceRoleBinding = [
+  local specs = params.namespaceLogForwarder[forwarder];
+  local namespace = utils.namespacedName(forwarder).namespace;
+  local serviceAccount = std.get(specs, 'serviceAccountName', utils.namespacedName(forwarder).name);
+
+  kube.RoleBinding(serviceAccount) {
+    metadata+: {
+      namespace: namespace,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: 'collect-application-logs',
+    },
+    subjects: [ {
+      kind: 'ServiceAccount',
+      name: serviceAccount,
+      namespace: namespace,
+    } ],
+  }
+  for forwarder in std.objectFields(params.namespaceLogForwarder)
+  if !std.member(namespaceLogForwarderIgnoreKeys, forwarder)
+];
 
 local enableLogForwarder = std.length(params.clusterLogForwarder) > 0 || std.get(legacyConfig, 'enabled', false);
 
@@ -229,6 +297,9 @@ local enableLogForwarder = std.length(params.clusterLogForwarder) > 0 || std.get
 if enableLogForwarder then
   {
     '31_cluster_logforwarding': clusterLogForwarder,
+    [if std.length(params.namespaceLogForwarder) > 1 then '32_namespace_logforwarding']: namespaceLogForwarder,
+    [if std.length(params.namespaceLogForwarder) > 1 then '32_namespace_serviceaccount']: namespaceServiceAccount,
+    [if std.length(params.namespaceLogForwarder) > 1 then '32_namespace_rolebinding']: namespaceRoleBinding,
   }
 else
   std.trace(

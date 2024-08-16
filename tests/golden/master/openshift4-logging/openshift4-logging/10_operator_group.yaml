@@ -6,6 +6,4 @@ metadata:
     name: cluster-logging
   name: cluster-logging
   namespace: openshift-logging
-spec:
-  targetNamespaces:
-    - openshift-logging
+spec: {}
