@@ -161,11 +161,11 @@ local patchPipelineDefaults = {
   local auditPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'audit-logs', {}),
 
   pipelines: {
-    'application-logs': {
+    [if !forwardingOnly || std.length(appsPipeline) > 0 then 'application-logs']: {
       inputRefs: [ 'application' ],
       outputRefs: pipelineOutputRefs(appsPipeline),
     },
-    'infrastructure-logs': {
+    [if !forwardingOnly || std.length(infraPipeline) > 0 then 'infrastructure-logs']: {
       inputRefs: [ 'infrastructure' ],
       outputRefs: pipelineOutputRefs(infraPipeline),
     },
