@@ -82,3 +82,8 @@ parameters:
               - my-apps
             outputRefs:
               - custom-forwarder
+
+    secrets:
+      my-secret:
+        stringData:
+          secret-key: '?{vaultkv:${cluster:tenant}/${cluster:name}/secret-value}'
