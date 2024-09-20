@@ -84,11 +84,14 @@ local subscriptions = std.filter(function(it) it != null, [
   elasticsearch,
 ]);
 
+local secrets = com.generateResources(params.secrets, kube.Secret);
+
 // Define outputs below
 {
   '00_namespace': namespace,
   '10_operator_group': operatorGroup,
   '20_subscriptions': subscriptions,
+  [if std.length(params.secrets) > 0 then '99_secrets']: secrets,
 }
 + (import 'config_logging.libsonnet')
 + (import 'config_forwarding.libsonnet')

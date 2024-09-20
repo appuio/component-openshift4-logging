@@ -388,6 +388,17 @@ A dictionary holding the `.spec` for namespaced log forwarding.
 See in examples below for configuration.
 
 
+== `secrets`
+
+[horizontal]
+type:: dict
+default:: `{}`
+
+A dict of secrets to create in the namespace.
+The key is the name of the secret, the value is the content of the secret.
+The value must be a dict with a key `stringData` which is a dict of key/value pairs to add to the secret.
+
+
 == Examples
 
 [source,yaml]

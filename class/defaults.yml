@@ -76,6 +76,8 @@ parameters:
     namespaceLogForwarderEnabled: false
     namespaceLogForwarder: {}
 
+    secrets: {}
+
     operatorResources:
       clusterLogging:
         requests:
