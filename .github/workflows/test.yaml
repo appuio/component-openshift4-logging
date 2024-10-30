@@ -39,6 +39,7 @@ jobs:
           - multilineerr
           - forwardingonly
           - legacy
+          - log-forwarding
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -59,6 +60,7 @@ jobs:
           - multilineerr
           - forwardingonly
           - legacy
+          - log-forwarding
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
