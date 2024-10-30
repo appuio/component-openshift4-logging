@@ -51,6 +51,13 @@ parameters:
         detectMultilineErrors: true
 
     clusterLogForwarder:
+      filters:
+        - name: legacy-filter
+          type: drop
+          drop:
+            - test:
+                - field: .message
+                  matches: '.*DEBUG.*'
       pipelines:
         application-logs:
           outputRefs:

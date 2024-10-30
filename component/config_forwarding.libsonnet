@@ -202,29 +202,31 @@ local clusterLogForwarderSpec = std.foldl(
 
 // Unfold objects into array for ClusterLogForwarder resource.
 local unfoldSpecs(specs) = {
-  // Unfold objects into array.
-  [if std.length(specs.inputs) > 0 then 'inputs']: [
-    { name: name } + specs.inputs[name]
-    for name in std.objectFields(specs.inputs)
-  ],
-  [if std.length(specs.outputs) > 0 then 'outputs']: [
-    { name: name } + specs.outputs[name]
-    for name in std.objectFields(specs.outputs)
-  ],
-  [if std.length(specs.pipelines) > 0 then 'pipelines']: [
-    { name: name } + specs.pipelines[name]
-    for name in std.objectFields(specs.pipelines)
-  ],
-  [if std.objectHas(specs, 'filters') && std.isObject(specs.filters) && std.length(specs.filters) > 0 then 'filters']: [
-    { name: name } + specs.filters[name]
-    for name in std.objectFields(specs.filters)
-  ],
-} + {
-  // Import remaining specs as is.
-  [key]: specs[key]
-  for key in std.objectFields(specs)
-  if !std.member([ 'inputs', 'outputs', 'pipelines' ], key)
-};
+                             // Unfold objects into array.
+                             [if std.length(specs.inputs) > 0 then 'inputs']: [
+                               { name: name } + specs.inputs[name]
+                               for name in std.objectFields(specs.inputs)
+                             ],
+                             [if std.length(specs.outputs) > 0 then 'outputs']: [
+                               { name: name } + specs.outputs[name]
+                               for name in std.objectFields(specs.outputs)
+                             ],
+                             [if std.length(specs.pipelines) > 0 then 'pipelines']: [
+                               { name: name } + specs.pipelines[name]
+                               for name in std.objectFields(specs.pipelines)
+                             ],
+                             [if std.objectHas(specs, 'filters') && std.length(specs.filters) > 0 then 'filters']: (
+                               if std.isObject(specs.filters) then
+                                 [ { name: name } + specs.filters[name] for name in std.objectFields(specs.filters) ]
+                               else specs.filters
+                             ),
+                           }
+                           + {
+                             // Import remaining specs as is.
+                             [key]: specs[key]
+                             for key in std.objectFields(specs)
+                             if !std.member([ 'inputs', 'outputs', 'pipelines', 'filters' ], key)
+                           };
 
 // ClusterLogForwarder:
 // Create definitive ClusterLogForwarder resource from specs.

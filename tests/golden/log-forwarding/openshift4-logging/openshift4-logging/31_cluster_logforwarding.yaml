@@ -11,41 +11,36 @@ spec:
     - drop:
         - test:
             - field: .message
-              matches: .*DEBUG.*
-      name: legacy-filter
+              notMatches: .*org\.keycloak\.events.*
+      name: keycloak-filter
       type: drop
   inputs:
     - application:
         namespaces:
-          - app-one
-          - app-two
-      name: my-apps
+          - vshn-keycloak-prod
+      name: keycloak-logs
   outputs:
-    - name: custom-forwarder
-      type: syslog
-    - elasticsearch:
-        version: 8
-      name: my-other-forwarder
-      type: elasticsearch
+    - loki:
+        tenantKey: keycloak
+      name: appuio-loki-keycloak
+      type: loki
+      url: https://my-loki-url.com
   pipelines:
     - inputRefs:
         - application
       name: application-logs
       outputRefs:
-        - my-other-forwarder
         - default
-        - my-forwarder
-      parse: json
-    - detectMultilineErrors: true
-      inputRefs:
+    - inputRefs:
         - infrastructure
       name: infrastructure-logs
       outputRefs:
         - default
-      parse: json
-    - inputRefs:
-        - my-apps
-      name: my-apps
+    - filterRefs:
+        - keycloak-filter
+      inputRefs:
+        - keycloak-logs
+      name: keycloak-logs
       outputRefs:
-        - custom-forwarder
-      parse: json
+        - appuio-loki-keycloak
+        - default
