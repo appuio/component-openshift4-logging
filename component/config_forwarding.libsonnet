@@ -215,6 +215,10 @@ local unfoldSpecs(specs) = {
     { name: name } + specs.pipelines[name]
     for name in std.objectFields(specs.pipelines)
   ],
+  [if std.objectHas(specs, 'filters') && std.isObject(specs.filters) && std.length(specs.filters) > 0 then 'filters']: [
+    { name: name } + specs.filters[name]
+    for name in std.objectFields(specs.filters)
+  ],
 } + {
   // Import remaining specs as is.
   [key]: specs[key]
