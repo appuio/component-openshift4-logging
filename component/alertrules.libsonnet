@@ -41,11 +41,7 @@ local ignore_alerts = std.set(
 // Provide partial objects for alert rules that need to be tuned compared to
 // upstream. The keys in this object correspond to the `alert` field of the
 // rule for which the patch is intended.
-local patch_alerts = {
-  FluentdQueueLengthIncreasing: {
-    'for': '12h',
-  },
-};
+local patch_alerts = params.patch_alerts;
 
 local loadFile(file) =
   local fpath = 'openshift4-logging/component/extracted_alerts/%s/%s' % [ params.alerts, file ];

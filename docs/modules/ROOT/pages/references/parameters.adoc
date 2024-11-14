@@ -80,6 +80,22 @@ This parameter can be used to disable alerts provided by openshift cluster-loggi
 The component supports removing entries in this parameter by providing the entry prefixed with `~`.
 
 
+== `patch_alerts`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+patch_alerts:
+  FluentdQueueLengthIncreasing:
+    for: '12h'
+----
+
+The parameter patch_alerts allows users to customize upstream alerts.
+
+
 == `components.elasticsearch`
 
 [horizontal]
