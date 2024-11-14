@@ -12,11 +12,6 @@ parameters:
     channel: 'stable-${openshift4_logging:version}'
     alerts: 'release-${openshift4_logging:version}'
 
-    ignore_alerts:
-      - ElasticsearchHighFileDescriptorUsage
-      - ElasticsearchOperatorCSVNotSuccessful
-      - FluentdQueueLengthIncreasing
-
     components:
       lokistack:
         enabled: true
@@ -108,6 +103,15 @@ parameters:
       ingester_fix:
         schedule: '*/10 * * * *'
         sleep_time: 2m
+
+    ignore_alerts:
+      - ElasticsearchHighFileDescriptorUsage
+      - ElasticsearchOperatorCSVNotSuccessful
+      - FluentdQueueLengthIncreasing
+
+    patch_alerts:
+      FluentdQueueLengthIncreasing:
+        for: '12h'
 
   openshift4_elasticsearch_operator:
     targetNamespaces:
