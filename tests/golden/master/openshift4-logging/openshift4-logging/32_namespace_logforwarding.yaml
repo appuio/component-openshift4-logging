@@ -1,7 +1,8 @@
 apiVersion: logging.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
-  annotations: {}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     name: bar
   name: bar
@@ -27,7 +28,8 @@ spec:
 apiVersion: logging.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
-  annotations: {}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     name: hands
   name: hands

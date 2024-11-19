@@ -225,6 +225,11 @@ local unfoldSpecs(specs) = {
 // ClusterLogForwarder:
 // Create definitive ClusterLogForwarder resource from specs.
 local clusterLogForwarder = lib.ClusterLogForwarder(params.namespace, 'instance') {
+  metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+    },
+  },
   spec: unfoldSpecs(clusterLogForwarderSpec),
 };
 
@@ -243,6 +248,11 @@ local namespaceLogForwarder = [
   local serviceAccount = std.get(specs, 'serviceAccountName', utils.namespacedName(forwarder).name);
 
   lib.ClusterLogForwarder(namespace, name) {
+    metadata+: {
+      annotations+: {
+        'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+      },
+    },
     spec: { serviceAccountName: serviceAccount } + com.makeMergeable(unfoldSpecs(specs)),
   }
   for forwarder in std.objectFields(params.namespaceLogForwarder)
