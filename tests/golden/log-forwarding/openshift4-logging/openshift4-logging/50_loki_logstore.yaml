@@ -1,0 +1,14 @@
+apiVersion: v1
+data: {}
+kind: Secret
+metadata:
+  annotations: {}
+  labels:
+    name: loki-logstore
+  name: loki-logstore
+stringData:
+  access_key_id: ''
+  access_key_secret: ''
+  bucketnames: c-green-test-1234-logstore
+  endpoint: ''
+type: Opaque

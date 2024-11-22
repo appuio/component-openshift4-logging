@@ -8,6 +8,13 @@ metadata:
   name: instance
   namespace: openshift-logging
 spec:
+  filters:
+    - drop:
+        - test:
+            - field: .message
+              matches: .*DEBUG.*
+      name: legacy-filter
+      type: drop
   inputs:
     - application:
         namespaces:

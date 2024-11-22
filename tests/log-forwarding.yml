@@ -23,42 +23,31 @@ parameters:
     defaultSourceNamespace: openshift-operators-redhat
 
   openshift4_logging:
-    clusterLogForwarding:
-      enabled: true
-      forwarders:
-        custom-forwarder:
-          type: syslog
-        my-other-forwarder:
-          type: elasticsearch
-          elasticsearch:
-            version: 8
-      namespace_groups:
-        my-apps:
-          namespaces:
-            - app-one
-            - app-two
-          forwarders:
-            - custom-forwarder
-          json: true
-      json:
-        enabled: true
-      application_logs:
-        json: true
-        forwarders:
-          - my-other-forwarder
-      infrastructure_logs:
-        json: true
-        detectMultilineErrors: true
-
     clusterLogForwarder:
+      inputs:
+        keycloak-logs:
+          application:
+            namespaces:
+              - vshn-keycloak-prod
+      outputs:
+        appuio-loki-keycloak:
+          type: loki
+          url: https://my-loki-url.com
+          loki:
+            tenantKey: "keycloak"
       filters:
-        - name: legacy-filter
+        keycloak-filter:
           type: drop
           drop:
             - test:
                 - field: .message
-                  matches: '.*DEBUG.*'
+                  notMatches: '.*org\.keycloak\.events.*'
       pipelines:
-        application-logs:
+        keycloak-logs:
+          inputRefs:
+            - keycloak-logs
+          filterRefs:
+            - keycloak-filter
           outputRefs:
-            - my-forwarder
+            - appuio-loki-keycloak
+            - default

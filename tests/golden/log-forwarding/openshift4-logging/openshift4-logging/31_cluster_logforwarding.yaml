@@ -1,0 +1,46 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  annotations: {}
+  labels:
+    name: instance
+  name: instance
+  namespace: openshift-logging
+spec:
+  filters:
+    - drop:
+        - test:
+            - field: .message
+              notMatches: .*org\.keycloak\.events.*
+      name: keycloak-filter
+      type: drop
+  inputs:
+    - application:
+        namespaces:
+          - vshn-keycloak-prod
+      name: keycloak-logs
+  outputs:
+    - loki:
+        tenantKey: keycloak
+      name: appuio-loki-keycloak
+      type: loki
+      url: https://my-loki-url.com
+  pipelines:
+    - inputRefs:
+        - application
+      name: application-logs
+      outputRefs:
+        - default
+    - inputRefs:
+        - infrastructure
+      name: infrastructure-logs
+      outputRefs:
+        - default
+    - filterRefs:
+        - keycloak-filter
+      inputRefs:
+        - keycloak-logs
+      name: keycloak-logs
+      outputRefs:
+        - appuio-loki-keycloak
+        - default

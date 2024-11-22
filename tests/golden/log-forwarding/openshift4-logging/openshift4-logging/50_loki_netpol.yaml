@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations: {}
+  labels:
+    name: allow-console-logging-view-plugin
+  name: allow-console-logging-view-plugin
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: console
+              component: ui
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-console
+      ports:
+        - port: 9443
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/created-by: openshift-logging_instance
+      app.kubernetes.io/name: logging-view-plugin
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations: {}
+  labels:
+    name: allow-console-logging-lokistack-gateway
+  name: allow-console-logging-lokistack-gateway
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: console
+              component: ui
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-console
+      ports:
+        - port: 8080
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: lokistack-gateway
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: lokistack
+  policyTypes:
+    - Ingress
