@@ -5,6 +5,11 @@ local inv = kap.inventory();
 local logmetrics = inv.parameters.openshift4_logging.components.logmetrics;
 
 local logMetricExporter = kube._Object('logging.openshift.io/v1alpha1', 'LogFileMetricExporter', 'instance') {
+  metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-wave': '-50',
+    },
+  },
   spec: logmetrics.spec,
 };
 

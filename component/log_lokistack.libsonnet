@@ -3,7 +3,6 @@ local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local po = import 'lib/patch-operator.libsonnet';
-local workaround = import 'loki_workaround.libsonnet';
 
 // The hiera parameters for the component
 local inv = kap.inventory();
@@ -50,6 +49,7 @@ local lokistack_spec = {
 local lokistack = kube._Object('loki.grafana.com/v1', 'LokiStack', 'loki') {
   metadata+: {
     annotations+: {
+      'argocd.argoproj.io/sync-wave': '-50',
       // Allow ArgoCD to do the dry run when the CRD doesn't exist yet
       'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
     },
@@ -120,13 +120,10 @@ local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
 // Define outputs below
 if loki.enabled then
   {
-    '50_loki_stack': lokistack,
-    '50_loki_logstore': logstore,
-    '50_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
-    '50_loki_rbac': [ aggregate_loki_log_access ],
-    '50_loki_operator_metrics_token': workaround.missing_metrics_token,
-    '50_loki_ingester_fix': workaround.ingester_stuck,
-    '50_loki_logreader_fix': workaround.app_logs_reader,
+    '30_loki_stack': lokistack,
+    '30_loki_logstore': logstore,
+    '30_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
+    '30_loki_rbac': [ aggregate_loki_log_access ],
   }
 else
   std.trace(

@@ -26,5 +26,3 @@ parameters:
     components:
       lokistack:
         enabled: false
-      elasticsearch:
-        enabled: false

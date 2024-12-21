@@ -5,6 +5,7 @@ local kube = import 'lib/kube.libjsonnet';
 // The hiera parameters for the component
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
+local lokiEnabled = params.components.lokistack.enabled;
 
 
 // Generate missing metrics SA token for Loki Operator.
@@ -146,8 +147,15 @@ local ingester_stuck = [
   },
 ];
 
-{
-  missing_metrics_token: [ missing_metrics_token ],
-  ingester_stuck: ingester_stuck,
-  app_logs_reader: app_logs_reader,
-}
+// Define outputs below
+if lokiEnabled then
+  {
+    '50_fix_missing_metrics_token': missing_metrics_token,
+    '50_fix_ingester_stuck': ingester_stuck,
+    '50_fix_app_logs_reader': app_logs_reader,
+  }
+else
+  std.trace(
+    'Lokistack disabled, not deploying Lokistack',
+    {}
+  )
