@@ -20,6 +20,23 @@ local clusterLogForwarderSpec = {
   local infraPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'infrastructure-logs', {}),
   local auditPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'audit-logs', {}),
 
+  managementState: 'Managed',
+  collector: {
+    resources: {
+      requests: {
+        cpu: '20m',
+        memory: '400M',
+      },
+    },
+    tolerations: [ {
+      key: 'storagenode',
+      operator: 'Exists',
+    } ],
+  },
+  serviceAccount: {
+    name: 'logcollector',
+  },
+  filters: {},
   inputs: {},
   outputs: {},
   pipelines: {
@@ -56,7 +73,7 @@ local unfoldSpecs(specs) = {
   // Import remaining specs as is.
   [key]: specs[key]
   for key in std.objectFields(specs)
-  if !std.member([ 'inputs', 'outputs', 'pipelines' ], key)
+  if !std.member([ 'filters', 'inputs', 'outputs', 'pipelines' ], key)
 };
 
 // ClusterLogForwarder:
@@ -71,10 +88,78 @@ local clusterLogForwarder = kube._Object('observability.openshift.io/v1', 'Clust
   spec: unfoldSpecs(clusterLogForwarderSpec),
 };
 
+// Collector ServiceAccount
+// Create a ServiceAccount and ClusterRoleBindings for collector pods.
+local rbac = [
+  kube.ServiceAccount('logcollector') {
+    metadata+: {
+      annotations+: {
+        'argocd.argoproj.io/sync-wave': '-50',
+      },
+      namespace: params.namespace,
+    },
+  },
+  kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-application-logs') {
+    metadata+: {
+      annotations+: {
+        'argocd.argoproj.io/sync-wave': '-50',
+      },
+      namespace: params.namespace,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: 'collect-application-logs'
+    },
+    subjects: [{
+      kind: 'ServiceAccount',
+      name: 'logcollector',
+      namespace: params.namespace
+    }],
+  },
+  kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-infrastructure-logs') {
+    metadata+: {
+      annotations+: {
+        'argocd.argoproj.io/sync-wave': '-50',
+      },
+      namespace: params.namespace,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: 'collect-infrastructure-logs'
+    },
+    subjects: [{
+      kind: 'ServiceAccount',
+      name: 'logcollector',
+      namespace: params.namespace
+    }],
+  },
+  kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-audit-logs') {
+    metadata+: {
+      annotations+: {
+        'argocd.argoproj.io/sync-wave': '-50',
+      },
+      namespace: params.namespace,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: 'collect-audit-logs'
+    },
+    subjects: [{
+      kind: 'ServiceAccount',
+      name: 'logcollector',
+      namespace: params.namespace
+    }],
+  },
+];
+
 // Define outputs below
 if forwarderEnabled then
   {
     '40_log_forwarder': clusterLogForwarder,
+    '40_log_forwarder_rbac': rbac,
   }
 else
   std.trace(

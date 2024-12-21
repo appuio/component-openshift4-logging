@@ -9,7 +9,7 @@ parameters:
 
     namespace: openshift-logging
 
-    version: '6.0'
+    version: '6.1'
     channel: 'stable-${openshift4_logging:version}'
 
     components:
@@ -61,13 +61,8 @@ parameters:
 
     alerts:
       release: 'release-${openshift4_logging:version}'
-      ignore:
-        - ElasticsearchHighFileDescriptorUsage
-        - ElasticsearchOperatorCSVNotSuccessful
-        - FluentdQueueLengthIncreasing
-      patch:
-        FluentdQueueLengthIncreasing:
-          for: '12h'
+      ignore: []
+      patch: {}
 
     operatorResources:
       clusterLogging:
@@ -95,4 +90,3 @@ parameters:
         sleep_time: 2m
 
   openshift4_console: ${openshift4_logging:_openshift4_console:${openshift4_logging:components:lokistack:enabled}}
-

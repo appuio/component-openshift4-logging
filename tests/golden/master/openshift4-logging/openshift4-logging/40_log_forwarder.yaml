@@ -8,12 +8,21 @@ metadata:
   name: instance
   namespace: openshift-logging
 spec:
+  collector:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 400M
+    tolerations:
+      - key: storagenode
+        operator: Exists
   inputs:
     - application:
         namespaces:
           - app-one
           - app-two
       name: my-apps
+  managementState: Managed
   outputs:
     - name: custom-forwarder
       type: syslog
@@ -40,3 +49,5 @@ spec:
       outputRefs:
         - custom-forwarder
       parse: json
+  serviceAccount:
+    name: logcollector

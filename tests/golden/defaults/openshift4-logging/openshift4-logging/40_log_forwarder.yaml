@@ -8,6 +8,15 @@ metadata:
   name: instance
   namespace: openshift-logging
 spec:
+  collector:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 400M
+    tolerations:
+      - key: storagenode
+        operator: Exists
+  managementState: Managed
   pipelines:
     - inputRefs:
         - application
@@ -19,3 +28,5 @@ spec:
       name: infrastructure-logs
       outputRefs:
         - default
+  serviceAccount:
+    name: logcollector
