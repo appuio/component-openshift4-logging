@@ -1,4 +1,4 @@
-apiVersion: logging.openshift.io/v1
+apiVersion: observability.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
   annotations:
@@ -17,26 +17,23 @@ spec:
   outputs:
     - name: custom-forwarder
       type: syslog
-    - elasticsearch:
-        version: 8
-      name: my-other-forwarder
-      type: elasticsearch
   pipelines:
     - inputRefs:
         - application
       name: application-logs
       outputRefs:
-        - my-other-forwarder
         - default
-        - my-forwarder
-      parse: json
-    - detectMultilineErrors: true
-      inputRefs:
+        - custom-forwarder
+    - inputRefs:
+        - audit
+      name: audit-logs
+      outputRefs:
+        - custom-forwarder
+    - inputRefs:
         - infrastructure
       name: infrastructure-logs
       outputRefs:
         - default
-      parse: json
     - inputRefs:
         - my-apps
       name: my-apps

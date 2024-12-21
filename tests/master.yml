@@ -24,7 +24,6 @@ parameters:
 
   openshift4_logging:
     channel: 'stable'
-    alerts: 'master'
 
     clusterLogForwarder:
       inputs:
@@ -49,6 +48,9 @@ parameters:
         audit-logs:
           outputRefs:
             - custom-forwarder
+
+    alerts:
+      release: 'master'
 
     secrets:
       my-secret:

@@ -3,6 +3,7 @@ kind: LokiStack
 metadata:
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: '-50'
   labels:
     name: loki
   name: loki
