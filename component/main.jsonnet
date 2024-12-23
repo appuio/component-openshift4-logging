@@ -69,9 +69,22 @@ local lokistack = if lokiEnabled then operatorlib.managedSubscription(
   },
 };
 
+local observability = if lokiEnabled then operatorlib.managedSubscription(
+  'openshift-operators-redhat',
+  'cluster-observability-operator',
+  'development'
+) {
+  metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-wave': '-80',
+    },
+  },
+};
+
 local subscriptions = std.filter(function(it) it != null, [
   logging,
   lokistack,
+  observability,
 ]);
 
 local secrets = com.generateResources(params.secrets, kube.Secret);

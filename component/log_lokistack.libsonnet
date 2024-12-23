@@ -117,6 +117,26 @@ local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
   ],
 };
 
+// Console Log Plugin
+local console_plugin = kube._Object('observability.openshift.io/v1alpha1', 'UIPlugin', 'logging') {
+  metadata: {
+    labels: {
+      name: 'logging',
+    },
+    name: 'logging',
+  },
+  spec: {
+    type: 'Logging',
+    logging: {
+      lokiStack: {
+        name: 'loki',
+      },
+      logsLimit: 50,
+      timeout: '30s',
+    },
+  },
+};
+
 // Define outputs below
 if loki.enabled then
   {
@@ -124,6 +144,7 @@ if loki.enabled then
     '30_loki_logstore': logstore,
     '30_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
     '30_loki_rbac': [ aggregate_loki_log_access ],
+    '30_loki_plugin': console_plugin,
   }
 else
   std.trace(

@@ -109,13 +109,13 @@ local rbac = [
     roleRef: {
       apiGroup: 'rbac.authorization.k8s.io',
       kind: 'ClusterRole',
-      name: 'collect-application-logs'
+      name: 'collect-application-logs',
     },
-    subjects: [{
+    subjects: [ {
       kind: 'ServiceAccount',
       name: 'logcollector',
-      namespace: params.namespace
-    }],
+      namespace: params.namespace,
+    } ],
   },
   kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-infrastructure-logs') {
     metadata+: {
@@ -127,13 +127,13 @@ local rbac = [
     roleRef: {
       apiGroup: 'rbac.authorization.k8s.io',
       kind: 'ClusterRole',
-      name: 'collect-infrastructure-logs'
+      name: 'collect-infrastructure-logs',
     },
-    subjects: [{
+    subjects: [ {
       kind: 'ServiceAccount',
       name: 'logcollector',
-      namespace: params.namespace
-    }],
+      namespace: params.namespace,
+    } ],
   },
   kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-audit-logs') {
     metadata+: {
@@ -145,13 +145,13 @@ local rbac = [
     roleRef: {
       apiGroup: 'rbac.authorization.k8s.io',
       kind: 'ClusterRole',
-      name: 'collect-audit-logs'
+      name: 'collect-audit-logs',
     },
-    subjects: [{
+    subjects: [ {
       kind: 'ServiceAccount',
       name: 'logcollector',
-      namespace: params.namespace
-    }],
+      namespace: params.namespace,
+    } ],
   },
 ];
 
