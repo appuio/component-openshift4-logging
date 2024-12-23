@@ -26,6 +26,10 @@ parameters:
     channel: 'stable'
 
     clusterLogForwarder:
+      filters:
+        my-filter:
+          openshiftLabels:
+            cluster_id: ${cluster:name}
       inputs:
         my-apps:
           application:

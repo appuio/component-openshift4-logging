@@ -64,7 +64,11 @@ local dropInfoRules =
   };
 
 local prometheus_rules(name, groups, baseURL) = kube._Object('monitoring.coreos.com/v1', 'PrometheusRule', name) {
-  metadata+: {
+  metadata: {
+    labels: {
+      name: name,
+    },
+    name: name,
     namespace: params.namespace,
   },
   spec: {

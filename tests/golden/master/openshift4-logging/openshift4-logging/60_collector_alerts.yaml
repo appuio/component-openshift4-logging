@@ -1,7 +1,6 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  annotations: {}
   labels:
     name: syn-collector-rules
   name: syn-collector-rules
