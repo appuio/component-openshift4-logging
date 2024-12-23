@@ -1,0 +1,19 @@
+= Upgrade from v4.x to v5.x
+
+The parameter `clusterLogForwarding` is deprecated.
+Backward compatibility for `clusterLogForwarding` has been removed.
+
+Several parameters in `clusterLogForwarder` have changed.
+See xref:references/parameters.adoc#_examples[Examples] and https://docs.openshift.com/container-platform/latest/observability/logging/logging-6.0/log6x-clf.html#structure-of-the-clusterlogforwarder[Structure of the ClusterLogForwarder] for reference.
+
+The parameter `clusterLogging` is deprecated and has been removed.
+Migrate collector configuration to `clusterLogForwarder.collector`.
+
+The parameter `namespaceLogForwarderEnabled` is deprecated and has been removed.
+Multi LogForwarder is enabled by default, see xref:how-tos/enable-multi-logforwarder.adoc[How-To] for migration if it was not enabled.
+
+The parameter `namespaceLogForwarder` is deprecated and has been removed.
+If you are using Multi LogForwarder with ProjectSyn, migrate them to `adhoc-configuration`.
+
+The parameters `ignore_alerts` and `patch_alerts` are deprecated.
+The component is backwards compatible, but moving the parameters to `alerts.ignore` and `alerts.patch` is highly encouraged.

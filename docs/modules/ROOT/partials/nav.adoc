@@ -8,6 +8,7 @@
 * xref:how-tos/upgrade-v1.x-v2.x.adoc[Upgrade from v1.x to v2.x]
 * xref:how-tos/upgrade-v2.x-v3.x.adoc[Upgrade from v2.x to v3.x]
 * xref:how-tos/upgrade-v3.x-v4.x.adoc[Upgrade from v3.x to v4.x]
+* xref:how-tos/upgrade-v4.x-v5.x.adoc[Upgrade from v4.x to v5.x]
 * xref:how-tos/switch-to-lokistack.adoc[Switch to Lokistack]
 * xref:how-tos/enable-multi-forwarder.adoc[Enable Multi LogForwarder]
 

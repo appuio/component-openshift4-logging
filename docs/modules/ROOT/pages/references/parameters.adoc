@@ -38,17 +38,15 @@ default:: `stable-${openshift4_logging:version}`
 Channel of the operator subscription to use.
 If you specify the logging stack version through parameter `version`, you shouldn't need to modify this parameter.
 
-In OpenShift 4.7, RedHat decoupled the logging stack version from the OpenShift version.
-The decoupled logging stack versions start at version 5.0.
-With version 5.1 of the logging stack, channels for specific minor versions were introduced.
-
 Ideally we would just default to the `stable` channel, as that channel will always be backed by a logging stack version compatible with the OpenShift cluster version by the OpenShift marketplace operator.
-However, since there's potential for changes in configuration between logging stack versions which need to be managed through the component, we default to using the `stable-5.x` channel matching the version specified in parameter `version`.
+However, since there's potential for changes in configuration between logging stack versions which need to be managed through the component, we default to using the `stable-6.x` channel matching the version specified in parameter `version`.
 
-See the https://docs.openshift.com/container-platform/latest/logging/cluster-logging-deploying.html#cluster-logging-deploy-cli_cluster-logging-deploying[OpenShift documentation] for details.
+See the https://docs.openshift.com/container-platform/latest/observability/logging/logging-6.0/log6x-upgrading-to-6.html[OpenShift documentation] for details.
 
 
 == `alerts`
+`
+=== `release`
 
 [horizontal]
 type:: string
@@ -70,7 +68,7 @@ Because of this, the component no longer automatically supports new versions of 
 ====
 
 
-== `ignore_alerts`
+=== `alerts.ignore`
 
 [horizontal]
 type:: list
@@ -80,130 +78,13 @@ This parameter can be used to disable alerts provided by openshift cluster-loggi
 The component supports removing entries in this parameter by providing the entry prefixed with `~`.
 
 
-== `patch_alerts`
+=== `alerts.patch`
 
 [horizontal]
 type:: dictionary
-default::
-+
-[source,yaml]
-----
-patch_alerts:
-  FluentdQueueLengthIncreasing:
-    for: '12h'
-----
+default:: {}
 
-The parameter patch_alerts allows users to customize upstream alerts.
-
-
-== `components.elasticsearch`
-
-[horizontal]
-type:: dictionary
-default::
-+
-[source,yaml]
-----
-components:
-  elasticsearch:
-    enabled: false
-    kibana_host: null
-    predict_elasticsearch_storage_alert:
-      enabled: true
-      lookback_range: 72h
-      predict_hours_from_now: 72
-      threshold: 85
-      for: 6h
-      severity: warning
-----
-
-Configuration of the elasticsearch component.
-
-IMPORTANT: Elasticsearch is deprecated.
-
-=== `components.elasticsearch.kibana_host`
-
-[horizontal]
-type:: string
-default:: `null`
-example:: `kibana.apps.cluster.syn.tools`
-
-Host name of the Kibana route.
-
-
-=== `components.elasticsearch.predict_elasticsearch_storage_alert`
-
-[horizontal]
-type:: dict
-example::
-+
-[source,yaml]
-----
-components:
-  elasticsearch:
-    predict_elasticsearch_storage_alert:
-      enabled: true
-      lookback_range: 72h
-      predict_hours_from_now: 72
-      threshold: 85
-      for: 6h
-      severity: warning
-----
-
-Create an alert `SYN_ElasticsearchExpectNodeToReachDiskWatermark` if the storage allocated for Elasticsearch is predicted to reach the low storage watermark.
-
-==== `components.elasticsearch.predict_elasticsearch_storage_alert.enabled`
-
-[horizontal]
-type:: boolean
-default:: `true`
-
-Enable or disable this alert.
-
-==== `components.elasticsearch.predict_elasticsearch_storage_alert.lookback_range`
-
-[horizontal]
-type:: prometheus duration
-default:: `72h`
-
-How for to look back to calculate the prediction.
-
-
-==== `components.elasticsearch.predict_elasticsearch_storage_alert.predict_hours_from_now`
-
-[horizontal]
-type:: number
-default:: `72`
-
-How far in the future the prediction is calculated.
-
-
-==== `components.elasticsearch.predict_elasticsearch_storage_alert.threshold`
-
-[horizontal]
-type:: number
-default:: `85`
-
-The threshold for the alert.
-Percentage of disk fill.
-
-
-==== `components.elasticsearch.predict_elasticsearch_storage_alert.for`
-
-[horizontal]
-type:: prometheus duration
-default:: `6h`
-
-The alert is firing once the threshold has been reached for this long.
-
-
-==== `components.elasticsearch.predict_elasticsearch_storage_alert.severity`
-
-[horizontal]
-type:: string
-default:: `warning`
-
-The severity of the fired alert.
+The parameter `alerts.patch` allows users to customize upstream alerts.
 
 
 == `components.lokistack`
@@ -345,27 +226,7 @@ spec:
 <1> configure nodeSelector
 <2> configure resources
 
-See the https://docs.openshift.com/container-platform/latest/observability/logging/log_collection_forwarding/cluster-logging-collector.html#creating-logfilesmetricexporter_cluster-logging-collector[LogCollection Docs] for available specs.
-
-
-== `operatorResources`
-
-[horizontal]
-type:: dictionary
-default:: see `defaults.yml`
-
-A dictionary holding the `.spec.config.resources` for OLM subscriptions maintained by this component.
-
-
-== `clusterLogging`
-
-[horizontal]
-type:: dictionary
-default:: {}
-
-A dictionary holding the `.spec` for cluster logging.
-
-See the https://docs.openshift.com/container-platform/latest/observability/logging/cluster-logging-deploying.html#create-cluster-logging-cli_cluster-logging-deploying[OpenShift docs] for available parameters.
+Exporter to collect metrics about container logs being produced in a kubernetes environment It publishes `log_logged_bytes_total` metric in prometheus.
 
 
 == `clusterLogForwarder`
@@ -376,32 +237,7 @@ default:: {}
 
 A dictionary holding the `.spec` for cluster log forwarding.
 
-See the https://docs.openshift.com/container-platform/latest/observability/logging/log_collection_forwarding/log-forwarding.html[OpenShift docs] for available parameters.
-
-
-== `clusterLogForwarding`
-
-IMPORTANT: `clusterLogForwarding` is deprecated, please use `clusterLogForwarder`
-
-
-== `namespaceLogForwarderEnabled`
-
-[horizontal]
-type:: bool
-default:: false
-
-NOTE: Enabling namespaced log forwarding requires redeploying the logging operator. See xref:how-tos/enable-multi-forwarder.adoc[How-To] for instructions.
-
-
-== `namespaceLogForwarder`
-
-[horizontal]
-type:: dictionary
-default:: {}
-
-A dictionary holding the `.spec` for namespaced log forwarding.
-
-See in examples below for configuration.
+See the https://docs.openshift.com/container-platform/latest/observability/logging/logging-6.1/log6x-clf-6.1.html[OpenShift docs] for available parameters.
 
 
 == `secrets`
@@ -415,41 +251,16 @@ The key is the name of the secret, the value is the content of the secret.
 The value must be a dict with a key `stringData` which is a dict of key/value pairs to add to the secret.
 
 
+== `operatorResources`
+
+[horizontal]
+type:: dictionary
+default:: see `defaults.yml`
+
+A dictionary holding the `.spec.config.resources` for OLM subscriptions maintained by this component.
+
+
 == Examples
-
-[source,yaml]
-----
-clusterLogging:
-  logStore:
-    retentionPolicy:
-      application:
-        maxAge: 15d
-    elasticsearch:
-      nodeCount: 5
-----
-
-=== Use namespaced ClusterLogForwarder
-
-Example creates a `ClusterLogForwarder`, `ServiceAccount` and `RoleBinding` in namespace `my-namespace`.
-
-[source,yaml]
-----
-namespaceLogForwarderEnabled: true
-namespaceLogForwarder:
-  my-namespace/my-forwarder:
-    outputs:
-      splunk-forwarder:
-        secret:
-          name: splunk-forwarder
-        type: fluentdForward
-        url: tls://splunk-forwarder:24224
-    pipelines:
-      application-logs:
-        inputRefs:
-          - application
-        outputRefs:
-          - splunk-forwarder
-----
 
 === Forward logs for all application logs to third-party
 
@@ -458,14 +269,23 @@ namespaceLogForwarder:
 clusterLogForwarder:
   outputs:
     splunk-forwarder:
-      secret:
-        name: splunk-forwarder
-      type: fluentdForward
-      url: tls://splunk-forwarder:24224
+      type: splunk
+      splunk:
+        authentication:
+          token:
+            key: hecToken
+            secretName: splunk-forwarder
+        url: https://splunk-server:8088
   pipelines:
     application-logs:
       outputRefs:
         - splunk-forwarder
+
+secrets:
+  splunk-forwarder:
+    type: Opaque
+    stringData:
+      hecToken: 'super-secret-token'
 ----
 
 === Forward logs for certain namespaces to third-party
@@ -480,43 +300,23 @@ clusterLogForwarder:
           - my-namespace
   outputs:
     splunk-forwarder:
-      secret:
-        name: splunk-forwarder
-      type: fluentdForward
-      url: tls://splunk-forwarder:24224
+      type: splunk
+      splunk:
+        authentication:
+          token:
+            key: hecToken
+            secretName: splunk-forwarder
+        url: https://splunk-server:8088
   pipelines:
     my-apps:
       inputRefs:
         - my-apps
       outputRefs:
         - splunk-forwarder
-----
 
-=== Enable JSON parsing for all application logs
-
-[source,yaml]
-----
-clusterLogForwarder:
-  pipelines:
-    application-logs:
-      parse: json
-----
-
-=== Enable JSON parsing for certain namespaces
-
-[source,yaml]
-----
-clusterLogForwarder:
-  inputs:
-    my-apps:
-      application:
-        namespaces:
-          - my-namespace
-  pipelines:
-    my-apps:
-      inputRefs:
-        - my-apps
-      outputRefs:
-        - default
-      parse: json
+secrets:
+  splunk-forwarder:
+    type: Opaque
+    stringData:
+      hecToken: 'super-secret-token'
 ----
