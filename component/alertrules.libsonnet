@@ -20,15 +20,24 @@ assert
 local ignore_alerts = std.set(
   // Add set of upstream alerts that should be ignored from processed value of
   // `params.ignore_alerts`
-  com.renderArray(std.get(params, 'ignore_alerts', []))
-  + com.renderArray(std.get(params, 'ignore_alerts', []))
+  local old_ignore = if std.objectHas(params, 'ignore_alerts') then
+    std.trace('Parameter `ignore_alerts` is deprecated, please migrate your config to `alerts.ignore`.', params.ignore_alerts)
+  else
+    [];
+  com.renderArray(params.alerts.ignore)
+  + com.renderArray(old_ignore)
 );
 
 // Alert rule patches.
 // Provide partial objects for alert rules that need to be tuned compared to
 // upstream. The keys in this object correspond to the `alert` field of the
 // rule for which the patch is intended.
-local patch_alerts = params.alerts.patch + std.get(params, 'patch_alerts', {});
+local patch_alerts =
+  local old_patch = if std.objectHas(params, 'patch_alerts') then
+    std.trace('Parameter `patch_alerts` is deprecated, please migrate your config to `alerts.patch`.', params.patch_alerts)
+  else
+    {};
+  params.alerts.patch + old_patch;
 
 local loadFile(file) =
   local fpath = 'openshift4-logging/component/extracted_alerts/%s/%s' % [ params.alerts.release, file ];
