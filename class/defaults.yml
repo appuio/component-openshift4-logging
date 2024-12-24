@@ -8,9 +8,9 @@ parameters:
       "False": {}
 
     namespace: openshift-logging
-    version: '5.9'
+
+    version: '6.1'
     channel: 'stable-${openshift4_logging:version}'
-    alerts: 'release-${openshift4_logging:version}'
 
     components:
       lokistack:
@@ -42,16 +42,6 @@ parameters:
               ingestion:
                 ingestionBurstSize: 9
                 ingestionRate: 5
-      elasticsearch:
-        enabled: false
-        kibana_host: null
-        predict_elasticsearch_storage_alert:
-          enabled: true
-          lookback_range: 72h
-          predict_hours_from_now: 72
-          threshold: 85
-          for: 6h
-          severity: warning
       logmetrics:
         enabled: false
         spec:
@@ -65,13 +55,14 @@ parameters:
               cpu: 200m
               memory: 128Mi
 
-    clusterLogging: {}
     clusterLogForwarder: {}
 
-    namespaceLogForwarderEnabled: false
-    namespaceLogForwarder: {}
-
     secrets: {}
+
+    alerts:
+      release: 'release-${openshift4_logging:version}'
+      ignore: []
+      patch: {}
 
     operatorResources:
       clusterLogging:
@@ -86,12 +77,6 @@ parameters:
           cpu: 50m
         limits:
           memory: 512Mi
-      elasticsearch:
-        requests:
-          memory: 1Gi
-          cpu: 100m
-        limits:
-          memory: 1.5Gi
 
     images:
       kubectl:
@@ -103,18 +88,5 @@ parameters:
       ingester_fix:
         schedule: '*/10 * * * *'
         sleep_time: 2m
-
-    ignore_alerts:
-      - ElasticsearchHighFileDescriptorUsage
-      - ElasticsearchOperatorCSVNotSuccessful
-      - FluentdQueueLengthIncreasing
-
-    patch_alerts:
-      FluentdQueueLengthIncreasing:
-        for: '12h'
-
-  openshift4_elasticsearch_operator:
-    targetNamespaces:
-      - ${openshift4_logging:namespace}
 
   openshift4_console: ${openshift4_logging:_openshift4_console:${openshift4_logging:components:lokistack:enabled}}

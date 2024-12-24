@@ -33,12 +33,9 @@ jobs:
       matrix:
         instance:
           - defaults
-          - release-5.4
           - master
-          - elasticsearch
           - multilineerr
           - forwardingonly
-          - legacy
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}
@@ -55,10 +52,8 @@ jobs:
         instance:
           - defaults
           - master
-          - elasticsearch
           - multilineerr
           - forwardingonly
-          - legacy
     defaults:
       run:
         working-directory: ${{ env.COMPONENT_NAME }}

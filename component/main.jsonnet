@@ -2,13 +2,10 @@ local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
 local operatorlib = import 'lib/openshift4-operators.libsonnet';
-local utils = import 'utils.libsonnet';
 
 local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
-
-local deployLokistack = params.components.lokistack.enabled;
-local deployElasticsearch = params.components.elasticsearch.enabled;
+local lokiEnabled = params.components.lokistack.enabled;
 
 // Namespace
 
@@ -16,6 +13,7 @@ local namespace = kube.Namespace(params.namespace) {
   metadata+: {
     annotations+: {
       'openshift.io/node-selector': '',
+      'argocd.argoproj.io/sync-wave': '-100',
     },
     labels+: {
       'openshift.io/cluster-monitoring': 'true',
@@ -27,12 +25,10 @@ local namespace = kube.Namespace(params.namespace) {
 
 local operatorGroup = operatorlib.OperatorGroup('cluster-logging') {
   metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-wave': '-90',
+    },
     namespace: params.namespace,
-  },
-  spec: {
-    [if !params.namespaceLogForwarderEnabled then 'targetNamespaces']: [
-      params.namespace,
-    ],
   },
 };
 
@@ -44,6 +40,11 @@ local logging = operatorlib.namespacedSubscription(
   params.channel,
   'redhat-operators'
 ) {
+  metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-wave': '-80',
+    },
+  },
   spec+: {
     config+: {
       resources: params.operatorResources.clusterLogging,
@@ -51,11 +52,16 @@ local logging = operatorlib.namespacedSubscription(
   },
 };
 
-local lokistack = if deployLokistack then operatorlib.managedSubscription(
+local lokistack = if lokiEnabled then operatorlib.managedSubscription(
   'openshift-operators-redhat',
   'loki-operator',
   params.channel
 ) {
+  metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-wave': '-80',
+    },
+  },
   spec+: {
     config+: {
       resources: params.operatorResources.lokistack,
@@ -63,17 +69,14 @@ local lokistack = if deployLokistack then operatorlib.managedSubscription(
   },
 };
 
-// With version 5.9 of the logging stack, elasticsearch is deprecated,
-// this will clamp elasticsearch-operator subscription to stable-5.8.
-local esChannel = if utils.isVersion59 then 'stable-5.8' else params.channel;
-local elasticsearch = if deployElasticsearch then operatorlib.managedSubscription(
+local observability = if lokiEnabled then operatorlib.managedSubscription(
   'openshift-operators-redhat',
-  'elasticsearch-operator',
-  esChannel
+  'cluster-observability-operator',
+  'development'
 ) {
-  spec+: {
-    config+: {
-      resources: params.operatorResources.elasticsearch,
+  metadata+: {
+    annotations+: {
+      'argocd.argoproj.io/sync-wave': '-80',
     },
   },
 };
@@ -81,7 +84,7 @@ local elasticsearch = if deployElasticsearch then operatorlib.managedSubscriptio
 local subscriptions = std.filter(function(it) it != null, [
   logging,
   lokistack,
-  elasticsearch,
+  observability,
 ]);
 
 local secrets = com.generateResources(params.secrets, kube.Secret);
@@ -93,9 +96,8 @@ local secrets = com.generateResources(params.secrets, kube.Secret);
   '20_subscriptions': subscriptions,
   [if std.length(params.secrets) > 0 then '99_secrets']: secrets,
 }
-+ (import 'config_logging.libsonnet')
-+ (import 'config_forwarding.libsonnet')
-+ (import 'loki.libsonnet')
-+ (import 'elasticsearch.libsonnet')
++ (import 'log_lokistack.libsonnet')
++ (import 'log_forwarder.libsonnet')
++ (import 'log_metricsexporter.libsonnet')
++ (import 'log_workaround.libsonnet')
 + (import 'alertrules.libsonnet')
-+ (import 'logmetrics.libsonnet')

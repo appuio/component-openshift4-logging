@@ -16,7 +16,6 @@ parameters:
         input_paths:
           - tests/console-patch.jsonnet
         output_path: console-patching/
-
   openshift4_operators:
     defaultInstallPlanApproval: Automatic
     defaultSource: openshift-operators-redhat
