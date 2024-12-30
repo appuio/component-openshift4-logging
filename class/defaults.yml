@@ -67,10 +67,10 @@ parameters:
     operatorResources:
       clusterLogging:
         requests:
-          memory: 128Mi
+          memory: 256Mi
           cpu: 10m
         limits:
-          memory: 256Mi
+          memory: 1Gi
       lokistack:
         requests:
           memory: 381Mi
