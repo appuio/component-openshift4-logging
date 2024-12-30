@@ -57,6 +57,10 @@ local clusterLogForwarderSpec = {
 // Unfold objects into array for ClusterLogForwarder resource.
 local unfoldSpecs(specs) = {
   // Unfold objects into array.
+  [if std.length(specs.filters) > 0 then 'filters']: [
+    { name: name } + specs.filters[name]
+    for name in std.objectFields(specs.filters)
+  ],
   [if std.length(specs.inputs) > 0 then 'inputs']: [
     { name: name } + specs.inputs[name]
     for name in std.objectFields(specs.inputs)
