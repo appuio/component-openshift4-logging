@@ -16,6 +16,10 @@ spec:
     tolerations:
       - key: storagenode
         operator: Exists
+  filters:
+    - name: my-filter
+      openshiftLabels:
+        cluster_id: c-green-test-1234
   inputs:
     - application:
         namespaces:
