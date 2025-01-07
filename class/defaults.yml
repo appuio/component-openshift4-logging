@@ -1,5 +1,8 @@
 parameters:
   openshift4_logging:
+    =_metadata:
+      multi_tenant: true
+
     =_openshift4_console:
       "True":
         config:
