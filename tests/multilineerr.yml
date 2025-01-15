@@ -23,8 +23,23 @@ parameters:
     defaultSourceNamespace: openshift-operators-redhat
 
   openshift4_logging:
+    components:
+      lokistack:
+        enabled: false
+
     clusterLogForwarder:
+      filters:
+        detectexception:
+          type: detectMultilineException
+        parse-json:
+          type: parse
+        labels:
+          type: openshiftLabels
+          openshiftLabels:
+            foo: bar
       pipelines:
         application-logs:
-          parse: json
-          detectMultilineErrors: true
+          filterRefs:
+            - detectexception
+            - labels
+            - parse-json

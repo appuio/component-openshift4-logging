@@ -161,7 +161,8 @@ local rbac = [
       namespace: params.namespace,
     } ],
   },
-  if lokiEnabled then kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-log-writer') {
+] + if lokiEnabled then [
+  kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-log-writer') {
     metadata+: {
       annotations+: {
         'argocd.argoproj.io/sync-wave': '-50',
@@ -179,7 +180,7 @@ local rbac = [
       namespace: params.namespace,
     } ],
   },
-];
+] else [];
 
 // Define outputs below
 if forwarderEnabled then
