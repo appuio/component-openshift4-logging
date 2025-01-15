@@ -30,6 +30,19 @@ spec:
   outputs:
     - name: custom-forwarder
       type: syslog
+    - lokiStack:
+        authentication:
+          token:
+            from: serviceAccount
+        target:
+          name: loki
+          namespace: openshift-logging
+      name: default-lokistack
+      tls:
+        ca:
+          configMapName: openshift-service-ca.crt
+          key: service-ca.crt
+      type: lokiStack
   pipelines:
     - name: application-logs
       outputRefs:
@@ -37,6 +50,12 @@ spec:
     - name: audit-logs
       outputRefs:
         - custom-forwarder
+    - inputRefs:
+        - application
+        - infrastructure
+      name: default-lokistack
+      outputRefs:
+        - default-lokistack
     - inputRefs:
         - my-apps
       name: my-apps

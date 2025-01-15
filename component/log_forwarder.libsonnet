@@ -28,8 +28,34 @@ local clusterLogForwarderSpec = {
   },
   filters: {},
   inputs: {},
-  outputs: {},
-  pipelines: {},
+  outputs: {
+    [if lokiEnabled then 'default-lokistack']: {
+      type: 'lokiStack',
+      lokiStack: {
+        target: {
+          name: 'loki',
+          namespace: params.namespace,
+        },
+        authentication: {
+          token: {
+            from: 'serviceAccount',
+          },
+        },
+      },
+      tls: {
+        ca: {
+          key: 'service-ca.crt',
+          configMapName: 'openshift-service-ca.crt',
+        },
+      },
+    },
+  },
+  pipelines: {
+    [if lokiEnabled then 'default-lokistack']: {
+      outputRefs: [ 'default-lokistack' ],
+      inputRefs: [ 'application', 'infrastructure' ],
+    },
+  },
 } + com.makeMergeable(params.clusterLogForwarder);
 
 // Unfold objects into array for ClusterLogForwarder resource.
@@ -128,6 +154,24 @@ local rbac = [
       apiGroup: 'rbac.authorization.k8s.io',
       kind: 'ClusterRole',
       name: 'collect-audit-logs',
+    },
+    subjects: [ {
+      kind: 'ServiceAccount',
+      name: 'logcollector',
+      namespace: params.namespace,
+    } ],
+  },
+  if lokiEnabled then kube._Object('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding', 'logcollector-log-writer') {
+    metadata+: {
+      annotations+: {
+        'argocd.argoproj.io/sync-wave': '-50',
+      },
+      namespace: params.namespace,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'ClusterRole',
+      name: 'logging-collector-logs-writer',
     },
     subjects: [ {
       kind: 'ServiceAccount',
