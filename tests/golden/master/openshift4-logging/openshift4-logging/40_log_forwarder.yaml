@@ -31,22 +31,12 @@ spec:
     - name: custom-forwarder
       type: syslog
   pipelines:
-    - inputRefs:
-        - application
-      name: application-logs
-      outputRefs:
-        - default
-        - custom-forwarder
-    - inputRefs:
-        - audit
-      name: audit-logs
+    - name: application-logs
       outputRefs:
         - custom-forwarder
-    - inputRefs:
-        - infrastructure
-      name: infrastructure-logs
+    - name: audit-logs
       outputRefs:
-        - default
+        - custom-forwarder
     - inputRefs:
         - my-apps
       name: my-apps

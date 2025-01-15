@@ -19,16 +19,7 @@ spec:
   managementState: Managed
   pipelines:
     - detectMultilineErrors: true
-      inputRefs:
-        - application
       name: application-logs
-      outputRefs:
-        - default
       parse: json
-    - inputRefs:
-        - infrastructure
-      name: infrastructure-logs
-      outputRefs:
-        - default
   serviceAccount:
     name: logcollector

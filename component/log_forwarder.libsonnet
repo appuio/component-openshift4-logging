@@ -7,19 +7,9 @@ local params = inv.parameters.openshift4_logging;
 local lokiEnabled = params.components.lokistack.enabled;
 local forwarderEnabled = lokiEnabled || std.length(params.clusterLogForwarder) > 0;
 
-// Make sure the default output is added to the pipelines `outputRefs`,
-// if the logging stack is not disabled.
-local pipelineOutputRefs(pipeline) =
-  local default = if lokiEnabled then [ 'default' ] else [];
-  std.get(pipeline, 'forwarders', []) + default;
-
 // clusterLogForwarderSpec:
 // Consecutively apply patches to result of previous apply.
 local clusterLogForwarderSpec = {
-  local appsPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'application-logs', {}),
-  local infraPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'infrastructure-logs', {}),
-  local auditPipeline = std.get(std.get(params.clusterLogForwarder, 'pipelines', {}), 'audit-logs', {}),
-
   managementState: 'Managed',
   collector: {
     resources: {
@@ -39,19 +29,7 @@ local clusterLogForwarderSpec = {
   filters: {},
   inputs: {},
   outputs: {},
-  pipelines: {
-    [if lokiEnabled || std.length(appsPipeline) > 0 then 'application-logs']: {
-      inputRefs: [ 'application' ],
-      outputRefs: pipelineOutputRefs(appsPipeline),
-    },
-    [if lokiEnabled || std.length(infraPipeline) > 0 then 'infrastructure-logs']: {
-      inputRefs: [ 'infrastructure' ],
-      outputRefs: pipelineOutputRefs(infraPipeline),
-    },
-    [if std.length(auditPipeline) > 0 then 'audit-logs']: {
-      inputRefs: [ 'audit' ],
-    },
-  },
+  pipelines: {},
 } + com.makeMergeable(params.clusterLogForwarder);
 
 // Unfold objects into array for ClusterLogForwarder resource.
