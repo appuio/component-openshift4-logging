@@ -17,16 +17,5 @@ spec:
       - key: storagenode
         operator: Exists
   managementState: Managed
-  pipelines:
-    - inputRefs:
-        - application
-      name: application-logs
-      outputRefs:
-        - default
-    - inputRefs:
-        - infrastructure
-      name: infrastructure-logs
-      outputRefs:
-        - default
   serviceAccount:
     name: logcollector
