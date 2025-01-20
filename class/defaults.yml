@@ -27,7 +27,7 @@ parameters:
           endpoint: ''
           bucketnames: '${cluster:name}-logstore'
         spec:
-          size: 1x.demo
+          size: 1x.pico
           storage:
             schemas:
               - version: v12
@@ -40,11 +40,6 @@ parameters:
           storageClassName: ''
           tenants:
             mode: openshift-logging
-          limits:
-            global:
-              ingestion:
-                ingestionBurstSize: 9
-                ingestionRate: 5
       logmetrics:
         enabled: false
         spec:

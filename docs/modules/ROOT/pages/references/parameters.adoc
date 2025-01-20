@@ -148,7 +148,7 @@ default::
 [source,yaml]
 ----
 spec:
-  size: 1x.extra-small
+  size: 1x.pico
   storage:
     schemas:
       - version: v13
@@ -159,14 +159,7 @@ spec:
   storageClassName: ''
   tenants:
     mode: openshift-logging
-  limits:
-    global:
-      ingestion:
-        ingestionBurstSize: 9 <1>
-        ingestionRate: 5 <2>
 ----
-<1> value in MiB (per push event)
-<2> value in MiB/s
 
 A dictionary holding the `.spec` for the LokiStack resource.
 

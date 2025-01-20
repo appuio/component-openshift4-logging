@@ -8,12 +8,7 @@ metadata:
     name: loki
   name: loki
 spec:
-  limits:
-    global:
-      ingestion:
-        ingestionBurstSize: 9
-        ingestionRate: 5
-  size: 1x.demo
+  size: 1x.pico
   storage:
     schemas:
       - effectiveDate: '2022-06-01'
@@ -28,34 +23,26 @@ spec:
     compactor:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 1
     distributor:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 2
     gateway:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 2
     indexGateway:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 2
     ingester:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 2
     querier:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 2
     queryFrontend:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 2
     ruler:
       nodeSelector:
         node-role.kubernetes.io/infra: ''
-      replicas: 1
   tenants:
     mode: openshift-logging

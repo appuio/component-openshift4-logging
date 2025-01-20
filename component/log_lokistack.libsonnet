@@ -8,8 +8,15 @@ local po = import 'lib/patch-operator.libsonnet';
 local inv = kap.inventory();
 local loki = inv.parameters.openshift4_logging.components.lokistack;
 
-
 local lokistack_spec = {
+  [if loki.spec.size == '1x.demo' then 'limits']: {
+    global: {
+      ingestion: {
+        ingestionBurstSize: 9,
+        ingestionRate: 5,
+      },
+    },
+  },
   template: {
     compactor: {
       [if loki.spec.size == '1x.demo' then 'replicas']: 1,
