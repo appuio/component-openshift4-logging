@@ -1,0 +1,43 @@
+= Enable Log Retention
+
+Loki uses S3 for storage, log retention is handled by S3 lifecycle policies.
+For S3 backends that do not support lifecycle policies, you can use Lokis compactor to configure log retention.
+
+== S3 Lifecycle Policies
+
+Get connection details for the `log-storage` bucket:
+
+[source,bash]
+----
+export CLUSTER_ID=<cluster-id>
+export AWS_ACCESS_KEY_ID=$(kubectl --as cluster-admin get secret -n openshift-logging loki-logstore -o jsonpath='{.data.access_key_id}' | base64 -d)
+export AWS_SECRET_ACCESS_KEY=$(kubectl --as cluster-admin get secret -n openshift-logging loki-logstore -o jsonpath='{.data.access_key_secret}' | base64 -d)
+export AWS_ENDPOINT=$(kubectl --as cluster-admin get secret -n openshift-logging loki-logstore -o jsonpath='{.data.endpoint}' | base64 -d)
+export AWS_BUCKET=$(kubectl --as cluster-admin get secret -n openshift-logging loki-logstore -o jsonpath='{.data.bucketnames}' | base64 -d)
+
+mc config host add $CLUSTER_ID $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+----
+
+Configure S3 lifecycle policies for the `log-storage` bucket:
+
+[source,bash]
+----
+mc ilm rule add --expire-days 30 $CLUSTER_ID/$AWS_BUCKET
+----
+
+== Lokis Compactor
+
+Set the retention period for the `log-storage` bucket:
+
+[source,yaml]
+----
+parameters:
+  openshift4_logging:
+    component:
+      lokistack:
+        spec:
+          limits:
+            global:
+              retention:
+                days: 30
+----
