@@ -29,7 +29,7 @@ local clusterLogForwarderSpec = {
   filters: {
     [if lokiEnabled then 'multiline-exception']: {
       type: 'detectMultilineException',
-    }
+    },
   },
   inputs: {},
   outputs: {
