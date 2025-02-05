@@ -26,7 +26,11 @@ local clusterLogForwarderSpec = {
   serviceAccount: {
     name: 'logcollector',
   },
-  filters: {},
+  filters: {
+    [if lokiEnabled then 'multiline-exception']: {
+      type: 'detectMultilineException',
+    }
+  },
   inputs: {},
   outputs: {
     [if lokiEnabled then 'default-lokistack']: {
@@ -52,6 +56,7 @@ local clusterLogForwarderSpec = {
   },
   pipelines: {
     [if lokiEnabled then 'default-lokistack']: {
+      filterRefs: [ 'multiline-exception' ],
       outputRefs: [ 'default-lokistack' ],
       inputRefs: [ 'application', 'infrastructure' ],
     },
