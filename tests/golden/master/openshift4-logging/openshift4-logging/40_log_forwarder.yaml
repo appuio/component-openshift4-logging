@@ -17,6 +17,8 @@ spec:
       - key: storagenode
         operator: Exists
   filters:
+    - name: multiline-exception
+      type: detectMultilineException
     - name: my-filter
       openshiftLabels:
         cluster_id: c-green-test-1234
@@ -50,7 +52,9 @@ spec:
     - name: audit-logs
       outputRefs:
         - custom-forwarder
-    - inputRefs:
+    - filterRefs:
+        - multiline-exception
+      inputRefs:
         - application
         - infrastructure
       name: default-lokistack

@@ -16,6 +16,9 @@ spec:
     tolerations:
       - key: storagenode
         operator: Exists
+  filters:
+    - name: multiline-exception
+      type: detectMultilineException
   managementState: Managed
   outputs:
     - lokiStack:
@@ -32,7 +35,9 @@ spec:
           key: service-ca.crt
       type: lokiStack
   pipelines:
-    - inputRefs:
+    - filterRefs:
+        - multiline-exception
+      inputRefs:
         - application
         - infrastructure
       name: default-lokistack

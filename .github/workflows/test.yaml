@@ -34,7 +34,6 @@ jobs:
         instance:
           - defaults
           - master
-          - multilineerr
           - forwardingonly
     defaults:
       run:
@@ -52,7 +51,6 @@ jobs:
         instance:
           - defaults
           - master
-          - multilineerr
           - forwardingonly
     defaults:
       run:
