@@ -127,6 +127,9 @@ local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
 // Console Log Plugin
 local console_plugin = kube._Object('observability.openshift.io/v1alpha1', 'UIPlugin', 'logging') {
   metadata: {
+    annotations: {
+      'argocd.argoproj.io/sync-options': 'SkipDryRunOnMissingResource=true',
+    },
     labels: {
       name: 'logging',
     },
