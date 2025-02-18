@@ -72,7 +72,7 @@ local lokistack = if lokiEnabled then operatorlib.managedSubscription(
 local observability = if lokiEnabled then operatorlib.managedSubscription(
   'openshift-operators-redhat',
   'cluster-observability-operator',
-  'development'
+  'stable'
 ) {
   metadata+: {
     annotations+: {
