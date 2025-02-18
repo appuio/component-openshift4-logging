@@ -54,7 +54,7 @@ metadata:
   name: cluster-observability-operator
   namespace: openshift-operators-redhat
 spec:
-  channel: development
+  channel: stable
   installPlanApproval: Automatic
   name: cluster-observability-operator
   source: openshift-operators-redhat
