@@ -80,7 +80,7 @@ parameters:
       kubectl:
         registry: quay.io
         repository: appuio/oc
-        tag: v4.16
+        tag: v4.17
 
     workaround:
       ingester_fix:
