@@ -18,6 +18,7 @@ parameters:
     components:
       lokistack:
         enabled: true
+        internalAppLogsEnabled: true
         clusterReaderLogAccess:
           - application
           - infrastructure

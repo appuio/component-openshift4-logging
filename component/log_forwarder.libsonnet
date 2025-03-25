@@ -6,7 +6,7 @@ local inv = kap.inventory();
 local params = inv.parameters.openshift4_logging;
 local lokiEnabled = params.components.lokistack.enabled;
 local forwarderEnabled = lokiEnabled || std.length(params.clusterLogForwarder) > 0;
-
+local internalAppLogsEnabled = lokiEnabled && params.components.lokistack.internalAppLogsEnabled;
 // clusterLogForwarderSpec:
 // Consecutively apply patches to result of previous apply.
 local clusterLogForwarderSpec = {
@@ -58,7 +58,9 @@ local clusterLogForwarderSpec = {
     [if lokiEnabled then 'default-lokistack']: {
       filterRefs: [ 'multiline-exception' ],
       outputRefs: [ 'default-lokistack' ],
-      inputRefs: [ 'application', 'infrastructure' ],
+      inputRefs: if internalAppLogsEnabled then
+        [ 'application', 'infrastructure' ]
+      else [ 'infrastructure' ],
     },
   },
 } + com.makeMergeable(params.clusterLogForwarder);

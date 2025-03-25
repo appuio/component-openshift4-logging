@@ -55,7 +55,6 @@ spec:
     - filterRefs:
         - multiline-exception
       inputRefs:
-        - application
         - infrastructure
       name: default-lokistack
       outputRefs:
