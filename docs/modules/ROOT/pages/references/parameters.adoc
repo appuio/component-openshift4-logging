@@ -100,6 +100,14 @@ default:: `true`
 
 Whether to deploy the LokiStack on the cluster.
 
+=== `components.lokistack.internalAppLogsEnabled`
+
+[horizontal]
+type:: boolean
+default:: `true`
+
+Whether to send application logs to the internal lokistack.
+
 
 === `components.lokistack.clusterReaderLogAccess`
 

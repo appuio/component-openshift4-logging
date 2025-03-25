@@ -25,6 +25,10 @@ parameters:
   openshift4_logging:
     channel: 'stable'
 
+    components:
+      lokistack:
+        internalAppLogsEnabled: false
+
     clusterLogForwarder:
       filters:
         my-filter:
