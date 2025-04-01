@@ -55,6 +55,13 @@ metadata:
   namespace: openshift-operators-redhat
 spec:
   channel: stable
+  config:
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        cpu: 5m
+        memory: 50m
   installPlanApproval: Automatic
   name: cluster-observability-operator
   source: openshift-operators-redhat

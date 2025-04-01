@@ -79,6 +79,11 @@ local observability = if lokiEnabled then operatorlib.managedSubscription(
       'argocd.argoproj.io/sync-wave': '-80',
     },
   },
+  spec+: {
+    config+: {
+      resources: params.operatorResources.observability,
+    },
+  },
 };
 
 local subscriptions = std.filter(function(it) it != null, [
