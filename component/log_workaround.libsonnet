@@ -150,9 +150,9 @@ local ingester_stuck = [
 // Define outputs below
 if lokiEnabled then
   {
-    '50_fix_missing_metrics_token': missing_metrics_token,
-    '50_fix_ingester_stuck': ingester_stuck,
-    '50_fix_app_logs_reader': app_logs_reader,
+    [if params.workaround.missing_metrics_token.enabled then '50_fix_missing_metrics_token']: missing_metrics_token,
+    [if params.workaround.app_logs_reader.enabled then '50_fix_ingester_stuck']: ingester_stuck,
+    [if params.workaround.ingester_fix.enabled then '50_fix_app_logs_reader']: app_logs_reader,
   }
 else
   std.trace(

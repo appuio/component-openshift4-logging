@@ -91,7 +91,12 @@ parameters:
         tag: v4.17
 
     workaround:
+      missing_metrics_token:
+        enabled: true
+      app_logs_reader:
+        enabled: true
       ingester_fix:
+        enabled: true
         schedule: '*/10 * * * *'
         sleep_time: 2m
 
