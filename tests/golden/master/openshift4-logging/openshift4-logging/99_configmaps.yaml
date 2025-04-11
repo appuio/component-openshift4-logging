@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE-----
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: my-configmap
+  name: my-configmap

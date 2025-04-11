@@ -93,6 +93,7 @@ local subscriptions = std.filter(function(it) it != null, [
 ]);
 
 local secrets = com.generateResources(params.secrets, kube.Secret);
+local configMaps = com.generateResources(params.configMaps, kube.ConfigMap);
 
 // Define outputs below
 {
@@ -100,6 +101,7 @@ local secrets = com.generateResources(params.secrets, kube.Secret);
   '10_operator_group': operatorGroup,
   '20_subscriptions': subscriptions,
   [if std.length(params.secrets) > 0 then '99_secrets']: secrets,
+  [if std.length(params.configMaps) > 0 then '99_configmaps']: configMaps,
 }
 + (import 'log_lokistack.libsonnet')
 + (import 'log_forwarder.libsonnet')

@@ -57,6 +57,7 @@ parameters:
     clusterLogForwarder: {}
 
     secrets: {}
+    configMaps: {}
 
     alerts:
       release: 'release-${openshift4_logging:version}'

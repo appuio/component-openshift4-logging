@@ -64,3 +64,10 @@ parameters:
       my-secret:
         stringData:
           secret-key: '?{vaultkv:${cluster:tenant}/${cluster:name}/secret-value}'
+    configMaps:
+      my-configmap:
+        data:
+          ca.crt: |
+            -----BEGIN CERTIFICATE-----
+            ...
+            -----END CERTIFICATE-----
