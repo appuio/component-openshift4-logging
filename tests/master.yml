@@ -71,3 +71,7 @@ parameters:
             -----BEGIN CERTIFICATE-----
             ...
             -----END CERTIFICATE-----
+
+    workaround:
+      missing_metrics_token:
+        enabled: false
