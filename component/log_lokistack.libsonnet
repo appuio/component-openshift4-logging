@@ -2,7 +2,6 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
-local po = import 'lib/patch-operator.libsonnet';
 
 // The hiera parameters for the component
 local inv = kap.inventory();
