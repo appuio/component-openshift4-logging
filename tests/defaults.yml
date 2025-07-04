@@ -1,4 +1,5 @@
 applications:
+  - espejote
   - openshift4-operators as openshift-operators-redhat
   - openshift4-monitoring
 
@@ -6,16 +7,26 @@ parameters:
   kapitan:
     dependencies:
       - type: https
+        source: https://raw.githubusercontent.com/projectsyn/component-espejote/master/lib/espejote.libsonnet
+        output_path: vendor/lib/espejote.libsonnet
+      - type: https
         source: https://raw.githubusercontent.com/appuio/component-openshift4-operators/v1.0.2/lib/openshift4-operators.libsonnet
         output_path: vendor/lib/openshift4-operators.libsonnet
       - type: https
-        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/v2.9.0/lib/openshift4-monitoring-alert-patching.libsonnet
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/master/lib/openshift4-monitoring-alert-patching.libsonnet
         output_path: vendor/lib/alert-patching.libsonnet
+      - type: https
+        source: https://raw.githubusercontent.com/appuio/component-openshift4-monitoring/master/lib/openshift4-monitoring-operator-rules.libsonnet
+        output_path: vendor/lib/operator-rules.libsonnet
     compile:
       - input_type: jsonnet
         input_paths:
           - tests/console-patch.jsonnet
         output_path: console-patching/
+
+  espejote:
+    namespace: syn-espejote
+
   openshift4_operators:
     defaultInstallPlanApproval: Automatic
     defaultSource: openshift-operators-redhat
