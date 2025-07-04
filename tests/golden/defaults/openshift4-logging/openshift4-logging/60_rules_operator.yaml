@@ -1,0 +1,152 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openshift4-monitoring-rules
+  namespace: openshift-logging
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openshift4-monitoring-rules
+  namespace: openshift-logging
+rules:
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - prometheusrules
+    verbs:
+      - '*'
+  - apiGroups:
+      - espejote.io
+    resourceNames:
+      - openshift4-monitoring-rules
+    resources:
+      - jsonnetlibraries
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openshift4-monitoring-rules
+  namespace: openshift-logging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshift4-monitoring-rules
+subjects:
+  - kind: ServiceAccount
+    name: openshift4-monitoring-rules
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openshift4-monitoring-rules-openshift-logging
+  namespace: syn-espejote
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshift4-monitoring-rules
+subjects:
+  - kind: ServiceAccount
+    name: openshift4-monitoring-rules
+    namespace: openshift-logging
+---
+apiVersion: espejote.io/v1alpha1
+kind: ManagedResource
+metadata:
+  labels:
+    app.kubernetes.io/name: openshift4-monitoring-rules
+  name: openshift4-monitoring-rules
+  namespace: openshift-logging
+spec:
+  context:
+    - name: op_rules
+      resource:
+        apiVersion: monitoring.coreos.com/v1
+        kind: PrometheusRule
+        labelSelector:
+          matchExpressions:
+            - key: espejote.io/created-by
+              operator: DoesNotExist
+            - key: espejote.io/ignore
+              operator: DoesNotExist
+  serviceAccountRef:
+    name: openshift4-monitoring-rules
+  template: |
+    local esp = import 'espejote.libsonnet';
+
+    local renderer = import 'lib/openshift4-monitoring-rules/renderer_v1.libsonnet';
+    local configGlobal = import 'lib/openshift4-monitoring-rules/config_v1.json';
+    local configComponent = import 'openshift4-monitoring-rules/config.json';
+
+    local opRules = esp.context().op_rules;
+    local inDelete(obj) = std.get(obj.metadata, 'deletionTimestamp', '') != '';
+
+    if std.member([ 'op_rules', 'generated_rules' ], esp.triggerName()) then (
+      // if the trigger is 'op_rules' or 'generated_rules', render single op_rule
+      local trigger = esp.triggerData();
+      local or = if esp.triggerName() == 'op_rules' then
+        trigger.resource
+      else
+        local cand = std.filter(function(r) r.metadata.name == trigger.resource.metadata.ownerReferences[0].name, opRules);
+        if std.length(cand) > 0 then cand[0];
+
+      if or != null && !inDelete(or) then [
+        renderer.process(or, configGlobal, configComponent)
+      ]
+    )
+    else [
+      // if the trigger is not 'op_rules' or 'generated_rules', render all op_rules
+      renderer.process(or, configGlobal, configComponent),
+      for or in opRules
+      if !inDelete(or)
+    ]
+  triggers:
+    - name: op_rules
+      watchContextResource:
+        name: op_rules
+    - name: generated_rules
+      watchResource:
+        apiVersion: monitoring.coreos.com/v1
+        kind: PrometheusRule
+        labelSelector:
+          matchExpressions:
+            - key: espejote.io/created-by
+              operator: In
+              values:
+                - openshift4-monitoring-rules
+    - name: jslib_global
+      watchResource:
+        apiVersion: espejote.io/v1alpha1
+        kind: JsonnetLibrary
+        name: openshift4-monitoring-rules
+        namespace: syn-espejote
+    - name: jslib_component
+      watchResource:
+        apiVersion: espejote.io/v1alpha1
+        kind: JsonnetLibrary
+        name: openshift4-monitoring-rules
+        namespace: openshift-logging
+---
+apiVersion: espejote.io/v1alpha1
+kind: JsonnetLibrary
+metadata:
+  labels:
+    app.kubernetes.io/name: openshift4-monitoring-rules
+  name: openshift4-monitoring-rules
+  namespace: openshift-logging
+spec:
+  data:
+    config.json: |-
+      {
+          "ignoreNames": [
+
+          ],
+          "patchRules": {
+
+          },
+          "teamLabel": null
+      }

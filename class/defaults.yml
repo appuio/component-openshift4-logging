@@ -60,7 +60,6 @@ parameters:
     configMaps: {}
 
     alerts:
-      release: 'release-${openshift4_logging:version}'
       ignore: []
       patch: {}
 

@@ -107,4 +107,4 @@ local configMaps = com.generateResources(params.configMaps, kube.ConfigMap);
 + (import 'log_forwarder.libsonnet')
 + (import 'log_metricsexporter.libsonnet')
 + (import 'log_workaround.libsonnet')
-+ (import 'alertrules.libsonnet')
++ (import 'rules-operator.libsonnet')

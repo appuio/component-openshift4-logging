@@ -10,6 +10,7 @@
 /helmcharts
 /manifests
 /vendor
+/jsonnetfile.json
 /jsonnetfile.lock.json
 /crds
 /compiled
