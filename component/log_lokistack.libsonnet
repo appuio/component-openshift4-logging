@@ -107,7 +107,7 @@ local netpol_lokigateway = kube.NetworkPolicy('allow-console-logging-lokistack-g
 };
 
 // Aggregate permission to view all logs to `cluster-reader` role
-local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
+local aggregate_loki_cluster_reader = kube.ClusterRole('syn:loki:cluster-reader') {
   metadata+: {
     labels+: {
       'rbac.authorization.k8s.io/aggregate-to-cluster-reader': 'true',
@@ -117,6 +117,25 @@ local aggregate_loki_log_access = kube.ClusterRole('syn:loki:cluster-reader') {
     {
       apiGroups: [ 'loki.grafana.com' ],
       resources: com.renderArray(loki.clusterReaderLogAccess),
+      resourceNames: [ 'logs' ],
+      verbs: [ 'get' ],
+    },
+  ],
+};
+
+// Aggregate permission to view logs to "namespace" role
+local aggregate_loki_app_logs = kube.ClusterRole('syn:loki:application-logs') {
+  metadata+: {
+    labels+: {
+      'rbac.authorization.k8s.io/aggregate-to-admin': 'true',
+      'rbac.authorization.k8s.io/aggregate-to-edit': 'true',
+      'rbac.authorization.k8s.io/aggregate-to-view': 'true',
+    },
+  },
+  rules: [
+    {
+      apiGroups: [ 'loki.grafana.com' ],
+      resources: [ 'application' ],
       resourceNames: [ 'logs' ],
       verbs: [ 'get' ],
     },
@@ -152,7 +171,7 @@ if loki.enabled then
     '30_loki_stack': lokistack,
     '30_loki_logstore': logstore,
     '30_loki_netpol': [ netpol_viewplugin, netpol_lokigateway ],
-    '30_loki_rbac': [ aggregate_loki_log_access ],
+    '30_loki_rbac': [ aggregate_loki_cluster_reader, aggregate_loki_app_logs ],
     '30_loki_plugin': console_plugin,
   }
 else
