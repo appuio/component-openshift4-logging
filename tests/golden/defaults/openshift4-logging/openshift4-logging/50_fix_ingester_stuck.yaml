@@ -130,7 +130,7 @@ spec:
               env:
                 - name: SLEEP_TIME
                   value: 2m
-              image: quay.io/appuio/oc:v4.18
+              image: quay.io/appuio/oc:v4.19
               imagePullPolicy: IfNotPresent
               name: check-pod
               ports: []

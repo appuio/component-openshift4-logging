@@ -94,16 +94,20 @@ spec:
         local cand = std.filter(function(r) r.metadata.name == trigger.resource.metadata.ownerReferences[0].name, opRules);
         if std.length(cand) > 0 then cand[0];
 
-      if or != null && !inDelete(or) then [
-        renderer.process(or, configGlobal, configComponent)
+      if or != null && !inDelete(or) then
+        local proc = renderer.process(or, configGlobal, configComponent);
+        if proc != null then
+          proc
+    )
+    else std.filter(
+      function(r) r != null,
+      [
+        // if the trigger is not 'op_rules' or 'generated_rules', render all op_rules
+        renderer.process(or, configGlobal, configComponent),
+        for or in opRules
+        if !inDelete(or)
       ]
     )
-    else [
-      // if the trigger is not 'op_rules' or 'generated_rules', render all op_rules
-      renderer.process(or, configGlobal, configComponent),
-      for or in opRules
-      if !inDelete(or)
-    ]
   triggers:
     - name: op_rules
       watchContextResource:
