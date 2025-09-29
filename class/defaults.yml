@@ -12,7 +12,7 @@ parameters:
 
     namespace: openshift-logging
 
-    version: '6.1'
+    version: '6.2'
     channel: 'stable-${openshift4_logging:version}'
 
     components:
