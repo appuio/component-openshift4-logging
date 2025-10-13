@@ -6,6 +6,7 @@ local kube = import 'lib/kube.libjsonnet';
 // The hiera parameters for the component
 local inv = kap.inventory();
 local loki = inv.parameters.openshift4_logging.components.lokistack;
+local consolePlugin = inv.parameters.openshift4_logging.components.consolePlugin;
 
 local lokistack_spec = {
   [if loki.spec.size == '1x.demo' then 'limits']: {
@@ -159,8 +160,8 @@ local console_plugin = kube._Object('observability.openshift.io/v1alpha1', 'UIPl
       lokiStack: {
         name: 'loki',
       },
-      logsLimit: 50,
-      timeout: '30s',
+      logsLimit: consolePlugin.logsLimit,
+      timeout: consolePlugin.timeout,
     },
   },
 };

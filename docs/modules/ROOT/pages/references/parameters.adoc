@@ -229,6 +229,20 @@ spec:
 
 Exporter to collect metrics about container logs being produced in a kubernetes environment It publishes `log_logged_bytes_total` metric in prometheus.
 
+== `components.consolePlugin`
+
+[horizontal]
+type:: dictionary
+default::
++
+[source,yaml]
+----
+logsLimit: 50
+timeout: '30s'
+----
+
+Configure `timeout` and `logsLimit` of the logging UIPlugin.
+See `kubectl explain uiplugins.spec.logging` for details.
 
 == `clusterLogForwarder`
 
