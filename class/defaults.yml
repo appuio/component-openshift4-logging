@@ -53,6 +53,9 @@ parameters:
             requests:
               cpu: 200m
               memory: 128Mi
+      consolePlugin:
+        logsLimit: 50
+        timeout: '30s'
 
     clusterLogForwarder: {}
 
