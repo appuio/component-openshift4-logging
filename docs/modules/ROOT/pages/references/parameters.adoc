@@ -18,7 +18,7 @@ The namespace in which to install the operator.
 
 [horizontal]
 type:: string
-default:: `5.8`
+default:: `6.4`
 
 The logging stack version to deploy.
 This parameter is used in the default values for parameters `channel` and `alerts`.
