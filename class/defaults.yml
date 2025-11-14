@@ -94,11 +94,11 @@ parameters:
 
     workaround:
       missing_metrics_token:
-        enabled: true
+        enabled: false
       app_logs_reader:
-        enabled: true
+        enabled: false
       ingester_fix:
-        enabled: true
+        enabled: false
         schedule: '*/10 * * * *'
         sleep_time: 2m
 
