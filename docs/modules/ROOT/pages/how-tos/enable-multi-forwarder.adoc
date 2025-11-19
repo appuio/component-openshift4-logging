@@ -10,9 +10,9 @@ You can complete the following procedure to redeploy the Operator without deleti
 Disable ArgoCD sync of component-openshift4-logging:
 [source,bash]
 ----
-kubectl --as=cluster-admin -n syn patch apps root --type=json \
+kubectl --as=system:admin -n syn patch apps root --type=json \
   -p '[{"op":"replace", "path":"/spec/syncPolicy", "value": {}}]'
-kubectl --as=cluster-admin -n syn patch apps openshift4-logging --type=json \
+kubectl --as=system:admin -n syn patch apps openshift4-logging --type=json \
   -p '[{"op":"replace", "path":"/spec/syncPolicy", "value": {}}]'
 ----
 
@@ -22,21 +22,21 @@ kubectl --as=cluster-admin -n syn patch apps openshift4-logging --type=json \
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin -n openshift-logging delete sub cluster-logging
+kubectl --as=system:admin -n openshift-logging delete sub cluster-logging
 ----
 
 1. Remove OperatorGroup:
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin -n openshift-logging delete og cluster-logging
+kubectl --as=system:admin -n openshift-logging delete og cluster-logging
 ----
 
 1. Remove ClusterServiceVersion:
 +
 [source,bash]
 ----
-kubectl --as=cluster-admin -n openshift-logging delete csv -l operators.coreos.com/cluster-logging.openshift-logging=
+kubectl --as=system:admin -n openshift-logging delete csv -l operators.coreos.com/cluster-logging.openshift-logging=
 ----
 
 == Enable namespaced LogForwarding
@@ -60,7 +60,7 @@ NOTE: Make sure ArgoCD is refreshed before enabling the sync again.
 Enable ArgoCD sync of component-openshift4-logging:
 [source,bash]
 ----
-kubectl --as=cluster-admin -n syn patch apps root --type=json \
+kubectl --as=system:admin -n syn patch apps root --type=json \
   -p '[{
     "op":"replace",
     "path":"/spec/syncPolicy",
