@@ -92,6 +92,8 @@ The parameter `alerts.patch` allows users to customize upstream alerts.
 Configuration of the lokistack component.
 See subsections for supported keys.
 
+NOTE: The component will drop keys with `null` and empty values.
+
 === `components.lokistack.enabled`
 
 [horizontal]
