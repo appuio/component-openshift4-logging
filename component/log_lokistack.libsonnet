@@ -5,7 +5,7 @@ local kube = import 'lib/kube.libjsonnet';
 
 // The hiera parameters for the component
 local inv = kap.inventory();
-local loki = inv.parameters.openshift4_logging.components.lokistack;
+local loki = std.prune(inv.parameters.openshift4_logging.components.lokistack);
 local consolePlugin = inv.parameters.openshift4_logging.components.consolePlugin;
 
 local lokistack_spec = {
