@@ -37,6 +37,9 @@ parameters:
     components:
       lokistack:
         internalAppLogsEnabled: false
+        spec:
+          storage:
+            tls: null
 
     clusterLogForwarder:
       filters:
