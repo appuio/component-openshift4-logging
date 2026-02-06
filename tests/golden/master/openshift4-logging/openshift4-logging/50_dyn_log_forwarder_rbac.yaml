@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-dyn-log-forwarder
+  name: espejote-dyn-log-forwarder
+  namespace: syn-espejote
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-managedresource-dyn-log-forwarder
+  name: espejote-managedresource-dyn-log-forwarder
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-managedresource-dyn-log-forwarder
+  name: espejote-managedresource-dyn-log-forwarder
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: espejote-managedresource-dyn-log-forwarder
+subjects:
+  - kind: ServiceAccount
+    name: espejote-dyn-log-forwarder
+    namespace: syn-espejote
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-managedresource-dyn-log-forwarder
+  name: espejote-managedresource-dyn-log-forwarder
+  namespace: syn-espejote
+rules:
+  - apiGroups:
+      - espejote.io
+    resourceNames:
+      - espejote-dyn-log-forwarder
+    resources:
+      - jsonnetlibraries
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-managedresource-dyn-log-forwarder
+  name: espejote-managedresource-dyn-log-forwarder
+  namespace: syn-espejote
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: espejote-managedresource-dyn-log-forwarder
+subjects:
+  - kind: ServiceAccount
+    name: espejote-dyn-log-forwarder
+    namespace: syn-espejote
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-managedresource-dyn-log-forwarder
+  name: espejote-managedresource-dyn-log-forwarder
+  namespace: openshift-logging
+rules:
+  - apiGroups:
+      - observability.openshift.io
+    resourceNames:
+      - instance
+    resources:
+      - clusterlogforwarders
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - create
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: openshift4-logging
+    app.kubernetes.io/name: espejote-managedresource-dyn-log-forwarder
+  name: espejote-managedresource-dyn-log-forwarder
+  namespace: openshift-logging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: espejote-managedresource-dyn-log-forwarder
+subjects:
+  - kind: ServiceAccount
+    name: espejote-dyn-log-forwarder
+    namespace: syn-espejote
