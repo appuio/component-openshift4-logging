@@ -1,0 +1,22 @@
+apiVersion: espejote.io/v1alpha1
+kind: JsonnetLibrary
+metadata:
+  labels:
+    app.kubernetes.io/name: espejote-dyn-log-forwarder
+  name: espejote-dyn-log-forwarder
+  namespace: syn-espejote
+spec:
+  data:
+    config.json: |-
+      {
+          "ignoreNamespacePrefixes": [
+              "appuio",
+              "kube",
+              "openshift",
+              "syn"
+          ],
+          "ignoreNamespaces": [
+
+          ],
+          "inputLabelPrefix": "input.openshift4-logging.syn.tools/"
+      }

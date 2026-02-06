@@ -1,4 +1,5 @@
 applications:
+  - espejote
   - openshift4-operators as openshift-operators-redhat
   - openshift4-monitoring
 
@@ -72,6 +73,9 @@ parameters:
           outputRefs:
             - custom-forwarder
         null-pipeline: null
+
+    dynamicLogForwarder:
+      enabled: true
 
     alerts:
       release: 'master'

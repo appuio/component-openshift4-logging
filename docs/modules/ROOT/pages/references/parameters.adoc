@@ -257,6 +257,80 @@ A dictionary holding the `.spec` for cluster log forwarding.
 See the https://docs.openshift.com/container-platform/latest/observability/logging/logging-6.1/log6x-clf-6.1.html[OpenShift docs] for available parameters.
 
 
+== `dynamicLogForwarder`
+
+Allows dynamic creation of ClusterLogForwarder inputs.
+
+This allows to dynamically add namespaces to the  `inputs.<NAME>.application.includes` field of a ClusterLogForwarder by using labels on namespaces.
+
+[INFO]
+====
+By labeling one or more namespaces with `input.openshift4-logging.syn.tools/my-org-apps`:
+[source,bash]
+----
+kubectl label ns my-org-int input.openshift4-logging.syn.tools/my-org-apps=
+kubectl label ns my-org-prod input.openshift4-logging.syn.tools/my-org-apps=
+----
+Then the following configuration will be added to the ClusterLogForwarder resource:
+[source,yaml]
+----
+spec:
+  inputs:
+    - application:
+        includes:
+          - namespace: my-org-int
+          - namespace: my-org-prod
+      name: test
+      type: my-org-apps
+----
+====
+
+[WARNING]
+====
+The pipeline and potential output must still be configured manually!
+====
+
+=== `dynamicLogForwarder.enabled`
+
+[horizontal]
+type:: boolean
+default:: `false`
+
+Enable ManagedResource that handles dynamic creation of ClusterLogForwarder inputs.
+
+=== `dynamicLogForwarder.ignoreNamespaces`
+
+[horizontal]
+type:: list
+default:: []
+
+Ignore namespaces by name.
+
+=== `dynamicLogForwarder.ignoreNamespacePrefixes`
+
+[horizontal]
+type:: list
+default::
++
+[source,yaml]
+----
+- kube
+- openshift
+- appuio
+- syn
+----
+
+Ignore namespaces by prefix.
+
+=== `dynamicLogForwarder.inputLabelPrefix`
+
+[horizontal]
+type:: string
+default:: `input.openshift4-logging.syn.tools/`
+
+Label prefix used on namespace for dynamic input creation.
+
+
 == `secrets`
 
 [horizontal]

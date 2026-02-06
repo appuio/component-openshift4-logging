@@ -58,6 +58,15 @@ parameters:
         timeout: '30s'
 
     clusterLogForwarder: {}
+    dynamicLogForwarder:
+      enabled: false
+      ignoreNamespaces: []
+      ignoreNamespacePrefixes:
+        - kube
+        - openshift
+        - appuio
+        - syn
+      inputLabelPrefix: input.openshift4-logging.syn.tools/
 
     secrets: {}
     configMaps: {}

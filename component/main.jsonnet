@@ -105,6 +105,7 @@ local configMaps = com.generateResources(params.configMaps, kube.ConfigMap);
 }
 + (import 'log_lokistack.libsonnet')
 + (import 'log_forwarder.libsonnet')
++ (import 'dyn_log_forwarder.libsonnet')
 + (import 'log_metricsexporter.libsonnet')
 + (import 'log_workaround.libsonnet')
 + (import 'rules-operator.libsonnet')
