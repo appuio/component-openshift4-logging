@@ -57,6 +57,8 @@ subjects:
 apiVersion: espejote.io/v1alpha1
 kind: ManagedResource
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     app.kubernetes.io/name: openshift4-monitoring-rules
   name: openshift4-monitoring-rules
@@ -138,6 +140,8 @@ spec:
 apiVersion: espejote.io/v1alpha1
 kind: JsonnetLibrary
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     app.kubernetes.io/name: openshift4-monitoring-rules
   name: openshift4-monitoring-rules
