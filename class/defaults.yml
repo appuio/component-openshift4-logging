@@ -99,7 +99,7 @@ parameters:
       kubectl:
         registry: quay.io
         repository: appuio/oc
-        tag: v4.20
+        tag: v4.21
 
     workaround:
       missing_metrics_token:
