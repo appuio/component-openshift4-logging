@@ -61,7 +61,7 @@ spec:
         memory: 512Mi
       requests:
         cpu: 5m
-        memory: 50m
+        memory: 50Mi
   installPlanApproval: Automatic
   name: cluster-observability-operator
   source: openshift-operators-redhat
