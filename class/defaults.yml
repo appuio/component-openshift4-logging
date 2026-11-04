@@ -90,7 +90,7 @@ parameters:
           memory: 512Mi
       observability:
         requests:
-          memory: 50m
+          memory: 50Mi
           cpu: 5m
         limits:
           memory: 512Mi
