@@ -1,0 +1,5 @@
+= Upgrade from v5.x to v6.x
+
+Component release v6.0.0 removes the `v12` storage schema from the default Loki stack definition.
+
+Before you apply this change, you must follow the instructions in the https://github.com/openshift/loki/blob/release-6.5/operator/docs/lokistack/sop.md#lokistack-schema-upgrades-required["Lokistack Schema Upgrades Required" runbook] to ensure that all the logs in your instances use the `v13` storage schema.

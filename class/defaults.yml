@@ -31,8 +31,6 @@ parameters:
           size: 1x.pico
           storage:
             schemas:
-              - version: v12
-                effectiveDate: '2022-06-01'
               - version: v13
                 effectiveDate: '2024-09-01'
             secret:
